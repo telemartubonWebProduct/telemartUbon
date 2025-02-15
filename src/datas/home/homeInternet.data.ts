@@ -36,7 +36,7 @@ export const items = [
         icon: "/assets/HomeInternet/oldcustomer/ico-iqiyi.webp",
       },
       {
-        //2
+        //23
         icon: "/assets/HomeInternet/oldcustomer/ico-viu.webp",
       },
     ],
