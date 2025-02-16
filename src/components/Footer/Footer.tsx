@@ -57,6 +57,11 @@ const Footer = () => {
                   Help Center
                 </Link>
               </li>
+              <li>
+                <Link href="/termsAndPrivacy" color="inherit" className="hover:text-gray-400">
+                  Terms and Privacy
+                </Link>
+              </li>
              
             </ul>
           </Grid>
