@@ -60,10 +60,11 @@ export default function Home() {
            
             <Grid item xs={12} md={12} lg={12}>
               <Banner />
+             
             </Grid>
 
           </Grid>
-
+           
 
         </Box>
       </MainLayout>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import CallIcon from '@mui/icons-material/Call';
+import { motion } from 'framer-motion';
 export default function Productnservice() {
   return (
     <Box 
@@ -66,7 +67,7 @@ export default function Productnservice() {
 
       {/* Right Section - Image */}
       <Box>
-        <img
+        <motion.img
           src="/assets/solar/wwenergy_product-scaled.webp"
           alt="Solar Rooftop System"
           style={{ 
