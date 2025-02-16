@@ -46,12 +46,12 @@ export default function Navbar() {
       >
         <div className="w-full bg-white py-2">
           <div className="mx-auto flex max-w-7xl items-center justify-start px-4">
-            <Link href="/login" className="px-4 text-lg text-black hover:text-red-600">
+            <Link href="#" className="px-4 text-lg text-black hover:text-red-600">
               บริษัทของเรา
             </Link>
             <span className="text-black">|</span>
-            <Link href="/register" className="px-4 text-lg text-black hover:text-red-600">
-              ค้นหาทรูช้อป
+            <Link href="/termsAndPrivacy" className="px-4 text-lg text-black hover:text-red-600">
+            termsAndPrivacy
             </Link>
           </div>
         </div>

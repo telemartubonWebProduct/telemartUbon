@@ -1,3 +1,6 @@
+"use client";
+
+
 import { FacebookProvider, CustomChat } from 'react-facebook';
 
 export default function FacebookChat() {
