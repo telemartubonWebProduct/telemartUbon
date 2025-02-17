@@ -321,7 +321,7 @@ const TermsAndPrivacy: React.FC = () => {
           </List>
 
           <Typography
-            color="textSecondary"
+            color="primary"
             fontFamily={"Prompt"}
             variant="h5"
             className="font-semibold mb-4"
@@ -340,7 +340,7 @@ const TermsAndPrivacy: React.FC = () => {
           </Typography>
 
           <Typography
-            color="textSecondary"
+            color="primary"
             fontFamily={"Prompt"}
             variant="h5"
             className="font-semibold mb-4"
