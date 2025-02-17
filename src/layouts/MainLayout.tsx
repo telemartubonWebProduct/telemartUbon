@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import { Box } from "@mui/material";
 import ScrollToTop from "@/components/ScrollToTop/ScrollToTop";
-import FacebookChat from "@/components/chatCustomer/FacebookChat";
+import BasicSpeedDial from "@/components/SpeedDial/BasicSpeedDial";
 
 export default function MainLayout({
   children,
@@ -14,8 +14,8 @@ export default function MainLayout({
       <Navbar />
       <main>{children}</main>
 
-      {/* <BasicSpeedDial /> */}
-      <FacebookChat />
+      <BasicSpeedDial />
+     
 
       <ScrollToTop />
       <Footer />
