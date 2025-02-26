@@ -30,15 +30,12 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta
-          name="facebook-domain-verification"
-          content="gc1jioc5u2verukl9jv0mubu89pugh"
-        />
+       
         <link rel="icon" href="/src/app/logo.ico" />
         
       </head>
       <body>
-        {children} <div id="fb-root"></div>
+        {children} 
         
       </body>
     </html>
