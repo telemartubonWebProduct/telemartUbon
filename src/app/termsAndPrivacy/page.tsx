@@ -257,7 +257,7 @@ const TermsAndPrivacy: React.FC = () => {
             className="font-semibold mb-4"
             color="primary"
           >
-            9. การเชื่อมต่อกับ Meta Messenger API
+            9. การเชื่อมต่อกับ Tawk Live Chat
           </Typography>
           <Typography
             color="textSecondary"
@@ -265,21 +265,20 @@ const TermsAndPrivacy: React.FC = () => {
             variant="body1"
             className="mb-4"
           >
-            เว็บไซต์ของเราอาจใช้ปลั๊กอินหรือ API ของ Meta Messenger
-            เพื่อให้ท่านสามารถสื่อสาร และติดต่อสอบถามได้สะดวกยิ่งขึ้น
-            เมื่อท่านคลิกหรือใช้ฟีเจอร์ดังกล่าว ข้อมูลบางส่วนอาจถูกส่งไปยัง Meta
-            (Facebook) เช่น ข้อความหรือรหัสผู้ใช้
-            โดยเป็นไปตามเงื่อนไขการใช้บริการและนโยบายความเป็นส่วนตัวของ Meta
-            โปรดตรวจสอบข้อมูลเพิ่มเติมได้ที่{" "}
+            เว็บไซต์ของเราอาจใช้ปลั๊กอินหรือ API ของ Tawk Live Chat
+            เพื่อให้ท่านสามารถสื่อสารและติดต่อสอบถามได้สะดวกยิ่งขึ้น
+            เมื่อท่านใช้ฟีเจอร์ดังกล่าว ข้อมูลบางส่วนอาจถูกส่งไปยัง Tawk.to เช่น
+            ข้อความหรือรหัสผู้ใช้ โดยเป็นไปตามเงื่อนไขการใช้บริการ
+            และนโยบายความเป็นส่วนตัวของ Tawk.to โปรดตรวจสอบข้อมูลเพิ่มเติมได้ที่{" "}
             <a
-              href="https://www.facebook.com/privacy/explanation"
+              href="https://www.tawk.to/privacy-policy/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 underline"
             >
-              Facebook Privacy Policy
+              Tawk.to Privacy Policy
             </a>
-            . หากท่านไม่ต้องการให้มีการประมวลผลข้อมูลผ่าน Meta Messenger
+            . หากท่านไม่ต้องการให้มีการประมวลผลข้อมูลผ่าน Tawk Live Chat
             กรุณาไม่ใช้บริการหรือปลั๊กอินดังกล่าว
           </Typography>
 
