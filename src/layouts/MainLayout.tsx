@@ -3,6 +3,7 @@ import Footer from "@/components/Footer/Footer";
 import { Box } from "@mui/material";
 import ScrollToTop from "@/components/ScrollToTop/ScrollToTop";
 import BasicSpeedDial from "@/components/SpeedDial/BasicSpeedDial";
+import TawkScript from "@/app/TawkScript";
 
 
 export default function MainLayout({
@@ -15,8 +16,9 @@ export default function MainLayout({
       <Navbar />
       <main>{children}</main>
 
-      <BasicSpeedDial />
+      {/* <BasicSpeedDial /> */}
 
+      <TawkScript />
       <ScrollToTop />
       <Footer />
      
