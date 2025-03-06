@@ -12,6 +12,8 @@ import PackageOffers from "@/components/home/PackageOffers/PackageOffers";
 import HomeInternet from "@/components/home/HomeInternet/HomeInternet";
 import Banner from "@/components/home/ฺBanner/Banner";
 import WifiHome from "@/components/home/WifiHome/WifiHome";
+import Announce from "@/components/home/announce/Announce";
+
 
 
 
@@ -32,6 +34,12 @@ export default function Home() {
                 <Introducing />
               </Box>
             </Grid>
+
+            <Grid item xs={12} md={12} lg={12}  className="bg-gray-100 mb-8">
+                <Box id="category" className="w-full mx-auto">
+                  <Announce />
+                </Box>
+              </Grid>
       
         
               <Grid item xs={12} md={12} lg={12}>

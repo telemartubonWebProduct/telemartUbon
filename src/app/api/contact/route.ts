@@ -12,7 +12,6 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -22,18 +21,17 @@ export async function POST(req: Request) {
       },
     });
 
-
-     await transporter.sendMail({
+    await transporter.sendMail({
       from: `"Telemart Contact Form" <${process.env.EMAIL_USER}>`,
       to: "nodemailertelemart@gmail.com",
       subject: `ติดต่อจาก คุณ ${firstName} `,
       text: `
-ชื่อ: ${firstName} ${lastName}
-อีเมล: ${email}
-เบอร์โทรศัพท์: ${phone}
+      ชื่อ: ${firstName} ${lastName}
+      อีเมล: ${email}
+      เบอร์โทรศัพท์: ${phone}
 
-ข้อความ:
-${message}
+      ข้อความ:
+      ${message}
       `,
     });
 
@@ -42,7 +40,6 @@ ${message}
       { status: 200 }
     );
   } catch (error) {
-  
     return NextResponse.json(
       { message: "Failed to send email", error },
       { status: 500 }
