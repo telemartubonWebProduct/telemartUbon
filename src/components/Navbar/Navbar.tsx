@@ -58,6 +58,11 @@ export default function Navbar() {
             <Link href="https://www.telemartmanagement.com/" className="px-4 text-lg text-black hover:text-red-600">
               เข้าสู่ระบบ
             </Link>
+
+
+
+
+            
           </div>
         </div>
       </motion.div>
