@@ -44,7 +44,7 @@ export default function Navbar() {
         }}
         transition={{ duration: 0.3 }}
       >
-        <div className="w-full bg-white py-2">
+        <div className="w-full bg-white py-2 flex justify-between">
           <div className="mx-auto flex max-w-7xl items-center justify-start px-4">
             <Link href="#" className="px-4 text-lg text-black hover:text-red-600">
               บริษัทของเรา
@@ -52,6 +52,11 @@ export default function Navbar() {
             <span className="text-black">|</span>
             <Link href="/termsAndPrivacy" className="px-4 text-lg text-black hover:text-red-600">
             termsAndPrivacy
+            </Link>
+          </div>
+          <div className="mx-auto flex max-w-7xl items-center justify-end px-4">
+            <Link href="https://www.telemartmanagement.com/" className="px-4 text-lg text-black hover:text-red-600">
+              เข้าสู่ระบบ
             </Link>
           </div>
         </div>
