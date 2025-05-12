@@ -77,6 +77,8 @@ export default function Navbar() {
 </motion.div>
 
 
+
+
       <nav className="relative w-full bg-white text-black">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-10">
           <Link href="/">
