@@ -36,10 +36,4 @@ export const mockData: NavItem[] = [
     ],
     //ttt
   },
-  {
-    title: "จัดการ",
-    subItems: [
-      { name: "เข้าสู่ระบบ", link: "https://www.telemartmanagement.com/" },
-    ],
-  },
 ];

@@ -37,35 +37,45 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow">
-      <motion.div
-        className="hidden overflow-hidden md:block"
-        animate={{
-          height: hidden ? 0 : "auto",
-        }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="w-full bg-white py-2 flex justify-between">
-          <div className="mx-auto flex max-w-7xl items-center justify-start px-4">
-            <Link href="#" className="px-4 text-lg text-black hover:text-red-600">
-              บริษัทของเรา
-            </Link>
-            <span className="text-black">|</span>
-            <Link href="/termsAndPrivacy" className="px-4 text-lg text-black hover:text-red-600">
-            termsAndPrivacy
-            </Link>
-          </div>
-          <div className="mx-auto flex max-w-7xl items-center justify-end px-4">
-            <Link href="https://www.telemartmanagement.com/" className="px-4 text-lg text-black hover:text-red-600">
-              เข้าสู่ระบบ
-            </Link>
+  <motion.div
+  className="overflow-hidden block"
+  animate={{ height: hidden ? 0 : "auto" }}
+  transition={{ duration: 0.3 }}
+>
+  <div className="w-full bg-white">
+    <div className="container mx-auto flex flex-wrap items-center justify-between py-2 px-4 sm:px-6 lg:px-8">
+      
+      {/* ซ้าย: ใช้ space-x ปรับระยะห่าง */}
+      <div className="flex flex-wrap items-center space-x-2">
+        <Link
+          href="#"
+          className="text-sm sm:text-base md:text-lg font-medium text-black hover:text-red-600"
+        >
+          บริษัทของเรา
+        </Link>
+        <span className="text-sm sm:text-base text-black">|</span>
+        <Link
+          href="/termsAndPrivacy"
+          className="text-sm sm:text-base md:text-lg font-medium text-black hover:text-red-600"
+        >
+          termsAndPrivacy
+        </Link>
+      </div>
 
+      {/* ขวา: เลื่อนลงมาเล็กน้อยบนมือถือ */}
+      <div className="mt-2 sm:mt-0">
+        <Link
+          href="https://www.telemartmanagement.com/"
+          className="text-sm sm:text-base md:text-lg font-medium text-black hover:text-red-600"
+        >
+          เข้าสู่ระบบ
+        </Link>
+      </div>
 
+    </div>
+  </div>
+</motion.div>
 
-
-            
-          </div>
-        </div>
-      </motion.div>
 
       <nav className="relative w-full bg-white text-black">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-10">
