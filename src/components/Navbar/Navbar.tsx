@@ -67,6 +67,7 @@ export default function Navbar() {
         <Link
           href="https://www.telemartmanagement.com/"
           className="text-sm sm:text-base md:text-lg font-medium text-black hover:text-red-600"
+          target="_blank"
         >
           เข้าสู่ระบบ
         </Link>
