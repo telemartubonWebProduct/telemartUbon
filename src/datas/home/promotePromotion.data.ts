@@ -9,7 +9,7 @@ interface PromotePromotoinData {
     imageSrc: string | StaticImageData; // Allow both
     alt: string;
     title: string;
-    description: string; //asdsad
+    description: string; //asdsadasdsd
 
 
   }
