@@ -14,9 +14,6 @@ export default function MainLayout({
     <Box>
       <Navbar />
       <main>{children}</main>
-
-      {/* <BasicSpeedDial /> */}
-
       <TawkScript />
       <ScrollToTop />
       <Footer />
