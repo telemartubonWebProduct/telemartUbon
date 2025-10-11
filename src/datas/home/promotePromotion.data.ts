@@ -9,7 +9,9 @@ interface PromotePromotoinData {
     imageSrc: string | StaticImageData; // Allow both
     alt: string;
     title: string;
-    description: string;
+    description: string; //asdsad
+
+
   }
   
  export const slides: PromotePromotoinData[] = [
