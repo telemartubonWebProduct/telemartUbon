@@ -2,6 +2,7 @@
 import "./globals.css";
 import { Prompt } from "next/font/google";
 import type { Metadata } from "next";
+import Script from "next/script";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -34,6 +35,13 @@ export default function RootLayout({
         <link rel="icon" href="/src/app/logo.ico" />
       </head>
       <body>
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=AW-18007307609" strategy="afterInteractive" />
+        <Script id="gtag-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'AW-18007307609');
+        `}} />
         {children}
        
       </body>
