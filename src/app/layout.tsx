@@ -33,15 +33,27 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         <link rel="icon" href="/src/app/logo.ico" />
+
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18007307609"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              window.gtag = gtag;
+              gtag('js', new Date());
+              gtag('config', 'AW-18007307609');
+            `,
+          }}
+        />
       </head>
       <body>
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=AW-18007307609" strategy="afterInteractive" />
-        <Script id="gtag-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'AW-18007307609');
-        `}} />
         {children}
        
       </body>

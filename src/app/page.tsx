@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import Carousel from "@/components/home/Carousel/Carousel";
 import HeaderBar from "@/components/home/HeaderBar/HeaderBar";
 import Introducing from "@/components/home/Introducing/Introducing";
@@ -19,6 +21,16 @@ import Announce from "@/components/home/announce/Announce";
 
 
 export default function Home() {
+  useEffect(() => {
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "conversion", {
+        send_to: "AW-18007307609/51JQCLqnuIYcENnqxopD",
+        value: 1.0,
+        currency: "THB",
+      });
+    }
+  }, []);
+
   return (
     <>
       <MainLayout>
