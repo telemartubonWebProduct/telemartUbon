@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# Retrieved third-party reference retained locally; handoff uses the original brief.
+/docs/renovation/references/rocket-pricing-free-source.md
 
 # vercel
 .vercel
