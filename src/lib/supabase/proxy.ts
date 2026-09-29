@@ -57,5 +57,9 @@ export async function updateSession(request: NextRequest) {
   }
   // Back-office responses are per user and must never be cached by a CDN.
   result.headers.set("Cache-Control", "private, no-store");
+  // No framing by other sites (clickjacking); same-origin framing stays
+  // available for the Mirror Editor preview.
+  result.headers.set("Content-Security-Policy", "frame-ancestors 'self'");
+  result.headers.set("X-Frame-Options", "SAMEORIGIN");
   return result;
 }

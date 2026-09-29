@@ -73,9 +73,12 @@ test("signed-out visitors are sent to sign in", async ({ page }) => {
   await expect(page).toHaveURL(/\/admin\/login\?next=%2Fadmin%2Fupdate-password$/);
 });
 
-test("back-office pages are private: not cached, not indexed", async ({ page }) => {
+test("back-office pages are private: not cached, not indexed, not framed", async ({ page }) => {
   const response = await page.goto("/admin/login");
-  expect(response?.headers()["cache-control"]).toContain("no-store");
+  const headers = response?.headers() ?? {};
+  expect(headers["cache-control"]).toContain("no-store");
+  expect(headers["content-security-policy"]).toContain("frame-ancestors 'self'");
+  expect(headers["x-frame-options"]).toBe("SAMEORIGIN");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
 });
 
