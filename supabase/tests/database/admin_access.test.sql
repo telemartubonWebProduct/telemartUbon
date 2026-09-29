@@ -38,13 +38,18 @@ select ok(
   (select relrowsecurity from pg_class where oid = 'public.audit_log'::regclass),
   'RLS is enabled on audit_log'
 );
+-- Counts are scoped to the fixtures so earlier local data cannot affect them.
 select is(
-  (select count(*) from public.audit_log where action = 'admin_membership.granted'),
+  (select count(*) from public.audit_log
+   where action = 'admin_membership.granted'
+     and target_id::uuid in ('11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333', '44444444-4444-4444-8444-444444444444')),
   3::bigint,
   'each granted membership is audited'
 );
 select is(
-  (select count(*) from public.audit_log where action = 'admin_membership.deactivated'),
+  (select count(*) from public.audit_log
+   where action = 'admin_membership.deactivated'
+     and target_id = '22222222-2222-4222-8222-222222222222'),
   1::bigint,
   'deactivation is audited'
 );
@@ -152,9 +157,9 @@ set local request.jwt.claims to '{"sub":"11111111-1111-4111-8111-111111111111","
 
 select is(private.is_active_admin(), true, 'active Admin is recognised');
 select is(
-  (select count(*) from public.admin_memberships),
+  (select count(*) from public.admin_memberships where user_id in ('11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333', '44444444-4444-4444-8444-444444444444')),
   3::bigint,
-  'active Admin sees every membership'
+  'active Admin sees other members, not only their own row'
 );
 select isnt_empty($$ select * from public.audit_log $$, 'active Admin reads the audit log');
 select lives_ok(
