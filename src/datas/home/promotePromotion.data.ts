@@ -1,6 +1,6 @@
-import L1 from "/src/assets/promoteProduct/L1.webp";
-import L2 from "/src/assets/promoteProduct/L2.webp";
-import L3 from "/src/assets/promoteProduct/L3.webp";
+import L1 from "@/assets/promoteProduct/L1.webp";
+import L2 from "@/assets/promoteProduct/L2.webp";
+import L3 from "@/assets/promoteProduct/L3.webp";
 
 import { StaticImageData } from "next/image";
 
