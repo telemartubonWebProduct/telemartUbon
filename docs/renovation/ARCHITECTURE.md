@@ -2,6 +2,8 @@
 
 สถานะ: **เลือก A+B+C แล้ว เตรียม architecture/dependencies สำหรับ dev handoff** ติดตั้ง Supabase JS, Supabase SSR, Zod และ GA Data client แบบ exact versions ใน package manifest/lockfile รวมถึง skills เตรียมงาน 4 รายการ เว็บยังใช้ implementation เดิม ยังไม่ได้สร้าง CMS ใหม่ เชื่อม application กับ Supabase เปลี่ยน schema หรือ deploy
 
+อัปเดต M1 (2026-09-29): สร้างแล้ว — Next 16.3.7/React 19.3.0, design tokens, route group `(public)` + หลังบ้าน `/admin`, Supabase SSR Auth แบบ Admin role เดียว, migration `admin_memberships`/`audit_log` พร้อม RLS และ CI ทดสอบกับ Supabase local stack; migration ยังไม่ได้ apply ที่ dev project และยังไม่ deploy ดู [M1-FOUNDATION.md](M1-FOUNDATION.md)
+
 Supabase target: **ผู้ใช้สร้าง resource แล้ว และตรวจ metadata/query ผ่าน MCP สำเร็จ** ใช้ project `wdcbbjvxrcxuaabcipqo` ใน organization `telemart-ubon` ตามรายละเอียด section 6 พร้อมสำหรับ dev handoff; application Auth/CMS/schema ยังไม่ได้ทำ และยังไม่ใช่ระบบ live
 
 ตรวจเอกสารและเวอร์ชัน: **2026-09-29 (Asia/Bangkok)**
@@ -47,7 +49,7 @@ flowchart LR
 
 ใช้ Next.js App Router หนึ่งแอป แบ่ง public, admin, preview และ integration อย่างชัดเจน มี server boundary สำหรับการ publish, lead intake และรายงานที่ใช้ credential
 
-โครงไฟล์ต่อไปนี้เป็น **โครงเสนอหลังอนุมัติ** ไม่ใช่ไฟล์ที่สร้างแล้ว:
+โครงไฟล์ต่อไปนี้เป็น **โครงเสนอหลังอนุมัติ** M1 สร้างแล้วเฉพาะ `src/app/(public)/` (ย้ายหน้าเดิม), `src/app/admin/` (เข้าสู่ระบบ/ไม่มีสิทธิ์/console), `src/lib/supabase/`, `src/lib/auth/`, `supabase/migrations/` และ `tests/`; ส่วนอื่นยังเป็นข้อเสนอ:
 
 | ส่วน | ตำแหน่งเสนอ | ความรับผิดชอบ |
 | --- | --- | --- |
@@ -165,7 +167,7 @@ Media แยก private draft bucket กับ public published bucket ที่
 | Postgres | `17.6` |
 | Schema baseline | `public_tables = 0`; read-only SQL query ผ่าน |
 
-ตรวจ `get_project`, explicit `get_organization` และ read SQL สำเร็จแล้ว แม้ `list_organizations` ยังแสดงเฉพาะ organization เก่า การ listing ไม่ครบไม่ลบล้างผล explicit lookup และไม่ต้อง reconnect เพื่อเริ่ม dev ต่อ ใช้ target นี้แทน proposed organization name/region ก่อนหน้า ยังไม่มี application tables/migrations/Auth wiring/CMS ที่สร้างในรอบนี้ Credentials ต้องส่งผ่าน environment secrets ไม่ใส่เอกสารหรือ repo การแยก local/dev/preview data และ backup/restore ยังคงเป็น implementation/release gates; เปลี่ยนแพลนหรือเพิ่ม resource ที่มีค่าใช้จ่ายต้องตรวจ quote เมื่อถึงงานนั้น
+ตรวจ `get_project`, explicit `get_organization` และ read SQL สำเร็จแล้ว แม้ `list_organizations` ยังแสดงเฉพาะ organization เก่า การ listing ไม่ครบไม่ลบล้างผล explicit lookup และไม่ต้อง reconnect เพื่อเริ่ม dev ต่อ ใช้ target นี้แทน proposed organization name/region ก่อนหน้า ยังไม่มี application tables/migrations/Auth wiring/CMS ที่สร้างในรอบนี้ (อัปเดต M1: migration `supabase/migrations/20260929185408_admin_access_foundation.sql` และ Auth wiring สร้างแล้ว ทดสอบบน local stack; apply ที่ project นี้ด้วย `npm run db:push:dev` ซึ่งตรวจ ref และ organization ก่อน ยังไม่ได้ apply) Credentials ต้องส่งผ่าน environment secrets ไม่ใส่เอกสารหรือ repo การแยก local/dev/preview data และ backup/restore ยังคงเป็น implementation/release gates; เปลี่ยนแพลนหรือเพิ่ม resource ที่มีค่าใช้จ่ายต้องตรวจ quote เมื่อถึงงานนั้น
 
 ตรวจ changelog index แล้ว พบ breaking changes ด้าน Postgres minor upgrades, Management API logs และ extension pinning ที่ต้องทบทวนหากนำมาใช้กับ target ที่ยืนยัน ตอนนี้ตรวจเพียง metadata/public-table baseline ยังไม่ได้ทำ full extension/schema/security audit [Supabase changelog](https://supabase.com/changelog), [Postgres upgrade notice](https://supabase.com/changelog/postgres-15-19-17-11-breaking-changes)
 
@@ -231,19 +233,19 @@ GA4 ไม่ใช่ visitor census และไม่รับประกั
 
 | Package/runtime | สถานะปัจจุบันใน manifest/local runtime | npm stable `latest`/official ที่ตรวจ 2026-09-29 | ข้อเสนอ |
 | --- | --- | --- | --- |
-| Next.js | `15.1.11` | `16.3.7` | เป้าหมาย upgrade หลัง audit/migration checks |
-| React / React DOM | `^19.0.0` | `19.3.0` ทั้งคู่ | ให้เท่ากันและตรวจ ecosystem |
-| `eslint-config-next` | `15.1.4` | `16.3.7` | ให้ตรง Next version |
+| Next.js | `16.3.7` (M1 อัปเกรดจาก `15.1.11`) | `16.3.7` | ใช้แล้ว; lint ผ่าน ESLint CLI, build ด้วย Turbopack |
+| React / React DOM | `19.3.0` ทั้งคู่ (M1) | `19.3.0` ทั้งคู่ | ใช้แล้ว |
+| `eslint-config-next` | `16.3.7` (M1) + ESLint `9.39.5` | `16.3.7` | ตรง Next แล้ว; ESLint 10 ติด peer ของ plugins |
 | Node.js | local `24.18.0`, npm `11.16.0`; Vercel project runtime ยังไม่ได้ตั้ง/ตรวจ | `24.21.0` Latest LTS บน Node release page | ตั้ง Vercel major `24.x`; platform จัดการ patch อัตโนมัติ |
 | `@supabase/supabase-js` | ติดตั้ง exact `2.117.2` แล้ว | `2.117.2` | เตรียม Auth/database/storage client; integration ยังไม่ได้ทำ |
 | `@supabase/ssr` | ติดตั้ง exact `0.12.7` แล้ว | `0.12.7` | เตรียม cookie SSR integration; auth wiring ยังไม่ได้ทำ |
 | `zod` | ติดตั้ง exact `4.6.5` แล้ว | `4.6.5` | เตรียม validate content/requests/event contract |
 | `@google-analytics/data` | `7.2.1` ติดตั้งเตรียมแล้ว | `7.2.1` | server report client; ยังไม่เชื่อม property/credentials |
 | `motion` | `framer-motion ^11.17.0` อยู่เดิม | `13.4.6` | เลือกหนึ่ง animation stack สำหรับ A+B+C |
-| Tailwind CSS | `^3.4.1` | `4.3.3` | เลือก CSS stack ก่อนทำ v4 migration |
-| TypeScript | `^5` | `7.0.2` | ประเมิน supported toolchain/build ก่อน upgrade major |
-| Playwright | ยังไม่มี | `1.63.0` | acceptance สำหรับ CMS/auth/lead flows |
-| Vitest | ยังไม่มี | `5.0.2` | targeted schema/service tests เมื่อจำเป็น |
+| Tailwind CSS | `3.4.19` (v3 LTS, M1) | `4.3.3` | tokens เป็น CSS variables; ตัดสิน v4 ใน M2 |
+| TypeScript | `5.9.3` (M1) | `7.0.2` | ประเมิน supported toolchain/build ก่อน upgrade major |
+| Playwright | `1.63.0` ติดตั้งแล้ว (M1) | `1.63.0` | smoke URL เดิม + Auth flows |
+| Vitest | `5.0.2` ติดตั้งแล้ว (M1) | `5.0.2` | unit tests ของ auth/validation/tokens |
 
 Registry references: [Next package](https://registry.npmjs.org/next), [React package](https://registry.npmjs.org/react), [React DOM](https://registry.npmjs.org/react-dom), [Supabase JS](https://registry.npmjs.org/@supabase%2fsupabase-js), [Supabase SSR](https://registry.npmjs.org/@supabase%2fssr), [Zod](https://registry.npmjs.org/zod), [GA Data client](https://registry.npmjs.org/@google-analytics%2fdata), [Motion](https://registry.npmjs.org/motion), [Tailwind CSS](https://registry.npmjs.org/tailwindcss), [TypeScript](https://registry.npmjs.org/typescript), [Playwright](https://registry.npmjs.org/@playwright%2ftest), [Vitest](https://registry.npmjs.org/vitest)
 
@@ -256,6 +258,8 @@ UI dependencies เลือกให้รองรับ A+B+C: เสนอ T
 ผล validation หลังติดตั้งเตรียมงาน: `npm run build` ผ่านบน **Next.js 15.1.11** และสร้าง 15 static pages; `npx tsc --noEmit` ผ่านหลัง Next generate declarations แล้ว การตรวจ TypeScript ก่อน build เคยพบ TS2307 10 รายการจาก declaration ที่ยังไม่ถูก generate ซึ่งหายไปหลัง build ผลนี้ยืนยัน build/typecheck ของเว็บเดิมพร้อม dependencies ที่ติดตั้ง ไม่ได้ยืนยัน Supabase Auth, Mirror CMS หรือ Next 16 runtime
 
 `npm audit` รอบเตรียมงานยังรายงาน vulnerabilities 19 รายการ รวม Next/Swiper ระดับ critical และ Nodemailer ระดับ high การอัปเกรดและทดสอบแพ็กเกจเหล่านี้อยู่ใน implementation milestone หลังสรุป interview ที่ยังเปิด; ไม่ถือว่าการเตรียม dependencies รอบนี้แก้ security baseline ของเว็บเสร็จแล้ว
+
+อัปเดต M1: อัปเกรด Next 16.3.7, Swiper 14.3.0, Nodemailer 10.0.12 และ transitive dependencies ในช่วง semver ที่อนุญาต ทำให้ `npm audit` เหลือ 0 รายการ; build/typecheck ของ Next 16 ผ่านโดยไม่ต้องพึ่ง build ก่อน (`npm run typecheck` ใช้ `next typegen`)
 
 ## 11. Vercel hosting, preview และโดเมนเดิม
 

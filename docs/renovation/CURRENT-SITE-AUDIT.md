@@ -49,6 +49,13 @@ Existing product prices/claims are source data, not verified current offers. Pac
 5. **UI/content architecture:** most pages are client components, and content is distributed across `src/datas`, JSX literals and images. Prices, legal conditions, links, headings and contact settings have no single source of truth or revision history. Home repeats `id="category"` (`src/app/page.tsx:55,63`), making section targeting ambiguous.
 6. **Dependency migration:** multiple overlapping UI/carousel layers increase the upgrade surface. Next and its ESLint config versions should be aligned; the `next lint` script must be replaced if migrating to a Next release that removes it. Select the supported current releases using primary documentation and peer-dependency checks at implementation time; this audit does not claim latest versions or vulnerability status.
 
+### M1 update (2026-09-29)
+
+- Fixed: item 2 (the two case-mismatched icons), the invalid `/src/app/logo.ico` link from item 4, and item 6's Next/ESLint alignment (Next 16.3.7 with the ESLint CLI).
+- Found and fixed while adding Linux smoke tests: React hydration error #418 on `/`, `/broadband`, `/broadband-old` and `/wEnergy` in production (MUI `Typography` `<p>` nested in `<p>`), and MUI/Emotion styles emitted inline in `<body>`. Both reproduced on the pre-M1 build first.
+- The page files moved to `src/app/(public)/…`; URLs are unchanged and covered by `tests/e2e/public-routes.spec.ts`.
+- Still open for M2/M5: the root description text, the conversion event fired on every home visit, contact validation (item 3) and the `/SoonContent` decision.
+
 ## Asset inventory and media rules
 
 - `public` contains 157 files, totaling 16,715,613 bytes (about 16.7 MB): 101 WebP, 36 PNG, 13 SVG, 5 JPG, 1 TSX source file and 1 executable.

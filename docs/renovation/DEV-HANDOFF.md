@@ -2,6 +2,8 @@
 
 สถานะ 2026-09-30: เตรียม repo, dependency, แผน, Node 24 และ Claude Cloud setup บน remote branch [`codex/telemart-dev-handoff`](https://github.com/telemartubonWebProduct/telemartUbon/tree/codex/telemart-dev-handoff) เพื่อเริ่มพัฒนา **ยังไม่ได้รีโนเวทหน้าเว็บ/หลังบ้าน เชื่อม Auth/GA4/Higgsfield/Vercel หรือ deploy** ให้แยกหลักฐานแต่ละขั้นตาม `PLAN.md`
 
+อัปเดต 2026-09-29: **M1 Foundation ทำแล้วบน branch `claude/vigilant-hypatia-czj87e`** (Next 16.3.7/React 19.3.0, tokens, shell, Auth Admin role เดียว + RLS/migration, CI) ทดสอบกับ Supabase local stack; ยังไม่ได้ apply migration ที่ dev project และยังไม่ deploy ดู [M1-FOUNDATION.md](M1-FOUNDATION.md) ก่อนเริ่ม M2
+
 ## ข้อสรุปที่ต้องรักษา
 
 | เรื่อง | ข้อสรุป |
@@ -43,6 +45,10 @@ NEXT_PUBLIC_SUPABASE_URL=https://wdcbbjvxrcxuaabcipqo.supabase.co
 ## ข้อความเริ่มงานที่คัดลอกไป Claude Cloud ได้
 
 > ทำ M1 Foundation ของ Telemart Ubon ใน branch นี้โดยอ่าน `CLAUDE.md` และ `docs/renovation/DEV-HANDOFF.md`, `PLAN.md`, `DECISIONS.md`, `ARCHITECTURE.md`, `CURRENT-SITE-AUDIT.md` ก่อน. เป้าหมายคือเตรียม runtime Next/React ที่เข้ากัน, design tokens/shell, Supabase Auth แบบ Admin role เดียวพร้อม RLS/migrations, CI และตรวจ lint/build/typecheck. ใช้เฉพาะ Supabase project `wdcbbjvxrcxuaabcipqo` ที่ผู้ใช้สร้างเป็น dev target; ก่อน SQL ตรวจ ref/organization และสร้าง migration versioned เพื่อรีวิว. รักษา URL เก่า/ข้อมูลจริง และแยกงาน frontend/CMS/leads/GA4/Higgsfield/Vercel ตาม milestones. รายงานสิ่งที่ทดสอบจริง, สิ่งที่ต้องใช้สิทธิ/ค่าจากเจ้าของ, และยังไม่ deploy หรือเปลี่ยน DNS. อย่าสร้าง project Supabase ใหม่ ไม่ลง secret ใน repo และอย่าอ้างว่า M2–M6 เสร็จเมื่อ M1 ผ่าน.
+
+## ข้อความเริ่ม M2 ที่คัดลอกได้
+
+> ทำ M2 Public + Content Model ของ Telemart Ubon ต่อจาก M1 โดยอ่าน `CLAUDE.md`, `docs/renovation/M1-FOUNDATION.md`, `PLAN.md`, `ARCHITECTURE.md`, `FREE-DESIGN-BRIEF.md`, `3D-MEDIA-PLAN.md` และ `CURRENT-SITE-AUDIT.md` ก่อน. ใช้ design tokens ใน `src/styles/tokens.css` และ route group `(public)`; รักษา URL เดิมทั้งหมด (smoke test ใน `tests/e2e/public-routes.spec.ts`). ราคา/โปร/เงื่อนไขใช้ข้อมูลที่ธุรกิจยืนยันเท่านั้น. ก่อนแตะ Supabase ให้ตรวจว่า migration ของ M1 ถูก apply ที่ `wdcbbjvxrcxuaabcipqo` แล้ว และใช้ `npm run db:push:dev` เท่านั้น. รายงานสิ่งที่ทดสอบจริง ไม่ deploy หรือเปลี่ยน DNS.
 
 ## เกณฑ์เริ่มพัฒนาจาก cloud
 

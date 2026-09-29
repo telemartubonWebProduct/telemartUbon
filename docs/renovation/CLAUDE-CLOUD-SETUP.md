@@ -50,6 +50,16 @@ Claude Cloud ใช้ Ubuntu 24.04 x86_64 และรายการ base tool
 
 `nvm` เป็น shell function ที่ต้อง source และ Bash non-interactive ไม่โหลด profile ปกติ ตาม [nvm documentation](https://github.com/nvm-sh/nvm#installing-in-docker) จึงติดตั้ง Node แบบระบุตำแหน่งคงที่ใน `/opt/telemart-cloud` และให้ `.claude/settings.json` เรียก `scripts/cloud/session-start.sh` เพื่อเขียน PATH ลง `CLAUDE_ENV_FILE` ในทุก startup/resume แทนการหวังว่า `export PATH` จาก setup shell จะคงอยู่ ตรวจ `node --version` และ `command -v node` ใน **shell ใหม่ของ cloud session** อีกครั้ง
 
+## สิ่งที่ตรวจพบจริงระหว่าง M1 (2026-09-29)
+
+- Session ที่เริ่มจาก commit ก่อนมี `.claude/settings.json` จะไม่รัน SessionStart hook: Node 24 มีอยู่ที่ `/opt/telemart-cloud` (setup script ทำงานแล้ว) แต่ต้อง `export PATH=/opt/telemart-cloud/node-v24.18.0-linux-x64/bin:$PATH` และ `npm ci` เอง; session ที่เริ่มบน branch ที่มี hook แล้วไม่ต้องทำ
+- `npm ci` จาก registry บางครั้งถูกตัดกลางทาง (`ECONNRESET`); รันซ้ำพร้อม `--fetch-retries=5 --maxsockets=6` ผ่าน
+- Docker daemon ไม่ได้รันเอง และ network policy ตอบ 429 จาก Docker Hub, บล็อก blob ของ `public.ecr.aws`/`ghcr.io` แต่ดึงผ่าน `mirror.gcr.io` ได้ — รัน `bash scripts/cloud/supabase-images.sh` (เปิด dockerd + ดึง image ของ Supabase CLI ผ่าน mirror) ก่อน `npm run db:start`
+- `api.supabase.com` ถูกปฏิเสธ (403) จึง apply migration ไป dev project จาก session นี้ไม่ได้ ให้เจ้าของรัน `npm run db:push:dev` จากเครื่องที่มีสิทธิ์ ไม่ใส่ access token หรือรหัสฐานข้อมูลใน environment variables ที่ทุกคนเห็น
+- `wdcbbjvxrcxuaabcipqo.supabase.co` เข้าถึงได้จาก VM (ตอบ 401 เมื่อไม่มี apikey) เมื่อต้องการทดสอบหลังบ้านกับ dev project ให้เพิ่ม `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (key สาธารณะ) ในช่อง Environment variables
+- Playwright ใช้ Chromium ที่ติดตั้งไว้: `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/opt/pw-browsers/chromium` (ไม่ต้อง `playwright install`)
+- `git push` ต้องให้ Claude GitHub App มีสิทธิ์เขียน repository; รอบนี้ fetch ได้แต่ push ได้ 403
+
 ## สิ่งที่ส่งไปกับ repository
 
 - ส่งไฟล์แผน, design brief, script, manifest/lock และ handoff ผ่าน remote branch `codex/telemart-dev-handoff` ที่ cloud จะ clone; ตรวจ branch ที่เลือกใน Claude Cloud

@@ -91,6 +91,19 @@ npm แจ้ง lifecycle scripts ของ sharp/protobufjs ยังไม่
 
 หน้าตัวเลือก `templates.html` เปิดผ่าน local preview ที่ `http://127.0.0.1:4318/templates.html` เพื่อดูภาพอ้างอิงจริง ไม่มีการ publish เว็บไซต์ local preview ใช้ Python HTTP server บน loopback และจะใช้ได้ขณะ process ทำงาน
 
+## เครื่องมือที่เพิ่มใน M1 (2026-09-29)
+
+| Library/tool | Exact version | หน้าที่ |
+|---|---|---|
+| `next` / `react` / `react-dom` | `16.3.7` / `19.3.0` / `19.3.0` | runtime ใหม่ (Turbopack build, proxy) |
+| `eslint-config-next` + `eslint` | `16.3.7` + `9.39.5` | lint ด้วย ESLint CLI (`npm run lint`) |
+| `vitest` | `5.0.2` | unit tests (`npm test`) |
+| `@playwright/test` | `1.63.0` | smoke URL เดิมและ Auth flows |
+| `supabase` (CLI ผ่าน npm) | `2.118.0` | local stack, migrations, pgTAP (`npm run db:*`) |
+| `@mui/material-nextjs` | `7.3.10` | Emotion cache สำหรับ App Router (แทน 6.3.1 ที่ไม่ได้ใช้และไม่รองรับ Next 16) |
+
+ลบ `@types/nodemailer` (Nodemailer 10 มี types ในตัว) และ `@eslint/eslintrc` (flat config ตรง) รายละเอียดผลทดสอบและเหตุผลอยู่ใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
+
 ## Setup 3D หลังเลือก A+B+C
 
 ผู้ใช้เพิ่ม C และยืนยัน Router Wi-Fi ของทรูเป็นภาพเด่น อนุญาตให้เลือก Three.js/Higgsfield/วิธีอื่นตามคุณภาพ ติดตั้ง exact pins เพิ่มแล้ว:

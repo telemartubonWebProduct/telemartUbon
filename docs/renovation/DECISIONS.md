@@ -43,6 +43,17 @@
 - รับคำขอทั่วประเทศไม่ใช่การยืนยัน fibre/solar ติดตั้งได้ทุกที่ ฟอร์มเก็บจังหวัด/รหัสไปรษณีย์เพื่อให้เจ้าหน้าที่ตรวจพื้นที่และเงื่อนไขจริง
 - Supabase MCP อ่าน organization/project ที่ผู้ใช้สร้างแล้วได้ด้วย ID, read-only SQL และ Security Advisors ผ่าน (`lints=[]`); ไม่มีการสร้าง project ซ้ำหรือย้าย region ชื่อที่ผู้ใช้ตั้งจริงต่างจากชื่อเสนอเดิม การเชื่อมแอป, schema, Auth, RLS และ tests ยังเป็นงาน M1 ข้างหน้า
 
+## ค่าเริ่มต้นที่เลือกระหว่าง M1 (2026-09-29, แก้ได้)
+
+ค่าต่อไปนี้เป็นการตัดสินใจเชิง implementation เพื่อให้ M1 ใช้งานได้และทดสอบได้ ไม่ใช่คำตอบทางธุรกิจ เปลี่ยนได้เมื่อเจ้าของต้องการ ผลทดสอบอยู่ใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
+
+- โครง route: หน้าเดิมอยู่ใน route group `(public)` (URL เดิมทุกหน้า), หลังบ้านอยู่ที่ `/admin`, ลิงก์อีเมลที่ `/auth/confirm`; Google Ads tag, Tawk และ Prompt font โหลดเฉพาะหน้าสาธารณะ
+- UI stack: คง Tailwind 3.4 + MUI 6 + framer-motion 11 สำหรับหน้าเดิมจนกว่า M2 จะสร้างหน้าใหม่; design tokens เป็น CSS variables จึงใช้ต่อได้ทั้ง Tailwind 3 และ 4 การย้าย Tailwind 4/เลิกใช้ MUI ตัดสินใน M2
+- เครื่องมือ: ESLint 9 (ESLint 10 ยังติด peer ของ plugins ใน eslint-config-next), TypeScript 5.9 (ยังไม่ประเมิน TypeScript 7), Vitest + Playwright, Supabase CLI แบบ pin ใน devDependencies
+- Auth: อีเมล + รหัสผ่าน แบบ invite-only (ปิดสมัครเอง); รหัสผ่านอย่างน้อย 12 ตัวอักษร มีตัวพิมพ์เล็ก/ใหญ่/ตัวเลข; เปลี่ยนรหัสผ่านแล้วออกจากระบบทุกอุปกรณ์; ลิงก์เชิญ/ลืมรหัสผ่านแบบ token hash ใช้ได้ในทุก browser; ยังไม่เปิด MFA (รอยืนยัน policy ก่อนใช้งานจริง)
+- สิทธิ์: `admin_memberships` เป็นแหล่งสิทธิ์หลัก ตรวจทุกคำขอด้วย RLS; ให้/ถอนสิทธิ์ผ่าน `private.grant_admin` / `private.revoke_admin` ใน SQL editor หรือ service role; ทุกการเปลี่ยนสิทธิ์ถูกบันทึกใน `audit_log` ซึ่งแก้/ลบไม่ได้
+- หลังบ้านใช้ภาษาไทยและ IBM Plex Sans Thai ตาม brief; หน้าหลังบ้านไม่ถูก index/cache/frame โดยเว็บอื่น
+
 ## ต้นไม้ของรอบถัดไป (ยังไม่ถามจน prerequisite ชัด)
 
 ```mermaid

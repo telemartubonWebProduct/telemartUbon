@@ -1,6 +1,6 @@
 # แผนรีโนเวท Telemart Ubon
 
-สถานะ 2026-09-30: **เตรียมส่งต่อการพัฒนา Claude Cloud** เลือก A+B+C พร้อมภาพเด่น Router Wi-Fi ตรวจ Supabase ที่ผู้ใช้สร้างแล้วและเตรียม tooling/handoff ยังไม่ได้สร้าง CMS/หลังบ้านหรือ migration เชื่อมแอปกับฐานข้อมูล เปลี่ยนหน้า production หรือ deploy
+สถานะ 2026-09-29: **M1 Foundation เสร็จในส่วนโค้ดและทดสอบกับ Supabase local stack แล้ว** (Next 16.3.7/React 19.3.0, design tokens, shell, Auth Admin role เดียว + RLS/migration, CI) ยังไม่ได้ apply migration กับ dev project `wdcbbjvxrcxuaabcipqo` ไม่ได้ deploy และไม่ได้เปลี่ยน DNS — ผลและสิ่งที่ต้องตั้งค่าต่ออยู่ใน [M1-FOUNDATION.md](M1-FOUNDATION.md) ขั้นถัดไปคือ M2
 
 ## เป้าหมายที่รับจากผู้ใช้
 
@@ -28,6 +28,7 @@ Mirror Editor ต้องแสดงหน้าเดียวกับเว
 - [เครื่องมือที่ติดตั้งและสถานะการเชื่อมต่อ](TOOLING-SETUP.md)
 - [คำถามและการตัดสินใจที่ยังเปิด](DECISIONS.md)
 - [ชุดส่งต่องานพัฒนา](DEV-HANDOFF.md) และ [ตั้งค่า Claude Cloud](CLAUDE-CLOUD-SETUP.md)
+- [รายงานผล M1 Foundation](M1-FOUNDATION.md)
 
 ## ชุดหน้าที่จะเปลี่ยน
 
@@ -61,6 +62,8 @@ URL เดิมต้องคงไว้หรือมี redirect map ท�
 
 แต่ละ milestone ต้องส่ง demo ที่ตรวจได้และระบุข้อจำกัด ไม่ถือว่าติดตั้งแพ็กเกจหรือ build ผ่านเท่ากับ service เชื่อมสำเร็จหรือ deploy แล้ว
 
+ผล M1 (2026-09-29): lint/typecheck/build ผ่าน, unit 56/56, pgTAP RLS 45/45, Playwright 35/35 (รวม login/logout/recovery/invite/denied 13 ข้อกับ Supabase Auth ใน local stack), `npm audit` 19 → 0 และภาพหน้าเว็บเดิม 10 URL ตรงกับ build เดิม ส่วนที่ยังต้องใช้สิทธิ์เจ้าของ: apply migration และตั้งค่า Auth ที่ dev project, สิทธิ์ push GitHub ดูรายการใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
+
 ## ขอบเขตการจัดการทุกค่า
 
 - คอนเทนต์: หัวเรื่อง คำอธิบาย ราคา หน่วยความเร็ว เงื่อนไข FAQ labels เมนู footer และข้อความฟอร์ม
@@ -73,7 +76,7 @@ URL เดิมต้องคงไว้หรือมี redirect map ท�
 
 ติดตั้งเตรียมเฉพาะ libraries ที่ requirement ชัดเจนแบบ exact pin: Supabase JS/SSR, Zod, GA Data client และ Three.js/React Three Fiber/Drei พร้อม Three types และ lockfile รายละเอียดผลจริงอยู่ TOOLING-SETUP.md ยังไม่ได้สร้างโมเดลหรือเชื่อม service
 
-เป้าหมาย runtime ที่ registry ยืนยันในรอบนี้คือ Next `16.3.7` / React `19.3.0` โดยเว็บเดิมยังเป็น Next `15.1.11` การ upgrade major, Tailwind/MUI/motion/editor/test tooling ทำใน M1 หลังตัดสินใจ scope และ compatibility ไม่ใช้ `npm audit fix --force` แทนแผน migration
+M1 อัปเกรดแล้วเป็น Next `16.3.7` / React `19.3.0` (จาก Next `15.1.11`) พร้อม test tooling (Vitest, Playwright, Supabase CLI) โดยไม่ใช้ `npm audit fix --force` ส่วน Tailwind 4, MUI/motion ชุดใหม่และ editor libraries ตัดสินใน M2/M3 ตามดีไซน์ใหม่ รายละเอียดใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
 
 Node local คือ `24.18.0`; Vercel เลือก Node LTS major `24.x` และ platform จัดการ patch ต้องตรวจ runtime จาก deployment จริง `next lint` ต้องย้ายเป็น ESLint CLI เมื่อ upgrade เพราะ Next 16 ไม่รัน lint แบบเดิม
 
