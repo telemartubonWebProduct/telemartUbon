@@ -1,15 +1,15 @@
 # ตั้งค่า Claude Cloud สำหรับ Telemart Ubon
 
-ตรวจเอกสารทางการวันที่ 29 กันยายน 2026 เอกสารนี้เป็นค่าที่แนะนำและวิธีส่งต่องาน **ยังไม่ได้สร้างหรือบันทึก cloud environment, ใส่ credentials หรือเริ่ม cloud session ให้ผู้ใช้** Repo มี `scripts/cloud/setup.sh`, `.env.example`, SessionStart hook และ handoff แยกแล้ว
+ตรวจเอกสารทางการวันที่ 29 กันยายน 2026 เอกสารนี้เป็นค่าที่แนะนำและวิธีส่งต่องาน **ยังไม่ได้สร้างหรือบันทึก cloud environment, ใส่ credentials หรือเริ่ม cloud session ให้ผู้ใช้** Repo มีสคริปต์ [environment-setup.sh](../../scripts/cloud/environment-setup.sh) ที่ไม่ต้องพึ่ง checkout, `.env.example`, SessionStart hook และ handoff แยกแล้ว
 
 ## ค่าที่กรอกใน Add cloud environment
 
 | ช่อง | ค่าที่แนะนำ |
 | --- | --- |
 | Name | `Telemart Ubon Renovation Dev` |
-| Network access | `Trusted` สำหรับติดตั้ง npm และตรวจโค้ดรอบแรก |
+| Network access | `Custom` พร้อมเลือก **Also include default list of common package managers** และเพิ่ม allowed domain `wdcbbjvxrcxuaabcipqo.supabase.co` เพื่อพัฒนา M1 กับโปรเจกต์จริง; หากยังทำเฉพาะ lint/build จะใช้ `Trusted` ชั่วคราวได้ |
 | Environment variables | ใช้ block ด้านล่าง เริ่มจากค่าที่ไม่มี secrets |
-| Setup script | `bash scripts/cloud/setup.sh` จาก repository root |
+| Setup script | คัดลอกเนื้อหาทั้งไฟล์ [scripts/cloud/environment-setup.sh](../../scripts/cloud/environment-setup.sh) ลงช่องนี้ ไม่ใช่ใส่ชื่อไฟล์เป็นคำสั่ง |
 
 Environment variables ที่คัดลอกได้ทันที:
 
@@ -27,25 +27,21 @@ NEXT_PUBLIC_SUPABASE_URL=https://wdcbbjvxrcxuaabcipqo.supabase.co
 
 ## Network สำหรับ setup และ integration
 
-เริ่ม `Trusted` สำหรับ code/dependency work ถ้าถึงขั้นติดต่อ Supabase ผ่าน SDK/HTTP จาก VM ให้เปลี่ยนเป็น `Custom`, เปิด **Also include default list of common package managers**, แล้วเพิ่ม `wdcbbjvxrcxuaabcipqo.supabase.co`; เพิ่ม `api.supabase.com` เมื่อจำเป็นต้องเรียก Management API จาก VM ข้อเสนอนี้ยังไม่ใช่การอนุมัติให้ cloud agent สร้างหรือแก้ production resource
+เริ่ม M1 ที่ต้องติดต่อ Supabase ผ่าน SDK/HTTP จาก VM ให้ใช้ `Custom`, เปิด **Also include default list of common package managers**, แล้วเพิ่ม `wdcbbjvxrcxuaabcipqo.supabase.co`; เพิ่ม `api.supabase.com` เฉพาะเมื่อจำเป็นต้องเรียก Management API จาก VM ถ้าทำเฉพาะ code/dependency work ใช้ `Trusted` ชั่วคราวได้ ข้อเสนอนี้ยังไม่ใช่การอนุมัติให้ cloud agent สร้างหรือแก้ production resource
 
-Trusted ครอบคลุม npm และ Node download domains แต่ไม่ได้ระบุ Supabase ในรายการ default; connector MCP ที่เปิดใช้เดินทางคนละช่องกับ VM network ดู [network access/default allowlist](https://code.claude.com/docs/en/cloud-environments#network-access) จึงต้องตรวจทั้งสิทธิของ connector และ HTTP reachability ตามวิธี integration ที่ใช้จริง ไม่เปิด Full เพียงเพื่อให้ npm ติดตั้งได้
+Default list ครอบคลุม npm, Node download และ Ubuntu apt domains แต่ไม่ได้ระบุ Supabase ในรายการ; connector MCP ที่เปิดใช้เดินทางคนละช่องกับ VM network ดู [network access/default allowlist](https://code.claude.com/docs/en/cloud-environments#network-access) จึงต้องตรวจทั้งสิทธิของ connector และ HTTP reachability ตามวิธี integration ที่ใช้จริง ไม่เปิด Full เพียงเพื่อให้ npm ติดตั้งได้
 
 ## Setup script และ checkout ที่ต้องตรวจ
 
-ค่าปกติในช่อง Setup script คือ:
+เปิด [environment-setup.sh](../../scripts/cloud/environment-setup.sh) แล้ววาง **เนื้อหาทั้งไฟล์** (เริ่ม `#!/usr/bin/env bash`) ลงช่อง Setup script สคริปต์นี้ติดตั้ง Node 24.18.0 จาก nodejs.org พร้อมตรวจ checksum ใน `/opt/telemart-cloud` โดยไม่ต้องมี checkout เพราะ Cloud อาจ cache environment ก่อน clone repository
 
-```bash
-bash scripts/cloud/setup.sh
-```
+ก่อนเริ่ม session ต้องให้ branch ที่ cloud clone มี `.claude/settings.json`, `scripts/cloud/session-start.sh`, `package.json`, `package-lock.json` และเอกสาร handoff ครบ ถ้า checkout หาไม่พบ ให้ตรวจ repository ที่เลือกและ branch ไม่คัดลอก path Windows ไปใช้ใน Linux และไม่เดา path `/root/...` ของ checkout
 
-ก่อนเริ่ม session ต้องให้ branch ที่ cloud clone มีไฟล์นี้พร้อม `package.json`, `package-lock.json` และเอกสาร handoff ครบ ถ้า script หาไม่พบ ให้ตรวจ `pwd`, repository ที่เลือก และ branch ก่อน ไม่คัดลอก path Windows ไปใช้ใน Linux และไม่เดา path `/root/...` ของ checkout
+หน้าที่แยกกันของสคริปต์ที่เตรียม:
 
-หน้าที่ของ script ที่งานหลักเตรียม:
-
-1. หา/ตรวจ root ของ checkout ที่ถูกต้องและตรวจ manifest/lockfile
-2. ใช้ Node 24.18.0 ตาม `.nvmrc` ดาวน์โหลดจาก nodejs.org ตรวจ SHA256 จาก official `SHASUMS256.txt`; ถ้า Ubuntu image ไม่มี `curl`/`xz` จะติดตั้งผ่าน `apt-get` ก่อน แล้วแสดง `node --version`/`npm --version`
-3. รัน `npm ci` ที่ root เพื่อติดตั้งตาม lockfile รวม dev dependencies; ถ้าขั้นนี้ล้มเหลวต้องรายงาน failure ไม่กลบด้วย `|| true`
+1. Environment setup เตรียม Node 24.18.0 โดยไม่ต้องมี checkout; ถ้า Ubuntu image ไม่มี `curl`/`xz` จะติดตั้งผ่าน `apt-get` ก่อน
+2. หลัง Claude เปิด session hook จะตรวจ checkout root, ใส่ Node 24 ลง `CLAUDE_ENV_FILE`, รัน `npm ci --include=dev` เมื่อ lockfile เปลี่ยน/ยังไม่มี dependencies; ถ้าล้มเหลวต้องรายงาน failure ไม่กลบด้วย `|| true`
+3. `scripts/cloud/setup.sh` คือคำสั่ง equivalent สำหรับทดสอบ repo ใน Linux container/local ไม่ใช่ค่าที่ใส่ใน Cloud UI
 4. ไม่เริ่ม dev server ค้างใน setup ไม่สร้าง Supabase project ไม่รัน migration ไม่ deploy และไม่พิมพ์ secrets
 
 `npm ci` ต้องมี lockfile ที่ตรงกับ manifest และไม่ปรับ manifest/lockfileระหว่างติดตั้งตาม [npm documentation](https://docs.npmjs.com/cli/v11/commands/npm-ci/) หาก lock ไม่ตรง ให้แก้ใน branch งานอย่างตั้งใจและตรวจ diff แทนการแทน `ci` ด้วย `install` เงียบ ๆ
@@ -56,7 +52,7 @@ Claude Cloud ใช้ Ubuntu 24.04 x86_64 และรายการ base tool
 
 ## สิ่งที่ส่งไปกับ repository
 
-- ส่งไฟล์แผน, design brief, script, manifest/lock และ handoff ผ่าน branch ที่ cloud จะ clone ตรวจ `git status` และ branch ก่อนส่ง
+- ส่งไฟล์แผน, design brief, script, manifest/lock และ handoff ผ่าน remote branch `codex/telemart-dev-handoff` ที่ cloud จะ clone; ตรวจ branch ที่เลือกใน Claude Cloud
 - พวก skills/plugin/config ที่อยู่เฉพาะบน Windows ไม่ได้พิสูจน์ว่ามีใน cloud ใช้ไฟล์ที่ repository มีจริงและ connector ที่ session เปิดจริง
 - Skills ที่เตรียมใน `.agents/skills/` เป็น canonical files ของงานนี้ ให้ handoff/`CLAUDE.md` ระบุไฟล์ที่ต้องอ่าน ส่วนการ auto-load slash commands ของ Claude Cloud ใช้ project `.claude/skills/` ที่ commit แล้ว หรือ skills ของบัญชี claude.ai ตาม [Claude skills documentation](https://code.claude.com/docs/en/skills#use-skills-in-cowork-and-cloud-sessions) ไม่อ้างว่า plugin ของ Codex ถูกเชื่อมให้ Claude แล้ว
 

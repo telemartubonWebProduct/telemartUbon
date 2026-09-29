@@ -91,7 +91,7 @@ Supabase MCP ตรวจ organization/project ของผู้ใช้ได
 
 - Repository เริ่มต้น clean; เปลี่ยนเฉพาะ tooling/dependencies/เอกสารการวางแผน ไม่มีการแก้หน้าหรือ API เดิม
 - Production build ของเว็บเดิมผ่าน (`npm run build`, Next 15.1.11) และ typecheck ผ่านหลัง build สร้าง Next image type declarations; initial typecheck ก่อนมี declarations เคยไม่ผ่าน ไม่ใช่ข้อสรุปว่า asset หาย
-- สำเนา repo พร้อม script Cloud ทดสอบบน Linux `node:24.18.0-bookworm-slim`: ติดตั้ง curl/xz เมื่อ base image ไม่มี, ดาวน์โหลด Node 24.18.0 พร้อม SHA256, `npm ci`, SessionStart PATH, `npm run lint`, `npm run build`, `npx tsc --noEmit` ผ่าน (ยังไม่ใช่ cloud session ของผู้ใช้)
+- สำเนา repo ทดสอบบน Linux `node:24.18.0-bookworm-slim`: `environment-setup.sh` ติดตั้ง curl/xz เมื่อ base image ไม่มีและดาวน์โหลด Node 24.18.0 พร้อม SHA256 **ก่อน checkout**, แล้ว SessionStart หลัง checkout ทำ `npm ci`/PATH, `npm run lint`, `npm run build`, `npx tsc --noEmit` ผ่าน (ยังไม่ใช่ cloud session ของผู้ใช้)
 - Dependency audit หลัง installation สุดท้าย (รวม GA Data client) พบ 19 รายการ: 3 low, 4 moderate, 10 high, 2 critical รวม Next/Swiper; ยังต้องแก้ใน M1 และตรวจซ้ำ
 - หน้าเว็บจริงตรวจผ่าน browser ที่ `https://www.telemartubon.com/`; ไม่ได้ทดสอบส่งฟอร์มหรือกดโฆษณาบน production
-- ไม่มี commit/push/deploy หรือ database migration ในขั้นนี้
+- ส่งชุดเตรียม dev ไปยัง remote branch `codex/telemart-dev-handoff` แล้ว; ยังไม่มี deploy หรือ database migration

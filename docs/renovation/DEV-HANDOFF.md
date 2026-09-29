@@ -1,6 +1,6 @@
 # Telemart Ubon — ส่งต่องานพัฒนา
 
-สถานะ 2026-09-30: เตรียม repo, dependency, แผน, Node 24 และ Claude Cloud setup เพื่อเริ่มพัฒนา **ยังไม่ได้รีโนเวทหน้าเว็บ/หลังบ้าน เชื่อม Auth/GA4/Higgsfield/Vercel หรือ deploy** ให้แยกหลักฐานแต่ละขั้นตาม `PLAN.md`
+สถานะ 2026-09-30: เตรียม repo, dependency, แผน, Node 24 และ Claude Cloud setup บน remote branch [`codex/telemart-dev-handoff`](https://github.com/telemartubonWebProduct/telemartUbon/tree/codex/telemart-dev-handoff) เพื่อเริ่มพัฒนา **ยังไม่ได้รีโนเวทหน้าเว็บ/หลังบ้าน เชื่อม Auth/GA4/Higgsfield/Vercel หรือ deploy** ให้แยกหลักฐานแต่ละขั้นตาม `PLAN.md`
 
 ## ข้อสรุปที่ต้องรักษา
 
@@ -23,14 +23,14 @@
 ## สิ่งที่เตรียมใน repository
 
 - `.nvmrc` pin Node `24.18.0`, `package-lock.json` พร้อม Supabase JS/SSR, Zod, GA Data, Three/Fiber/Drei. `.env.example` มีเฉพาะ URL สาธารณะและชื่อค่าที่ต้องกำหนด ไม่มี secret.
-- `scripts/cloud/setup.sh` ลง Node จาก official nodejs.org พร้อมตรวจ SHA256 แล้ว `npm ci --include=dev`; `.claude/settings.json` เรียก `session-start.sh` เพื่อให้ Node 24 และ lock dependencies พร้อมใน session ใหม่/ที่ resume.
+- `scripts/cloud/environment-setup.sh` เป็นเนื้อหาสำหรับช่อง Setup script ติดตั้ง Node จาก official nodejs.org พร้อมตรวจ SHA256 โดยไม่พึ่ง checkout; `.claude/settings.json` เรียก `session-start.sh` เพื่อใส่ Node 24 ใน PATH และ `npm ci --include=dev` ตาม lockfile ใน session ใหม่/ที่ resume. `setup.sh` ใช้ทดสอบ repo ใน Linux local/container.
 - `CLAUDE.md` ชี้ข้อกำหนดและทักษะใน repo. `.agents/skills` เป็นไฟล์อ้างอิงที่ checkout ได้ ไม่ใช่การยืนยันว่า Claude slash skills หรือ Higgsfield connector ถูกติดตั้งใน Claude Cloud.
 - Repo เดิมเป็น Next `15.1.11`, React `19.0.0`. เป้าหมาย Next 16/React 19 และ audit 19 รายการอยู่ใน M1; อย่าอ้างว่าการลง libs ทำให้ upgrade เสร็จ.
-- Windows baseline ก่อนส่งต่อผ่าน lint/build/typecheck. ทดสอบสำเนา repo ใน Linux container `node:24.18.0-bookworm-slim` แล้ว `scripts/cloud/setup.sh`, SessionStart, lint, build และ `npx tsc --noEmit` ผ่านครบ; Claude Cloud Ubuntu 24.04 จริงยังต้องตรวจแยก. Asset path runtime สองจุดใน `src/datas/home/WifiHome.data.ts` (การสะกดชื่อรูป Sim และ iQIYI) เป็นจุดตรวจบน filesystem case-sensitive.
+- Windows baseline ก่อนส่งต่อผ่าน lint/build/typecheck. ทดสอบ Linux container `node:24.18.0-bookworm-slim` แล้ว: environment setup ลง Node ก่อน checkout, SessionStart ทำ `npm ci`, lint, build และ `npx tsc --noEmit` ผ่านครบ; Claude Cloud Ubuntu 24.04 จริงยังต้องตรวจแยก. Asset path runtime สองจุดใน `src/datas/home/WifiHome.data.ts` (การสะกดชื่อรูป Sim และ iQIYI) เป็นจุดตรวจบน filesystem case-sensitive.
 
 ## ค่าที่ใส่ใน Claude Cloud
 
-ดู [CLAUDE-CLOUD-SETUP.md](CLAUDE-CLOUD-SETUP.md). ใช้ Name `Telemart Ubon Renovation Dev`, Network `Trusted`, Environment variables ดังนี้ และ Setup script `bash scripts/cloud/setup.sh`:
+ดู [CLAUDE-CLOUD-SETUP.md](CLAUDE-CLOUD-SETUP.md). ใช้ Name `Telemart Ubon Renovation Dev`, Network `Custom` พร้อม default package-manager domains และ `wdcbbjvxrcxuaabcipqo.supabase.co`, Environment variables ดังนี้ และวาง **เนื้อหาทั้งไฟล์** [environment-setup.sh](../../scripts/cloud/environment-setup.sh) ในช่อง Setup script:
 
 ```dotenv
 NEXT_TELEMETRY_DISABLED=1
@@ -38,7 +38,7 @@ CI=true
 NEXT_PUBLIC_SUPABASE_URL=https://wdcbbjvxrcxuaabcipqo.supabase.co
 ```
 
-เลือก branch ของงานส่งต่อนี้ใน Claude Cloud หลังมี remote branch แล้ว หาก cloud เลือก default branch โดยอัตโนมัติ ให้เลือก branch ที่มี `DEV-HANDOFF.md`/`scripts/cloud/setup.sh` หรือรวม branch ผ่าน review ก่อน. ค่าที่เป็น secret/service-role/SMTP/GA credentials ไม่อยู่ในฟอร์ม environment variables ที่เห็นได้กับทุกคนที่ใช้ environment.
+เลือก remote branch **`codex/telemart-dev-handoff`** ใน Claude Cloud หาก cloud เลือก default branch โดยอัตโนมัติ ให้เลือก branch นี้หรือรวมผ่าน review ก่อน. ค่าที่เป็น secret/service-role/SMTP/GA credentials ไม่อยู่ในฟอร์ม environment variables ที่เห็นได้กับทุกคนที่ใช้ environment.
 
 ## ข้อความเริ่มงานที่คัดลอกไป Claude Cloud ได้
 
@@ -50,4 +50,4 @@ NEXT_PUBLIC_SUPABASE_URL=https://wdcbbjvxrcxuaabcipqo.supabase.co
 2. Cloud setup/session-start ออกด้วย exit 0; ใน shell ใหม่ `node --version` เป็น `v24.18.0`, `npm ci` ผ่าน, `npm run build`/`npx tsc --noEmit` ผ่านบน Linux.
 3. Supabase target เป็น ref ใหม่จริงและไม่มีการใช้ org/project truefiberhome. Integration/M1 จะเริ่มหลังอ่านแผน; production/paid feature/สิทธิ external เพิ่มเป็นคนละ gate.
 
-ถ้า network `Trusted` ปฏิเสธ HTTP ไป Supabase ให้เพิ่ม `wdcbbjvxrcxuaabcipqo.supabase.co` แบบ Custom โดยคง default npm domains ตามคู่มือ cloud. MCP connector กับ outbound VM network ไม่ใช่เส้นทางเดียวกัน.
+ถ้าต้องการทดสอบ repo โดยยังไม่เรียก Supabase จะใช้ `Trusted` ชั่วคราวได้ แต่ก่อน M1 เชื่อม SDK ให้เลือก `Custom` ตามด้านบน. MCP connector กับ outbound VM network ไม่ใช่เส้นทางเดียวกัน.
