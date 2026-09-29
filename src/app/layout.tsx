@@ -3,6 +3,7 @@ import "./globals.css";
 import { Prompt } from "next/font/google";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -37,8 +38,6 @@ export default function RootLayout({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <link rel="icon" href="/src/app/logo.ico" />
-
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=AW-18007307609"
@@ -59,8 +58,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {children}
-       
+        {/* Flushes MUI/Emotion styles into <head> during SSR instead of inline
+            <style> tags in <body>, which caused production hydration errors. */}
+        <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
       </body>
     </html>
   );

@@ -34,7 +34,7 @@ interface WifiHomeProps {
           title: "",
         },
         {
-          icon: "/assets/tol-ico/Sim 10GB.png",
+          icon: "/assets/tol-ico/sim 10GB.png",
           title: "",
         },
         {
@@ -75,7 +75,7 @@ interface WifiHomeProps {
           title: "",
         },
         {
-          icon: "/assets/tol-ico/iQiyi.png",
+          icon: "/assets/tol-ico/iQIYI.png",
           title: "",
         },
         {

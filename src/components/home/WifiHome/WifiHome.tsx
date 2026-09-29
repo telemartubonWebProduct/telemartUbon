@@ -118,6 +118,7 @@ export default function WifiHome() {
                     ความเร็ว (ดาวน์โหลด/อัปโหลด)
                   </Typography>
                   <Typography
+                    component="div"
                     variant="body1"
                     fontFamily="Prompt"
                     sx={{

@@ -18,6 +18,7 @@ export default function Countshow() {
             }}
           >
             <Typography
+              component="div"
               sx={{
                 color: "#002549",
                 textAlign: "center",
@@ -36,6 +37,7 @@ export default function Countshow() {
               </Typography>
             </Typography>
             <Typography
+              component="div"
               sx={{
                 color: "#002549",
                 textAlign: "center",
@@ -54,6 +56,7 @@ export default function Countshow() {
               </Typography>
             </Typography>
             <Typography
+              component="div"
               sx={{
                 color: "#002549",
                 textAlign: "center",
@@ -72,6 +75,7 @@ export default function Countshow() {
               </Typography>
             </Typography>
             <Typography
+              component="div"
               sx={{
                 color: "#002549",
                 textAlign: "center",

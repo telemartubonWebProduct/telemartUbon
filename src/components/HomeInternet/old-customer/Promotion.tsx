@@ -151,7 +151,7 @@ export default function PromotionBroadband() {
                                     <Typography variant="body1" fontFamily="Prompt" sx={{ mb: 1, color: "#000", fontSize: "12px" }}>
                                         ความเร็ว (ดาวน์โหลด/อัปโหลด)
                                     </Typography>
-                                    <Typography variant="body1" fontFamily="Prompt" sx={{ mb: 1, color: "#000", fontSize: "32px", display: "inline-flex", alignItems: "center", fontWeight: 600, }}>
+                                    <Typography component="div" variant="body1" fontFamily="Prompt" sx={{ mb: 1, color: "#000", fontSize: "32px", display: "inline-flex", alignItems: "center", fontWeight: 600, }}>
                                         {item.speedDownload} Mbps/
                                         <Box component="span" sx={{ display: "inline-flex", flexDirection: "column", position: "relative", top: "-4px", ml: "2px" }}>
                                             <Typography sx={{ fontSize: "14px", fontWeight: "bold", lineHeight: 1 }}>{item.speedUpload}</Typography>
