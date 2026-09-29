@@ -2,7 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 // E2E runs against a production build (`npm run build` first). Set
 // E2E_BASE_URL to test an already running server instead of starting one.
-const port = Number(process.env.E2E_PORT ?? 3100);
+// Port 3000 matches the local Auth site_url, so links in test emails reach this server.
+const port = Number(process.env.E2E_PORT ?? 3000);
 const baseURL = process.env.E2E_BASE_URL ?? `http://127.0.0.1:${port}`;
 
 // Environments with a preinstalled browser (e.g. Claude Cloud's
@@ -24,7 +25,9 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    // Auth flows share per-run accounts, so they run once (desktop; the spec
+    // covers the phone layout with its own viewport).
+    { name: "mobile", use: { ...devices["Pixel 7"] }, testIgnore: /admin-auth\.spec\.ts/ },
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined

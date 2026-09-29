@@ -19,3 +19,26 @@ body {
   background: var(--background);
   font-family: "Prompt", Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
+
+/* Back office (src/app/admin), built on the Telemart tokens. */
+@layer components {
+  .tm-admin {
+    /* Declared here, where next/font sets --font-plex-thai, so it resolves. */
+    --tm-font-sans: var(--font-plex-thai), "IBM Plex Sans Thai", Tahoma, sans-serif;
+    min-height: 100dvh;
+    background: var(--tm-color-canvas);
+    color: var(--tm-color-ink);
+    font-family: var(--tm-font-sans);
+    font-size: var(--tm-text-body);
+    line-height: var(--tm-leading-body);
+  }
+
+  .tm-admin :focus-visible {
+    outline: 3px solid var(--tm-color-focus);
+    outline-offset: 2px;
+  }
+
+  .tm-admin .tm-on-ink :focus-visible {
+    outline-color: var(--tm-color-focus-inverse);
+  }
+}

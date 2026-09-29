@@ -10,11 +10,13 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:local": "bash scripts/e2e/run-local.sh",
     "db:start": "supabase start -x realtime,storage-api,imgproxy,studio,postgres-meta,edge-runtime,logflare,vector,supavisor",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:lint": "supabase db lint --level warning --fail-on error",
     "db:test": "supabase test db",
+    "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "db:push:dev": "bash scripts/supabase/push-dev.sh"
   },
   "dependencies": {
