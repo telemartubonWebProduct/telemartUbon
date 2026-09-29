@@ -1,30 +1,14 @@
-// app/layout.tsx (TypeScript) หรือ app/layout.jsx (JavaScript)
-import "./globals.css";
-import { Prompt } from "next/font/google";
 import type { Metadata } from "next";
-import Script from "next/script";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
+import "@/styles/tokens.css";
+import "./globals.css";
 
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-
-// 1) เรียกใช้ฟอนต์ Prompt จาก next/font/google
-const prompt = Prompt({
-  subsets: ["thai"], // เลือก subset เป็น thai เพื่อให้แสดงผลภาษาไทยได้
-  weight: ["300", "400", "500", "600", "700"], // ต้องการ weight ใดบ้าง
-  display: "swap", // ใช้ค่า 'swap' เพื่อปรับการแสดงผลให้เร็วขึ้น
-});
-
+// Shared by the public site and the back office. Fonts, tracking tags and UI
+// providers live in the (public) and admin layouts so neither area loads the
+// other's scripts.
 export const metadata: Metadata = {
   title: "TelemartUbon",
   description: "Testing Prompt Thai font",
 };
-
-
-
-
-//sdsds
 
 export default function RootLayout({
   children,
@@ -32,36 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // 2) เพิ่ม className จากตัวแปร prompt.className ตรงแท็ก html หรือ body
-    <html lang="th" className={prompt.className}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-        <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=AW-18007307609"
-          strategy="afterInteractive"
-        />
-        <Script
-          id="gtag-init"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              window.gtag = gtag;
-              gtag('js', new Date());
-              gtag('config', 'AW-18007307609');
-            `,
-          }}
-        />
-      </head>
-      <body>
-        {/* Flushes MUI/Emotion styles into <head> during SSR instead of inline
-            <style> tags in <body>, which caused production hydration errors. */}
-        <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
-      </body>
+    <html lang="th">
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,0 +1,81 @@
+/*
+ * Telemart design tokens (docs/renovation/FREE-DESIGN-BRIEF.md).
+ * White is the canvas, black carries text and emphasis, red is reserved for the
+ * primary action. Values are plain CSS custom properties so theme settings can
+ * later override them per page or section, after a contrast check.
+ *
+ * Contrast on white: red #E60012 = 4.8:1 (white text on red is the same),
+ * muted #52525B = 7.7:1, danger #B8000E = 6.8:1, success #166534 = 7.1:1.
+ */
+:root {
+  /* Brand palette */
+  --tm-color-canvas: #ffffff;
+  --tm-color-ink: #000000;
+  --tm-color-red: #e60012;
+  --tm-color-surface: #f5f5f5;
+  --tm-color-ink-muted: #52525b;
+  --tm-color-line: #e4e4e7;
+
+  /* Derived states */
+  --tm-color-red-press: #b8000e;
+  --tm-color-red-wash: #fdebec;
+  --tm-color-on-red: #ffffff;
+  --tm-color-on-ink: #ffffff;
+  --tm-color-danger: #b8000e;
+  --tm-color-danger-wash: #fdebec;
+  --tm-color-success: #166534;
+  --tm-color-success-wash: #ecf8f0;
+  --tm-color-focus: #000000;
+  --tm-color-focus-inverse: #ffffff;
+
+  /* Type: IBM Plex Sans Thai for headings and body. Thai stacks vowels and tone
+     marks, so line heights stay generous. Containers that load the font through
+     next/font redeclare this with var(--font-plex-thai) first. */
+  --tm-font-sans: "IBM Plex Sans Thai", Tahoma, sans-serif;
+  --tm-text-caption: 0.8125rem; /* 13px */
+  --tm-text-small: 0.875rem; /* 14px */
+  --tm-text-body: 1rem; /* 16px */
+  --tm-text-lead: 1.125rem; /* 18px */
+  --tm-text-h4: 1.25rem; /* 20px */
+  --tm-text-h3: 1.5rem; /* 24px */
+  --tm-text-h2: 1.875rem; /* 30px */
+  --tm-text-h1: 2.375rem; /* 38px */
+  --tm-text-display: 3rem; /* 48px */
+  --tm-leading-body: 1.7;
+  --tm-leading-heading: 1.35;
+
+  /* Shape: controls, panels and pills differ on purpose. */
+  --tm-radius-control: 6px;
+  --tm-radius-panel: 12px;
+  --tm-radius-pill: 999px;
+
+  /* Layout */
+  --tm-content-max: 75rem; /* 1200px */
+  --tm-gutter: 1rem;
+  --tm-admin-nav-width: 15rem;
+  --tm-control-height: 2.75rem; /* 44px touch target */
+
+  /* Motion */
+  --tm-duration-fast: 120ms;
+  --tm-duration-base: 200ms;
+  --tm-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --tm-gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --tm-gutter: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tm-duration-fast: 0ms;
+    --tm-duration-base: 0ms;
+  }
+}
