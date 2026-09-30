@@ -2,7 +2,11 @@
 // Applies supabase/migrations to the Telemart Ubon dev project, and only that project.
 //
 //   npm run db:push:dev          verify the target, then show pending migrations (dry run)
-//   npm run db:push:dev:apply    verify, dry run, confirm by typing the ref, then push
+//   npm run db:push:dev:apply    verify, confirm by typing the ref, then push the pending migrations
+//
+// The apply confirmation is read before the Supabase CLI runs: on Windows the console did not
+// deliver typed input to a prompt shown after the CLI had run. Where a terminal cannot take
+// input at all, CONFIRM_PROJECT_REF=<ref> set for that run confirms instead.
 //
 // Runs the same way from cmd, PowerShell, bash and CI. Before anything touches a database it
 // confirms, through the Management API, that the project ref is the dev project and that it
@@ -139,6 +143,7 @@ async function fetchProject(token) {
   }
 }
 
+/** Resolves with the trimmed answer, or null when input closes before a line is entered. */
 function ask(question) {
   const readline = createInterface({ input: process.stdin, output: process.stdout });
   return new Promise((resolve) => {
@@ -146,7 +151,7 @@ function ask(question) {
     readline.once("close", () => {
       if (answered) return;
       process.stdout.write("\n");
-      resolve("");
+      resolve(null);
     });
     readline.question(question, (answer) => {
       answered = true;
@@ -154,6 +159,27 @@ function ask(question) {
       readline.close();
     });
   });
+}
+
+async function confirmApply() {
+  const preset = (process.env.CONFIRM_PROJECT_REF ?? "").trim();
+  if (preset) {
+    if (preset !== DEV_PROJECT_REF) {
+      fail(`CONFIRM_PROJECT_REF is '${preset}', expected '${DEV_PROJECT_REF}'; nothing was applied.`);
+    }
+    console.log(`Confirmed by CONFIRM_PROJECT_REF=${DEV_PROJECT_REF}.`);
+    return;
+  }
+
+  console.log("This pushes every migration that `npm run db:push:dev` lists as pending.");
+  const answer = await ask(`Type the project ref (${DEV_PROJECT_REF}) to apply them: `);
+  if (answer === null) {
+    fail(
+      "No input was received, so nothing was applied. If this terminal cannot take typed input, " +
+        `set CONFIRM_PROJECT_REF=${DEV_PROJECT_REF} for this run and try again.`,
+    );
+  }
+  if (answer !== DEV_PROJECT_REF) fail("Cancelled; nothing was applied.");
 }
 
 async function main() {
@@ -168,6 +194,8 @@ async function main() {
   console.log(`Target verified: ref=${DEV_PROJECT_REF} organization=${DEV_ORGANIZATION_ID} status=${project.status ?? "unknown"}`);
 
   const supabase = supabaseCli(cliEnvironment(token));
+  if (apply) await confirmApply();
+
   supabase("link", "--project-ref", DEV_PROJECT_REF);
 
   const linkedRefFile = path.join(root, "supabase", ".temp", "project-ref");
@@ -176,16 +204,12 @@ async function main() {
     fail(`Refusing: supabase/.temp/project-ref is '${linkedRef}', expected '${DEV_PROJECT_REF}'.`);
   }
 
-  console.log("Pending migrations (dry run):");
-  supabase("db", "push", "--linked", "--skip-vault", "--dry-run");
-
   if (!apply) {
+    console.log("Pending migrations (dry run):");
+    supabase("db", "push", "--linked", "--skip-vault", "--dry-run");
     console.log("Dry run only; nothing was applied. To push these migrations run: npm run db:push:dev:apply");
     return;
   }
-
-  const answer = await ask(`Type the project ref (${DEV_PROJECT_REF}) to apply these migrations: `);
-  if (answer !== DEV_PROJECT_REF) fail("Cancelled; nothing was applied.");
 
   supabase("db", "push", "--linked", "--skip-vault", "--yes");
   supabase("migration", "list", "--linked");

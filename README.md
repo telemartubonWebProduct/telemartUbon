@@ -69,8 +69,11 @@ bash        export SUPABASE_ACCESS_TOKEN=sbp_...
 
 ```bash
 npm run db:push:dev         # verify the target, link, show pending migrations (dry run)
-npm run db:push:dev:apply   # the same, then type the ref to apply
+npm run db:push:dev:apply   # verify, type the ref to confirm, then apply
 ```
+
+The apply confirmation is asked before the CLI runs. In a terminal that cannot take typed input, set
+`CONFIRM_PROJECT_REF=wdcbbjvxrcxuaabcipqo` for that run instead.
 
 No database password is needed: the Supabase CLI signs in with a temporary login role created from the
 token (or set `SUPABASE_DB_PASSWORD`).
