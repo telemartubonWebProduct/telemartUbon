@@ -87,7 +87,8 @@ E2E ด้าน Auth ครอบคลุม: ผู้ไม่ได้เ�
 
 ## ข้อจำกัดและเรื่องที่ทราบ
 
-- การตรวจ project ref ทำได้ในระดับ: `https://wdcbbjvxrcxuaabcipqo.supabase.co` ตอบกลับจริง (401 เพราะไม่มี apikey) ส่วนการตรวจ organization อยู่ใน `scripts/supabase/push-dev.mjs` (เงื่อนไขอยู่ใน `dev-target.mjs` ซึ่งมี unit test) ซึ่งต้องใช้ access token ของเจ้าของ; ทดสอบลำดับการทำงานทั้งหมดกับ Management API/CLI จำลองและตรวจว่า CLI 2.118.0 รับทุก flag แล้ว แต่ยังไม่ได้รันกับ dev project จริง
+- การตรวจ project ref ทำได้ในระดับ: `https://wdcbbjvxrcxuaabcipqo.supabase.co` ตอบกลับจริง (401 เพราะไม่มี apikey) ส่วนการตรวจ organization อยู่ใน `scripts/supabase/push-dev.mjs` (เงื่อนไขอยู่ใน `dev-target.mjs` ซึ่งมี unit test) ซึ่งต้องใช้ access token ของเจ้าของ; ทดสอบลำดับการทำงานทั้งหมดกับ Management API/CLI จำลองและตรวจว่า CLI 2.118.0 รับทุก flag แล้ว; 30 ก.ย. เจ้าของรัน `npm run db:push:dev` บน Windows cmd และการตรวจ ref/organization ผ่านกับ dev project จริง (`ACTIVE_HEALTHY`) แต่ยังไม่ถึงขั้น link/push เพราะยังไม่ได้ `npm ci`
+- Node 24 บน Windows อาจ abort ด้วย `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` เมื่อเรียก `process.exit()` หลัง `fetch()` (พบจริงในรอบนั้น หลังข้อความของสคริปต์) สคริปต์จึงจบด้วย `process.exitCode` เสมอ ล้าง timer และอ่าน response ให้จบก่อน; ยังไม่ได้ยืนยันซ้ำบน Windows
 - Supabase CLI 2.118.0 ให้ environment variable `SUPABASE_PROJECT_ID` มีผลเหนือ project ที่ link ไว้ (ทดสอบแล้ว) สคริปต์จึงลบตัวแปรที่เปลี่ยนเป้าหมายได้ (`SUPABASE_PROJECT_ID`, `SUPABASE_DB_URL`, `SUPABASE_API_URL`, `SUPABASE_DASHBOARD_URL`, `SUPABASE_PROFILE`, `SUPABASE_WORKDIR`) ก่อนเรียก CLI และส่ง `--workdir` เป็น root ของ repo เสมอ
 - `npm run test:e2e:local` และ `scripts/supabase/local-env.sh` ยังต้องใช้ bash (Linux/macOS/WSL/Git Bash); คำสั่งอื่นรวมถึง `db:push:dev` ใช้บน Windows cmd/PowerShell ได้
 - `/api/contact` compile ผ่านกับ Nodemailer 10 แต่ไม่ได้ทดสอบส่งอีเมลจริง (ไม่มี credentials) — M5 จะแทนด้วย lead flow

@@ -36,16 +36,21 @@ const TARGET_OVERRIDES = [
 
 const root = path.resolve(fileURLToPath(new URL("../..", import.meta.url)));
 
-function fail(message) {
-  console.error(message);
-  process.exit(1);
+class Stop extends Error {
+  constructor(message, exitCode) {
+    super(message);
+    this.exitCode = exitCode;
+  }
+}
+
+function fail(message, exitCode = 1) {
+  throw new Stop(message, exitCode);
 }
 
 function parseArgs(args) {
   if (args.length === 0) return { apply: false };
   if (args.length === 1 && args[0] === "--apply") return { apply: true };
-  console.error("Usage: npm run db:push:dev  |  npm run db:push:dev:apply");
-  process.exit(2);
+  fail("Usage: npm run db:push:dev  |  npm run db:push:dev:apply", 2);
 }
 
 function readAccessToken() {
@@ -102,23 +107,36 @@ function supabaseCli(env) {
 }
 
 async function fetchProject(token) {
-  let response;
+  const timeout = new AbortController();
+  const timer = setTimeout(() => timeout.abort(), 30_000);
+  let status;
+  let body;
   try {
-    response = await fetch(`${MANAGEMENT_API}/projects/${DEV_PROJECT_REF}`, {
+    const response = await fetch(`${MANAGEMENT_API}/projects/${DEV_PROJECT_REF}`, {
       headers: { Authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(30_000),
+      signal: timeout.signal,
     });
+    status = response.status;
+    // Always read the body so the connection is released before the script exits.
+    body = await response.text();
   } catch (error) {
     fail(`Could not reach the Supabase Management API: ${error instanceof Error ? error.message : error}`);
+  } finally {
+    clearTimeout(timer);
   }
-  if (response.status === 401) fail("The Management API rejected SUPABASE_ACCESS_TOKEN (invalid or expired).");
-  if (!response.ok) {
+
+  if (status === 401) fail("The Management API rejected SUPABASE_ACCESS_TOKEN (invalid or expired).");
+  if (status < 200 || status > 299) {
     fail(
-      `The Management API returned HTTP ${response.status} for project ${DEV_PROJECT_REF}. ` +
+      `The Management API returned HTTP ${status} for project ${DEV_PROJECT_REF}. ` +
         "Use a token from an account that belongs to the telemart-ubon organization.",
     );
   }
-  return response.json().catch(() => null);
+  try {
+    return JSON.parse(body);
+  } catch {
+    return null;
+  }
 }
 
 function ask(question) {
@@ -138,35 +156,46 @@ function ask(question) {
   });
 }
 
-const { apply } = parseArgs(process.argv.slice(2));
-const token = readAccessToken();
+async function main() {
+  const { apply } = parseArgs(process.argv.slice(2));
+  const token = readAccessToken();
 
-console.log(`Checking project ${DEV_PROJECT_REF} through the Management API...`);
-const project = await fetchProject(token);
-const problem = devTargetProblem(project);
-if (problem) fail(`Refusing: ${problem}.`);
-if (project.status === "INACTIVE") fail(`Project ${DEV_PROJECT_REF} is paused. Restore it in the Supabase dashboard first.`);
-console.log(`Target verified: ref=${DEV_PROJECT_REF} organization=${DEV_ORGANIZATION_ID} status=${project.status ?? "unknown"}`);
+  console.log(`Checking project ${DEV_PROJECT_REF} through the Management API...`);
+  const project = await fetchProject(token);
+  const problem = devTargetProblem(project);
+  if (problem) fail(`Refusing: ${problem}.`);
+  if (project.status === "INACTIVE") fail(`Project ${DEV_PROJECT_REF} is paused. Restore it in the Supabase dashboard first.`);
+  console.log(`Target verified: ref=${DEV_PROJECT_REF} organization=${DEV_ORGANIZATION_ID} status=${project.status ?? "unknown"}`);
 
-const supabase = supabaseCli(cliEnvironment(token));
-supabase("link", "--project-ref", DEV_PROJECT_REF);
+  const supabase = supabaseCli(cliEnvironment(token));
+  supabase("link", "--project-ref", DEV_PROJECT_REF);
 
-const linkedRefFile = path.join(root, "supabase", ".temp", "project-ref");
-const linkedRef = existsSync(linkedRefFile) ? readFileSync(linkedRefFile, "utf8").trim() : "";
-if (linkedRef !== DEV_PROJECT_REF) {
-  fail(`Refusing: supabase/.temp/project-ref is '${linkedRef}', expected '${DEV_PROJECT_REF}'.`);
+  const linkedRefFile = path.join(root, "supabase", ".temp", "project-ref");
+  const linkedRef = existsSync(linkedRefFile) ? readFileSync(linkedRefFile, "utf8").trim() : "";
+  if (linkedRef !== DEV_PROJECT_REF) {
+    fail(`Refusing: supabase/.temp/project-ref is '${linkedRef}', expected '${DEV_PROJECT_REF}'.`);
+  }
+
+  console.log("Pending migrations (dry run):");
+  supabase("db", "push", "--linked", "--skip-vault", "--dry-run");
+
+  if (!apply) {
+    console.log("Dry run only; nothing was applied. To push these migrations run: npm run db:push:dev:apply");
+    return;
+  }
+
+  const answer = await ask(`Type the project ref (${DEV_PROJECT_REF}) to apply these migrations: `);
+  if (answer !== DEV_PROJECT_REF) fail("Cancelled; nothing was applied.");
+
+  supabase("db", "push", "--linked", "--skip-vault", "--yes");
+  supabase("migration", "list", "--linked");
 }
 
-console.log("Pending migrations (dry run):");
-supabase("db", "push", "--linked", "--skip-vault", "--dry-run");
-
-if (!apply) {
-  console.log("Dry run only; nothing was applied. To push these migrations run: npm run db:push:dev:apply");
-  process.exit(0);
+// Leave through process.exitCode, never process.exit(): on Windows, Node 24 can abort with
+// "Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)" when process.exit() runs after fetch().
+try {
+  await main();
+} catch (error) {
+  console.error(error instanceof Stop ? error.message : error);
+  process.exitCode = error instanceof Stop ? error.exitCode : 1;
 }
-
-const answer = await ask(`Type the project ref (${DEV_PROJECT_REF}) to apply these migrations: `);
-if (answer !== DEV_PROJECT_REF) fail("Cancelled; nothing was applied.");
-
-supabase("db", "push", "--linked", "--skip-vault", "--yes");
-supabase("migration", "list", "--linked");
