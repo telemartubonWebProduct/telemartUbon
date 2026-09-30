@@ -31,13 +31,33 @@ export type Database = {
                   Relationships: [
                     
                   ]
+                },"content_drafts": {
+                  Row: {
+                    "body": NonNullable<Json>,"created_at": string,"document_id": string,"revision": number,"schema_version": number,"updated_at": string,"updated_by": string | null
+                  }
+                  Insert: {
+                    "body": NonNullable<Json>,"created_at"?: string,"document_id": string,"revision"?: number,"schema_version": number,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "body"?: NonNullable<Json>,"created_at"?: string,"document_id"?: string,"revision"?: number,"schema_version"?: number,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    
+                  ]
                 }
           }
           Views: {
             [_ in never]: never
           }
           Functions: {
-            [_ in never]: never
+            "discard_content_draft":
+{ Args: { "p_document_id": string,"p_expected_revision": number }; Returns: undefined
+                           },
+"save_content_draft":
+{ Args: { "p_body": Json,"p_document_id": string,"p_expected_revision": number,"p_schema_version": number }; Returns: {
+              "revision": number,"updated_at": string
+            }[]
+                           }
           }
           Enums: {
             [_ in never]: never
