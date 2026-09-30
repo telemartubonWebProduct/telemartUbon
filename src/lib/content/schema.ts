@@ -170,6 +170,7 @@ export const uiKeys = [
   "offerPrice",
   "emptyGroup",
   "jumpTo",
+  "contents",
   "call",
   "email",
   "chatOnLine",
@@ -208,6 +209,7 @@ export const siteSettings = z.strictObject({
   navigation: z.array(navItem),
   headerCta: cta,
   footer: z.strictObject({
+    about: localizedText,
     groups: z.array(z.strictObject({ id: stableId, heading: localizedText, links: z.array(link) })),
     copyright: localizedText,
   }),
@@ -262,7 +264,10 @@ export const homePage = z.strictObject({
     note: localizedText,
     primaryCta: cta,
     secondaryCta: cta,
-    visualAlt: localizedText,
+    /** Router picture: the poster, and the fallback of the 3D model. */
+    visual: stableId,
+    /** Visible line under the picture, such as "illustration, not the installed model". */
+    visualNote: localizedText,
   }),
   services: z.strictObject({
     heading: localizedText,
@@ -367,6 +372,17 @@ export const contactPage = z.strictObject({
   seo,
   hero: z.strictObject({ heading: localizedText, description: localizedText }),
   channelsHeading: localizedText,
+  /** Contact channels in display order; addresses come from site settings. */
+  channels: z
+    .array(
+      z.strictObject({
+        id: stableId,
+        channel: contactChannel,
+        title: localizedText,
+        description: localizedText,
+      }),
+    )
+    .min(1),
   formNote: localizedText,
 });
 export type ContactPage = z.infer<typeof contactPage>;

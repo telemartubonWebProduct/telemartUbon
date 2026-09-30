@@ -20,6 +20,38 @@ export const contactPage: ContactPage = {
     ),
   },
   channelsHeading: t("ช่องทางติดต่อ", "Ways to reach us"),
+  // The old contact page's LINE button opened lineService; the footer paired
+  // lineSales with the @341tmfte QR code. Which account the business wants here
+  // is on the review list (docs/renovation/M2-PUBLIC-SITE.md).
+  channels: [
+    {
+      id: "line",
+      channel: "line-sales",
+      title: t("LINE", "LINE"),
+      description: t(
+        "สอบถามแพ็กเกจ ขอคำแนะนำ หรือขอให้เจ้าหน้าที่ติดต่อกลับ",
+        "Ask about packages, get advice or ask us to call you back.",
+      ),
+    },
+    {
+      id: "phone",
+      channel: "phone-sales",
+      title: t("โทรศัพท์", "Phone"),
+      description: t("โทรคุยกับฝ่ายขายได้โดยตรง", "Call our sales team directly."),
+    },
+    {
+      id: "email",
+      channel: "email",
+      title: t("อีเมล", "Email"),
+      description: t("ส่งรายละเอียดหรือเอกสารถึงเรา", "Send us details or documents."),
+    },
+    {
+      id: "facebook",
+      channel: "facebook",
+      title: t("เฟซบุ๊ก", "Facebook"),
+      description: t("ติดตามข่าวและส่งข้อความถึงเพจของเรา", "Follow our news and message our page."),
+    },
+  ],
   formNote: t(
     "ต้องการให้เจ้าหน้าที่โทรกลับ ส่งชื่อ เบอร์โทร และพื้นที่ที่ต้องการติดตั้งมาทาง LINE ได้เลย",
     "Want us to call you back? Send your name, phone number and the area you need service in on LINE.",

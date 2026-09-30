@@ -9,8 +9,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
         // Telemart design tokens (src/styles/tokens.css).
         tm: {
           canvas: "var(--tm-color-canvas)",
@@ -24,7 +22,10 @@ export default {
             wash: "var(--tm-color-red-wash)",
           },
           "on-red": "var(--tm-color-on-red)",
-          "on-ink": "var(--tm-color-on-ink)",
+          "on-ink": {
+            DEFAULT: "var(--tm-color-on-ink)",
+            muted: "var(--tm-color-on-ink-muted)",
+          },
           danger: {
             DEFAULT: "var(--tm-color-danger)",
             wash: "var(--tm-color-danger-wash)",

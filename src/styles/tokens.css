@@ -21,6 +21,7 @@
   --tm-color-red-wash: #fdebec;
   --tm-color-on-red: #ffffff;
   --tm-color-on-ink: #ffffff;
+  --tm-color-on-ink-muted: #d4d4d8; /* secondary text on black, 14.2:1 */
   --tm-color-danger: #b8000e;
   --tm-color-danger-wash: #fdebec;
   --tm-color-success: #166534;

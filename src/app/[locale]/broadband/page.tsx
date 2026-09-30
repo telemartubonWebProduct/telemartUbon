@@ -1,22 +1,16 @@
-"use client";
-import BannerBoardbandNewcus from "@/components/HomeInternet/new-customer/Banner";
-import Bannertwo from "@/components/HomeInternet/new-customer/bannertwo";
-import PackageBroadbandNew from "@/components/HomeInternet/new-customer/Package";
-import Sectiontwo from "@/components/HomeInternet/new-customer/Sectiontwo";
-import MainLayout from "@/layouts/MainLayout";
-import { Box } from "@mui/material";
+import type { Metadata } from "next";
 
-export default function Broadband() {
-    return (
-        <>
-            <MainLayout>
-                <Box className="bg-white">
-                    <BannerBoardbandNewcus />
-                    <PackageBroadbandNew />
-                    <Bannertwo />
-                    <Sectiontwo />
-                </Box>
-            </MainLayout>
-        </>
-    );
+import { PackagePageView } from "@/components/site/PackagePageView";
+import { getPackagePage } from "@/lib/content";
+import { pageLocale } from "@/lib/i18n/page";
+import { pageMetadata } from "@/lib/seo/metadata";
+
+const page = getPackagePage("/broadband");
+
+export async function generateMetadata({ params }: PageProps<"/[locale]/broadband">): Promise<Metadata> {
+  return pageMetadata({ locale: await pageLocale(params), path: page.path, seo: page.seo });
+}
+
+export default async function Page({ params }: PageProps<"/[locale]/broadband">) {
+  return <PackagePageView page={page} locale={await pageLocale(params)} />;
 }

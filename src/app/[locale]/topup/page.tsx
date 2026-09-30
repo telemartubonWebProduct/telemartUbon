@@ -1,25 +1,16 @@
+import type { Metadata } from "next";
 
-"use client";
-import BannerTop from "@/components/Topup/BannerTop";
+import { PackagePageView } from "@/components/site/PackagePageView";
+import { getPackagePage } from "@/lib/content";
+import { pageLocale } from "@/lib/i18n/page";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-import Promotion from "@/components/Topup/Promotion";
-import PromotionBannerTopup from "@/components/Topup/promotionBanner";
-import MainLayout from "@/layouts/MainLayout";
+const page = getPackagePage("/topup");
 
-import Box from "@mui/material/Box";
+export async function generateMetadata({ params }: PageProps<"/[locale]/topup">): Promise<Metadata> {
+  return pageMetadata({ locale: await pageLocale(params), path: page.path, seo: page.seo });
+}
 
-export default function Topup() {
-    return (
-        <>
-            <MainLayout>
-                <Box className="bg-white">
-                    <BannerTop />
-                    <PromotionBannerTopup/>
-                    <Box className="flex justify-center items-center">
-                    <Promotion/>
-                    </Box>
-                </Box>
-            </MainLayout>
-        </>
-    );
+export default async function Page({ params }: PageProps<"/[locale]/topup">) {
+  return <PackagePageView page={page} locale={await pageLocale(params)} />;
 }

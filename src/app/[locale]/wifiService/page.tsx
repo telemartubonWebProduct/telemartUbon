@@ -1,54 +1,53 @@
-"use client";
+import type { Metadata } from "next";
+import Image from "next/image";
 
-import { lineSupport } from "@/globals/buttonActionPath";
-import MainLayout from "@/layouts/MainLayout";
-import { Box, Typography, Button } from "@mui/material";
-import Link from "next/link";
+import { CtaLink } from "@/components/site/links";
+import { PageHero } from "@/components/site/PageHero";
+import { PageShell } from "@/components/site/PageShell";
+import { Steps } from "@/components/site/Steps";
+import { content, getMedia } from "@/lib/content";
+import { tx } from "@/lib/content/render";
+import { pageLocale } from "@/lib/i18n/page";
+import { pageMetadata } from "@/lib/seo/metadata";
 
+const page = content.pages.agent;
 
-export default function WifiService() {
+export async function generateMetadata({ params }: PageProps<"/[locale]/wifiService">): Promise<Metadata> {
+  return pageMetadata({ locale: await pageLocale(params), path: page.path, seo: page.seo });
+}
+
+export default async function ApplyWithAgentPage({ params }: PageProps<"/[locale]/wifiService">) {
+  const locale = await pageLocale(params);
+  const { site } = content;
+  const image = getMedia(page.hero.image);
   return (
-    <MainLayout>
-      <Box className="bg-white min-h-screen w-full mx-auto">
-       
-        <Box
-          className="relative w-full h-[550px]
-                    bg-no-repeat bg-center bg-cover
-                    sm:bg-[url('/assets/WifiService/banner01.webp')] bg-[url('/assets/WifiService/banner02.webp')]"
-        >
-          <Box className="absolute inset-0 flex flex-col justify-center items-start pl-16 w-full h-full text-white">
-            <Typography fontFamily={"Prompt"} variant="h3" className="font-bold">
-              สมัครเน็ตบ้านผ่านเจ้าหน้าที่
-            </Typography>
-            <Typography fontFamily={"Prompt"} variant="h5" className="mt-4">
-              ติดตั้งเน็ตบ้านไฟเบอร์ง่ายๆ เพียงกรอกข้อมูล เจ้าหน้าที่พร้อมให้บริการ
-            </Typography>
-          </Box>
-        </Box>
-
-        
-        <Box
-          className="relative w-full h-[700px]
-                    bg-no-repeat bg-center bg-cover
-                    bg-[url('/assets/WifiService/banner03.webp')]"  
-        >
-             <Box className="absolute inset-0 flex flex-col justify-center items-start pl-16 w-full h-full text-black">
-            <Typography fontFamily={"Prompt"} variant="h3" className="font-bold">
-              สมัครเน็ตบ้านผ่านเจ้าหน้าที่
-            </Typography>
-            <Typography fontFamily={"Prompt"} variant="h5" className="mt-4">
-              ติดตั้งเน็ตบ้านไฟเบอร์ง่ายๆ เพียงกรอกข้อมูล เจ้าหน้าที่พร้อมให้บริการ
-            </Typography>
-            <Box className=" flex justify-end items-end">
-            <Link  href={lineSupport}>
-            <Button variant="contained"  className="mt-4 justify-end rounded-lg font-['Prompt',serif] bg-[#FB4141] hover:bg-[#FB4141]" >
-                ติดต่อเจ้าหน้าที่กดเลย
-            </Button>
-            </Link>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-    </MainLayout>
+    <PageShell locale={locale} path={page.path}>
+      <PageHero
+        heading={tx(page.hero.heading, locale)}
+        description={tx(page.hero.description, locale)}
+        actions={
+          <>
+            <CtaLink cta={page.hero.primaryCta} locale={locale} site={site} />
+            <CtaLink cta={page.hero.secondaryCta} locale={locale} site={site} />
+          </>
+        }
+        media={
+          <Image
+            src={image.src}
+            width={image.width}
+            height={image.height}
+            alt={tx(image.alt, locale)}
+            preload
+            sizes="(min-width: 1024px) 36rem, 100vw"
+            className="aspect-[16/9] w-full rounded-tm-panel object-cover"
+          />
+        }
+      />
+      <Steps
+        id="agent-steps"
+        heading={tx(page.steps.heading, locale)}
+        items={page.steps.items.map((item) => ({ id: item.id, title: tx(item.title, locale), description: tx(item.description, locale) }))}
+      />
+    </PageShell>
   );
 }

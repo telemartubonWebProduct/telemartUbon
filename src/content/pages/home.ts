@@ -38,10 +38,8 @@ export const home: HomePage = {
       target: page("/service"),
       style: "secondary",
     },
-    visualAlt: t(
-      "ภาพประกอบเราเตอร์ Wi-Fi สีขาวพร้อมวงสัญญาณสีแดง ไม่ใช่ภาพรุ่นจริง",
-      "Illustration of a white Wi-Fi router with red signal rings, not a specific model",
-    ),
+    visual: "router-concept",
+    visualNote: t("ภาพประกอบ ไม่ใช่รุ่นที่ติดตั้งจริง", "Illustration, not the exact model you receive"),
   },
   services: {
     heading: t("เลือกบริการที่ต้องการ", "What are you looking for?"),

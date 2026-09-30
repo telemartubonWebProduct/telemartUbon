@@ -54,6 +54,10 @@ export const site: SiteSettings = {
     style: "primary",
   },
   footer: {
+    about: t(
+      "แพ็กเกจเน็ตบ้านทรู เน็ตมือถือ และโซลาร์เซลล์ W&W Energy เจ้าหน้าที่ช่วยเลือกและติดต่อกลับ รับเรื่องจากทุกจังหวัด",
+      "True home internet, mobile packages and W&W Energy solar. Our team helps you choose and calls you back, wherever you are in Thailand.",
+    ),
     groups: [
       {
         id: "services",
@@ -116,6 +120,7 @@ export const site: SiteSettings = {
       "No checked packages in this category yet. Ask our team for the latest offers.",
     ),
     jumpTo: t("ไปยังหมวด", "Jump to"),
+    contents: t("หัวข้อในหน้านี้", "On this page"),
     call: t("โทร", "Call"),
     email: t("อีเมล", "Email"),
     chatOnLine: t("แชตทาง LINE", "Chat on LINE"),

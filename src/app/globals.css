@@ -2,22 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #f8f8f8;
-    --foreground: #ededed;
+@layer base {
+  body {
+    margin: 0;
+    background: var(--tm-color-canvas);
+    color: var(--tm-color-ink);
   }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: "Prompt", Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
 /* Back office (src/app/admin), built on the Telemart tokens. */
@@ -40,5 +30,183 @@ body {
 
   .tm-admin .tm-on-ink :focus-visible {
     outline-color: var(--tm-color-focus-inverse);
+  }
+}
+
+/* Public site (src/app/[locale]), built on the same tokens. */
+@layer components {
+  .tm-site {
+    --tm-font-sans: var(--font-plex-thai), "IBM Plex Sans Thai", Tahoma, sans-serif;
+    min-height: 100dvh;
+    background: var(--tm-color-canvas);
+    color: var(--tm-color-ink);
+    font-family: var(--tm-font-sans);
+    font-size: var(--tm-text-body);
+    line-height: var(--tm-leading-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .tm-site :focus-visible {
+    outline: 3px solid var(--tm-color-focus);
+    outline-offset: 2px;
+  }
+
+  .tm-site .tm-on-ink :focus-visible {
+    outline-color: var(--tm-color-focus-inverse);
+  }
+
+  /* In-page anchors land below the sticky header. */
+  .tm-site [id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  .tm-container {
+    width: 100%;
+    max-width: var(--tm-content-max);
+    margin-inline: auto;
+    padding-inline: var(--tm-gutter);
+  }
+
+  .tm-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: var(--tm-control-height);
+    padding: 0.625rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--tm-radius-control);
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    text-decoration: none;
+    transition-property: background-color, border-color, color;
+    transition-duration: var(--tm-duration-fast);
+    transition-timing-function: var(--tm-ease-out);
+  }
+
+  .tm-button-primary {
+    background: var(--tm-color-red);
+    border-color: var(--tm-color-red);
+    color: var(--tm-color-on-red);
+  }
+
+  .tm-button-primary:hover {
+    background: var(--tm-color-red-press);
+    border-color: var(--tm-color-red-press);
+  }
+
+  .tm-button-secondary {
+    background: transparent;
+    border-color: var(--tm-color-ink);
+    color: var(--tm-color-ink);
+  }
+
+  .tm-button-secondary:hover {
+    background: var(--tm-color-ink);
+    color: var(--tm-color-on-ink);
+  }
+
+  .tm-on-ink .tm-button-secondary {
+    border-color: var(--tm-color-on-ink);
+    color: var(--tm-color-on-ink);
+  }
+
+  .tm-on-ink .tm-button-secondary:hover {
+    background: var(--tm-color-on-ink);
+    color: var(--tm-color-ink);
+  }
+
+  .tm-link {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+  }
+
+  .tm-link:hover {
+    text-decoration-color: var(--tm-color-red);
+    text-decoration-thickness: 2px;
+  }
+
+  /* Prices and speeds line up digit by digit. */
+  .tm-num {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Package comparison: every card in a row of cards shares the same row
+     tracks (subgrid), so name, speed, price, contract and benefits line up
+     across packages whatever their lengths. */
+  .tm-compare {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16.5rem), 1fr));
+    gap: 1rem;
+  }
+
+  .tm-compare-card {
+    display: grid;
+    grid-row: span var(--tm-rows);
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
+
+  @supports not (grid-template-rows: subgrid) {
+    .tm-compare-card {
+      display: flex;
+      flex-direction: column;
+      grid-row: auto;
+    }
+  }
+
+  .tm-compare-card > * + * {
+    border-top: 1px solid var(--tm-color-line);
+  }
+
+  /* A package without a field keeps the row, without drawing an empty box. */
+  .tm-compare-card > :empty {
+    border-top-color: transparent;
+  }
+
+  .tm-compare-compact {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: 0.75rem;
+  }
+
+  .tm-faq summary {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .tm-faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .tm-faq [data-open-icon] {
+    transition: transform var(--tm-duration-base) var(--tm-ease-out);
+  }
+
+  .tm-faq details[open] [data-open-icon] {
+    transform: rotate(45deg);
+  }
+
+  @keyframes tm-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* The one orchestrated moment on the page: the hero visual arrives once. */
+  .tm-reveal {
+    animation: tm-reveal 700ms var(--tm-ease-out) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tm-reveal {
+      animation: none;
+    }
   }
 }

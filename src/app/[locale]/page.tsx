@@ -1,93 +1,29 @@
-"use client";
+import type { Metadata } from "next";
 
-import { useEffect } from "react";
+import { Faq, FeaturedPackages, HomeSteps, MobileAddons, ServiceChooser, SolarTeaser } from "@/components/site/home/HomeSections";
+import { HomeHero } from "@/components/site/home/HomeHero";
+import { PageShell } from "@/components/site/PageShell";
+import { content } from "@/lib/content";
+import { pageLocale } from "@/lib/i18n/page";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-import Carousel from "@/components/home/Carousel/Carousel";
-import HeaderBar from "@/components/home/HeaderBar/HeaderBar";
-import Introducing from "@/components/home/Introducing/Introducing";
+const page = content.pages.home;
 
+export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
+  return pageMetadata({ locale: await pageLocale(params), path: page.path, seo: page.seo });
+}
 
-import MainLayout from "@/layouts/MainLayout";
-import CategoryCards from "@/components/home/Category/Category";
-import { Box, Grid } from "@mui/material";
-import PackageOffers from "@/components/home/PackageOffers/PackageOffers";
-import HomeInternet from "@/components/home/HomeInternet/HomeInternet";
-import Banner from "@/components/home/ฺBanner/Banner";
-import WifiHome from "@/components/home/WifiHome/WifiHome";
-import Announce from "@/components/home/announce/Announce";
-
-
-
-
-
-export default function Home() {
-  useEffect(() => {
-    if (typeof window.gtag === "function") {
-      window.gtag("event", "conversion", {
-        send_to: "AW-18007307609/51JQCLqnuIYcENnqxopD",
-        value: 1.0,
-        currency: "THB",
-      });
-    }
-  }, []);
-
+export default async function HomePage({ params }: PageProps<"/[locale]">) {
+  const locale = await pageLocale(params);
   return (
-    <>
-      <MainLayout>
-        <Box className="min-h-screen w-full   mx-auto ">
-          <HeaderBar />
-          <Grid container spacing={0} className="w-full mx-auto ">
-            <Grid id="carousel" item xs={12} md={12} lg={12}>
-              <Carousel />
-            </Grid>
-
-            <Grid item xs={12} md={12} lg={12}>
-              <Box id="introducing" className="w-full mx-auto">
-                <Introducing />
-              </Box>
-            </Grid>
-
-            <Grid item xs={12} md={12} lg={12}  className="bg-gray-100 mb-8">
-                <Box id="category" className="w-full mx-auto">
-                  <Announce />
-                </Box>
-              </Grid>
-      
-        
-              <Grid item xs={12} md={12} lg={12}>
-                <Box id="category" className="w-full mx-auto">
-                  <CategoryCards />
-                </Box>
-              </Grid>
-          
-            <Grid item xs={12} md={12} lg={12}>
-              <Box id="wifihome" className="w-full mx-auto mb-8">
-              <WifiHome />
-              </Box>
-            </Grid>
-           
-            <Grid item xs={12} md={12} lg={12}>
-              <Box id="packageoffers" className="w-full mx-auto">
-                <PackageOffers />
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={12} lg={12}>
-              <Box id="home-internet" className="w-full mx-auto">
-                <HomeInternet />
-              </Box>
-            </Grid>
-          
-           
-            <Grid item xs={12} md={12} lg={12}>
-              <Banner />
-             
-            </Grid>
-
-          </Grid>
-           
-
-        </Box>
-      </MainLayout>
-    </>
+    <PageShell locale={locale} path={page.path}>
+      <HomeHero locale={locale} />
+      <ServiceChooser locale={locale} />
+      <FeaturedPackages locale={locale} />
+      <MobileAddons locale={locale} />
+      <HomeSteps locale={locale} />
+      <SolarTeaser locale={locale} />
+      <Faq locale={locale} />
+    </PageShell>
   );
 }

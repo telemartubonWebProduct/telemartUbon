@@ -1,24 +1,16 @@
-"use client";
-import BannerMonthy from "@/components/Monthy/Banner";
-import BannerproMonthy from "@/components/Monthy/bannerPromotion";
-import PromotionMonthy from "@/components/Monthy/Promotions";
+import type { Metadata } from "next";
 
-import MainLayout from "@/layouts/MainLayout";
+import { PackagePageView } from "@/components/site/PackagePageView";
+import { getPackagePage } from "@/lib/content";
+import { pageLocale } from "@/lib/i18n/page";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-import Box from "@mui/material/Box";
+const page = getPackagePage("/monthy");
 
-export default function Monthly() {
-    return (
-        <>
-            <MainLayout>
-                <Box className="bg-white">
-                    <BannerMonthy />
-                    <BannerproMonthy/>
-                    <Box className="flex justify-center items-center">
-                    <PromotionMonthy/>
-                    </Box>
-                </Box>
-            </MainLayout>
-        </>
-    );
+export async function generateMetadata({ params }: PageProps<"/[locale]/monthy">): Promise<Metadata> {
+  return pageMetadata({ locale: await pageLocale(params), path: page.path, seo: page.seo });
+}
+
+export default async function Page({ params }: PageProps<"/[locale]/monthy">) {
+  return <PackagePageView page={page} locale={await pageLocale(params)} />;
 }

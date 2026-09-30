@@ -108,6 +108,7 @@ export function contentProblems(content: SiteContent): string[] {
   needMedia(site.brand.logo, "site brand");
   needMedia(site.contact.lineQr, "site contact");
   needMedia(site.seo.image, "site seo");
+  needMedia(pages.home.hero.visual, "home hero");
   needMedia(pages.home.solar.image, "home solar");
   needMedia(pages.solar.hero.image, "solar hero");
   needMedia(pages.solar.about.image, "solar about");

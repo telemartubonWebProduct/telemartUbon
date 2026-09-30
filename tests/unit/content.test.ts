@@ -1,3 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { publicPages } from "@/content/routes";
@@ -81,6 +84,18 @@ describe("site content", () => {
     const boosts = publicPackages("broadband-existing", "speed-boost").map((item) => item.id);
     expect(boosts).toContain("boost-1000-500");
     expect(boosts).not.toContain("boost-1000-500-duplicate");
+  });
+
+  it("points every media entry at a file in public/, with the SVG's real size", () => {
+    for (const [id, asset] of Object.entries(content.media)) {
+      const file = path.join(process.cwd(), "public", decodeURIComponent(asset.src));
+      expect(existsSync(file), `${id}: ${asset.src}`).toBe(true);
+      if (asset.src.endsWith(".svg")) {
+        const svg = readFileSync(file, "utf8");
+        expect(svg, id).toContain(`width="${asset.width}"`);
+        expect(svg, id).toContain(`height="${asset.height}"`);
+      }
+    }
   });
 
   it("shows only regular prices above offer prices", () => {

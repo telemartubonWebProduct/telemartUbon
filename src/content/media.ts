@@ -136,6 +136,20 @@ export const media = {
   "solar-knowledge-7": asset("/assets/wEnergy/knowledge/install7.webp", 300, 236, "photo", "หน้าจอแอปติดตามการผลิตไฟฟ้า", "Monitoring app showing power production"),
   "solar-knowledge-8": asset("/assets/wEnergy/knowledge/install8.webp", 300, 170, "photo", "การล้างทำความสะอาดแผงโซลาร์เซลล์", "Cleaning solar panels"),
 
+  // Drawn for this site (M2). A concept, not a specific True router: replace it
+  // once the business approves a product reference (docs/renovation/3D-MEDIA-PLAN.md).
+  "router-concept": {
+    src: "/media/router-concept.svg",
+    width: 624,
+    height: 405,
+    kind: "illustration",
+    alt: {
+      th: "ภาพประกอบเราเตอร์ Wi-Fi สีขาวพร้อมวงสัญญาณสีแดง ไม่ใช่ภาพรุ่นจริง",
+      en: "Illustration of a white Wi-Fi router with red signal rings, not a specific model",
+    },
+    source: "วาดสำหรับเว็บนี้ (scripts/media/router-concept.py)",
+  },
+
   // Apply with an agent
   "agent-support": asset(
     "/assets/HomeInternet/home-tol-Applywithagent.webp",

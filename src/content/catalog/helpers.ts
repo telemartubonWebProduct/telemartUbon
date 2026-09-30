@@ -14,7 +14,7 @@ export const days = (n: number) => t(`${n} วัน`, n === 1 ? "1 day" : `${n}
 
 export const autoRenew = t("ต่ออายุอัตโนมัติ", "Renews automatically");
 
-export const contractMonths = (n: number) => t(`สัญญา ${n} เดือน`, `${n}-month contract`);
+export const contractMonths = (n: number) => t(`${n} เดือน`, `${n} months`);
 
 const importedNote = "นำเข้าจากเว็บเดิม: ธุรกิจต้องยืนยันราคาและเงื่อนไขปัจจุบันก่อนเปิดใช้งาน";
 
@@ -23,7 +23,7 @@ type Draft = Omit<CatalogPackage, "benefits" | "details" | "conditions" | "revie
   details?: LocalizedText[];
   conditions?: LocalizedText[];
   image?: MediaId;
-  /** Legacy file under src/datas and the export/entry the record came from. */
+  /** Legacy file under src/datas (removed in M2; see commit 87c70d2) and the export/entry the record came from. */
   from: [file: string, entry: string];
   /** Extra review notes (Thai). */
   notes?: string[];
