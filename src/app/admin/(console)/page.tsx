@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { pageTitle } from "@/components/admin/styles";
+import { pageTitle, textLink } from "@/components/admin/styles";
 import { requireActiveAdmin } from "@/lib/auth/access";
 
 export const metadata: Metadata = { title: "ภาพรวม" };
 
 const upcoming = [
-  { label: "แก้ไขหน้าเว็บแบบเห็นหน้าจริง (Mirror Editor)", milestone: "M3" },
-  { label: "แพ็กเกจ บริการ และคลังสื่อ", milestone: "M2–M3" },
-  { label: "เผยแพร่ ประวัติการแก้ไข และย้อนกลับ", milestone: "M4" },
+  { label: "เผยแพร่ร่าง ประวัติการแก้ไข และย้อนกลับ", milestone: "M4" },
+  { label: "อัปโหลดรูปใหม่เข้าคลังสื่อ", milestone: "M4" },
   { label: "คำขอให้ติดต่อกลับและรายงาน", milestone: "M5" },
 ];
 
@@ -37,6 +37,22 @@ export default async function AdminOverviewPage() {
             การเข้าถึงจะหยุดในคำขอถัดไปทันที
           </dd>
         </dl>
+      </section>
+
+      <section aria-labelledby="tools-heading" className="mt-12">
+        <h2 id="tools-heading" className="text-tm-h4 font-semibold">
+          เครื่องมือ
+        </h2>
+        <ul className="mt-4 divide-y divide-tm-line border-y border-tm-line">
+          <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+            <Link href="/admin/editor" className={textLink}>
+              แก้ไขหน้าเว็บ (Mirror Editor)
+            </Link>
+            <span className="text-tm-small text-tm-muted">
+              แก้ข้อความ รูป ปุ่ม และสีบนหน้าจริง บันทึกเป็นร่างอัตโนมัติ หน้าเว็บจริงยังไม่เปลี่ยนจนกว่าจะเผยแพร่ (M4)
+            </span>
+          </li>
+        </ul>
       </section>
 
       <section aria-labelledby="next-heading" className="mt-12">

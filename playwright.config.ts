@@ -25,9 +25,9 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
-    // Auth flows share per-run accounts, so they run once (desktop; the spec
-    // covers the phone layout with its own viewport).
-    { name: "mobile", use: { ...devices["Pixel 7"] }, testIgnore: /admin-auth\.spec\.ts/ },
+    // Back-office flows share per-run accounts and drafts, so they run once
+    // (desktop; the specs cover phone layouts with their own viewports).
+    { name: "mobile", use: { ...devices["Pixel 7"] }, testIgnore: /admin-[a-z]+\.spec\.ts/ },
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined

@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 // Sections appear here as their milestones ship; the shell stays the same.
-const sections = [{ href: "/admin", label: "ภาพรวม" }] as const;
+const sections = [
+  { href: "/admin", label: "ภาพรวม" },
+  { href: "/admin/editor", label: "แก้ไขหน้าเว็บ" },
+] as const;
 
 export function AdminNav() {
   const pathname = usePathname();
