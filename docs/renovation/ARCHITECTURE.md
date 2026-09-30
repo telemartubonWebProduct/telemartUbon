@@ -2,7 +2,7 @@
 
 สถานะ: **เลือก A+B+C แล้ว เตรียม architecture/dependencies สำหรับ dev handoff** ติดตั้ง Supabase JS, Supabase SSR, Zod และ GA Data client แบบ exact versions ใน package manifest/lockfile รวมถึง skills เตรียมงาน 4 รายการ เว็บยังใช้ implementation เดิม ยังไม่ได้สร้าง CMS ใหม่ เชื่อม application กับ Supabase เปลี่ยน schema หรือ deploy
 
-อัปเดต M1 (2026-09-29): สร้างแล้ว — Next 16.3.7/React 19.3.0, design tokens, route group `(public)` + หลังบ้าน `/admin`, Supabase SSR Auth แบบ Admin role เดียว, migration `admin_memberships`/`audit_log` พร้อม RLS และ CI ทดสอบกับ Supabase local stack; migration ยังไม่ได้ apply ที่ dev project และยังไม่ deploy ดู [M1-FOUNDATION.md](M1-FOUNDATION.md)
+อัปเดต M1 (2026-09-29): สร้างแล้ว — Next 16.3.7/React 19.3.0, design tokens, route group `(public)` + หลังบ้าน `/admin`, Supabase SSR Auth แบบ Admin role เดียว, migration `admin_memberships`/`audit_log` พร้อม RLS และ CI ทดสอบกับ Supabase local stack และ CI บน GitHub; 30 ก.ย. เจ้าของ apply migration ที่ dev project และสร้าง Admin คนแรกแล้ว (เจ้าของแจ้ง) ยังไม่ deploy ดู [M1-FOUNDATION.md](M1-FOUNDATION.md)
 
 Supabase target: **ผู้ใช้สร้าง resource แล้ว และตรวจ metadata/query ผ่าน MCP สำเร็จ** ใช้ project `wdcbbjvxrcxuaabcipqo` ใน organization `telemart-ubon` ตามรายละเอียด section 6 พร้อมสำหรับ dev handoff; application Auth/CMS/schema ยังไม่ได้ทำ และยังไม่ใช่ระบบ live
 

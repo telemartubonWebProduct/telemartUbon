@@ -1,6 +1,6 @@
 # แผนรีโนเวท Telemart Ubon
 
-สถานะ 2026-09-29: **M1 Foundation เสร็จในส่วนโค้ดและทดสอบกับ Supabase local stack แล้ว** (Next 16.3.7/React 19.3.0, design tokens, shell, Auth Admin role เดียว + RLS/migration, CI) ยังไม่ได้ apply migration กับ dev project `wdcbbjvxrcxuaabcipqo` ไม่ได้ deploy และไม่ได้เปลี่ยน DNS — ผลและสิ่งที่ต้องตั้งค่าต่ออยู่ใน [M1-FOUNDATION.md](M1-FOUNDATION.md) ขั้นถัดไปคือ M2
+สถานะ 2026-09-29 (อัปเดต 30 ก.ย.): **M1 Foundation เสร็จในส่วนโค้ดและทดสอบกับ Supabase local stack และ CI บน GitHub แล้ว** (Next 16.3.7/React 19.3.0, design tokens, shell, Auth Admin role เดียว + RLS/migration, CI) เจ้าของ apply migration กับ dev project `wdcbbjvxrcxuaabcipqo` และสร้าง Admin คนแรกแล้ว (เจ้าของแจ้ง 30 ก.ย.) ไม่ได้ deploy และไม่ได้เปลี่ยน DNS — ผลและสิ่งที่ต้องตั้งค่าต่ออยู่ใน [M1-FOUNDATION.md](M1-FOUNDATION.md) ขั้นถัดไปคือ M2
 
 ## เป้าหมายที่รับจากผู้ใช้
 
@@ -62,7 +62,7 @@ URL เดิมต้องคงไว้หรือมี redirect map ท�
 
 แต่ละ milestone ต้องส่ง demo ที่ตรวจได้และระบุข้อจำกัด ไม่ถือว่าติดตั้งแพ็กเกจหรือ build ผ่านเท่ากับ service เชื่อมสำเร็จหรือ deploy แล้ว
 
-ผล M1 (2026-09-29, อัปเดต 30 ก.ย.): lint/typecheck/build ผ่าน, unit 59/59, pgTAP RLS 45/45, Playwright 35/35 (รวม login/logout/recovery/invite/denied 13 ข้อกับ Supabase Auth ใน local stack), `npm audit` 19 → 0 และภาพหน้าเว็บเดิม 10 URL ตรงกับ build เดิม ส่วนที่ยังต้องใช้สิทธิ์เจ้าของ: apply migration และตั้งค่า Auth ที่ dev project, สิทธิ์ push GitHub ดูรายการใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
+ผล M1 (2026-09-29, อัปเดต 30 ก.ย.): lint/typecheck/build ผ่าน, unit 59/59, pgTAP RLS 45/45, Playwright 35/35 (รวม login/logout/recovery/invite/denied 13 ข้อกับ Supabase Auth ใน local stack), `npm audit` 19 → 0 และภาพหน้าเว็บเดิม 10 URL ตรงกับ build เดิม CI บน GitHub ผ่านทั้ง 2 jobs ใน draft PR #2; migration และ Admin คนแรกทำแล้วที่ dev project (เจ้าของแจ้ง 30 ก.ย.) ส่วนที่ยังเหลือดูใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
 
 ## ขอบเขตการจัดการทุกค่า
 

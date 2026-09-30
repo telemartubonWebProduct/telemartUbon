@@ -2,7 +2,7 @@
 
 วันที่ 29 กันยายน 2026 · branch `claude/vigilant-hypatia-czj87e` (เริ่มจาก `codex/telemart-dev-handoff` commit `d3363b2`)
 
-**สรุป:** งานโค้ดของ M1 เสร็จและทดสอบผ่านบน Linux (Node 24.18.0) กับ Supabase ที่รันจริงแบบ local stack (Auth, Data API, Postgres 17.6) แล้ว **ยังไม่ได้ apply migration หรือทดสอบกับ Supabase dev project `wdcbbjvxrcxuaabcipqo`** เพราะ session นี้ไม่มี access token/รหัสฐานข้อมูล และ network policy ปิด `api.supabase.com` ไม่มีการ deploy และไม่มีการเปลี่ยน DNS
+**สรุป:** งานโค้ดของ M1 เสร็จและทดสอบผ่านบน Linux (Node 24.18.0) กับ Supabase ที่รันจริงแบบ local stack (Auth, Data API, Postgres 17.6) และบน GitHub Actions ใน [draft PR #2](https://github.com/telemartubonWebProduct/telemartUbon/pull/2) แล้ว วันที่ 30 ก.ย. เจ้าของรัน `npm run db:push:dev:apply` จาก Windows เพื่อ apply migration ที่ dev project `wdcbbjvxrcxuaabcipqo` สร้าง Admin คนแรก และเข้าหลังบ้านบนเครื่องตัวเองแล้ว (เจ้าของแจ้ง; session ของ Claude ตรวจ hosted project ตรงไม่ได้เพราะไม่มี publishable key และ network policy ปิด `api.supabase.com`) ไม่มีการ deploy และไม่มีการเปลี่ยน DNS
 
 ## เกณฑ์รับงาน M1 เทียบกับผล
 
@@ -14,8 +14,8 @@
 | design tokens | `src/styles/tokens.css` + Tailwind namespace `tm` | unit test ตรวจ contrast WCAG AA ทุกคู่สีข้อความ |
 | responsive shell | route group `(public)` แยกจาก `/admin`; หลังบ้านมี sidebar ดำบน desktop และแถบเมนูบนมือถือ | screenshot desktop/mobile, e2e “console on a phone” |
 | Supabase SSR Auth แบบ Admin role เดียว + RLS | migration + RLS + หน้าเข้าสู่ระบบ/ลืมรหัสผ่าน/ตั้งรหัสผ่าน/ไม่มีสิทธิ์/console | pgTAP 45 ข้อ, Playwright auth 13 ข้อ |
-| login/logout/recovery และ denied access ทดสอบจริง | **ผ่านกับ Supabase Auth จริงใน local stack** (GoTrue v2.197.0, PostgREST v16.3); ยังไม่ได้ทดสอบบน hosted dev project | `npm run test:e2e:local` |
-| CI | `.github/workflows/ci.yml` พร้อม | ทุกคำสั่งรันผ่านในเครื่อง, actionlint ผ่าน; **ยังไม่เคยรันบน GitHub** เพราะ push ไม่ได้ |
+| login/logout/recovery และ denied access ทดสอบจริง | **ผ่านกับ Supabase Auth จริงใน local stack** (GoTrue v2.197.0, PostgREST v16.3); บน hosted dev project เจ้าของเข้าหลังบ้านได้แล้ว (เจ้าของแจ้ง 30 ก.ย.) | `npm run test:e2e:local` |
+| CI | `.github/workflows/ci.yml` พร้อม | ผ่านบน GitHub Actions ทั้ง 2 jobs (lint/typecheck/unit/build และ Supabase local + pgTAP + Playwright) ใน draft PR #2 |
 
 ## สิ่งที่ทำ (เรียงตาม commit)
 
@@ -56,8 +56,8 @@ E2E ด้าน Auth ครอบคลุม: ผู้ไม่ได้เ�
 
 ## สิ่งที่ยังต้องตั้งค่าจริง (ต้องใช้สิทธิ์ของเจ้าของ)
 
-1. **GitHub** — push ไป `telemartubonWebProduct/telemartUbon` ถูกปฏิเสธ (403: Claude GitHub App ไม่มีสิทธิ์เขียน) ให้ reconnect GitHub ที่ https://claude.ai/connect-github และติดตั้ง Claude GitHub App ให้ organization/repository (หรือให้ owner ของ org ติดตั้ง) จากนั้นจึง push branch/เปิด PR และให้ CI รันจริงได้
-2. **Apply migration ที่ dev project** (ต้องทำก่อนข้อ 4 เพราะ schema `private` และ `private.grant_admin` มาจาก migration นี้) จากเครื่องที่ checkout branch นี้แล้ว `npm ci` — ใช้ได้ทั้ง cmd, PowerShell และ bash:
+1. ✅ **GitHub** (30 ก.ย.) — ติดตั้ง/เชื่อม Claude GitHub App แล้ว push branch และเปิด draft PR #2 ได้ CI ผ่าน; อย่า merge จนกว่าจะพร้อม deploy เพราะ Vercel deploy production จาก `main`
+2. ✅ **Apply migration ที่ dev project** — ทำแล้ว 30 ก.ย. (เจ้าของแจ้ง) ใช้ขั้นตอนเดียวกันกับ migration ถัดไป (ต้องทำก่อนข้อ 4 เพราะ schema `private` และ `private.grant_admin` มาจาก migration นี้) จากเครื่องที่ checkout branch นี้แล้ว `npm ci` — ใช้ได้ทั้ง cmd, PowerShell และ bash:
    1. สร้าง personal access token ที่ https://supabase.com/dashboard/account/tokens ด้วยบัญชีที่อยู่ใน organization telemart-ubon แล้วตั้งค่าเฉพาะ terminal ที่ใช้ (ไม่ใส่ `.env.local`, repo หรือ environment variables ที่ทุกคนเห็น): cmd `set SUPABASE_ACCESS_TOKEN=sbp_...` · PowerShell `$env:SUPABASE_ACCESS_TOKEN = "sbp_..."` · bash `export SUPABASE_ACCESS_TOKEN=sbp_...`
    2. `npm run db:push:dev` — ตรวจ ref `wdcbbjvxrcxuaabcipqo` + organization `pfvlbpujcoqiqziehstu` ผ่าน Management API, link แล้ว dry run (ควรเห็น `20260929185408_admin_access_foundation.sql`)
    3. `npm run db:push:dev:apply` — ตรวจ ref/organization แล้วให้พิมพ์ ref ยืนยันก่อนเรียก CLI จากนั้น link, push และแสดง `migration list` (ถ้า terminal รับการพิมพ์ไม่ได้ ให้ตั้ง `CONFIRM_PROJECT_REF=wdcbbjvxrcxuaabcipqo` เฉพาะรอบนั้นแทน)
@@ -68,12 +68,12 @@ E2E ด้าน Auth ครอบคลุม: ผู้ไม่ได้เ�
    - URL Configuration: Site URL เป็น origin ที่ใช้ทดสอบ (เช่น `http://localhost:3000` หรือ staging URL) และเพิ่ม Redirect URLs ของ origin เหล่านั้น เช่น `http://localhost:3000/**`
    - Email Templates: ใช้เนื้อหาและหัวเรื่องจาก `supabase/templates/invite.html` และ `recovery.html` (ลิงก์ไป `/auth/confirm` แบบ token hash)
    - SMTP: อีเมลในตัวของ Supabase ส่งได้เฉพาะสมาชิกทีมและจำนวนจำกัด หากจะเชิญ Admin ที่ไม่ใช่สมาชิกทีม ต้องตั้ง custom SMTP
-4. **สร้าง Admin คนแรก** (หลังข้อ 2): Authentication → Users → Add user แล้วเลือกอย่างใดอย่างหนึ่ง
+4. ✅ **สร้าง Admin คนแรก** — ทำแล้ว 30 ก.ย. (เจ้าของแจ้ง) วิธีเดียวกันใช้กับ Admin คนถัดไป (หลังข้อ 2): Authentication → Users → Add user แล้วเลือกอย่างใดอย่างหนึ่ง
    - Create new user: ใส่อีเมลและรหัสผ่านอย่างน้อย 12 ตัวที่มีตัวพิมพ์เล็ก/ใหญ่/ตัวเลข และเลือก Auto Confirm User (ไม่ต้องพึ่งอีเมล)
    - Send invitation: ลิงก์ในอีเมลชี้ไปที่ Site URL จึงต้องตั้งข้อ 3 (Site URL, Redirect URLs, template) และเปิดแอปที่ origin นั้นก่อน
 
    จากนั้นรัน `select private.grant_admin('อีเมล', 'Initial Admin');` ใน SQL editor ถ้าขึ้น `schema "private" does not exist` แปลว่ายังไม่ได้ apply migration (ข้อ 2) ถ้าขึ้น `No Supabase Auth user has email ...` แปลว่ายังไม่มีผู้ใช้นั้นใน Authentication
-5. **Publishable key**: คัดลอกจาก Project Settings → API Keys ใส่ `NEXT_PUBLIC_SUPABASE_URL` และ `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ใน `.env.local`/Claude Cloud environment (ทั้งสองค่าเปิดเผยได้) แล้ว `npm run dev` และเข้า http://localhost:3000/admin/login เพื่อทดสอบหลังบ้านกับ dev project จริง
+5. **Publishable key**: คัดลอกจาก Project Settings → API Keys ใส่ `NEXT_PUBLIC_SUPABASE_URL` และ `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ใน `.env.local`/Claude Cloud environment (ทั้งสองค่าเปิดเผยได้; ใน `.env.local` ของเจ้าของมีแล้ว ส่วน Claude Cloud environment ยังไม่มี `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ถ้าใส่ไว้ session ถัดไปจะตรวจ hosted project ผ่าน Data API ได้เอง) แล้ว `npm run dev` และเข้า http://localhost:3000/admin/login เพื่อทดสอบหลังบ้านกับ dev project จริง
 6. **ยืนยันนโยบาย** ก่อนใช้งานจริงตาม ARCHITECTURE.md: รายชื่ออีเมล Admin, การเปิด MFA, ภาษา UI หลังบ้าน (ตอนนี้ภาษาไทย)
 7. งานของ milestone ถัดไปที่ยังไม่เริ่ม: GA4 property/สิทธิ์ Data API (M5), บัญชี Higgsfield (M2 สื่อ), Vercel project/env/แพลนและโดเมน (M6), ราคาและข้อมูลแพ็กเกจที่ธุรกิจยืนยัน (M2)
 

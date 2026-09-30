@@ -2,7 +2,7 @@
 
 สถานะ 2026-09-30: เตรียม repo, dependency, แผน, Node 24 และ Claude Cloud setup บน remote branch [`codex/telemart-dev-handoff`](https://github.com/telemartubonWebProduct/telemartUbon/tree/codex/telemart-dev-handoff) เพื่อเริ่มพัฒนา **ยังไม่ได้รีโนเวทหน้าเว็บ/หลังบ้าน เชื่อม Auth/GA4/Higgsfield/Vercel หรือ deploy** ให้แยกหลักฐานแต่ละขั้นตาม `PLAN.md`
 
-อัปเดต 2026-09-29: **M1 Foundation ทำแล้วบน branch `claude/vigilant-hypatia-czj87e`** (Next 16.3.7/React 19.3.0, tokens, shell, Auth Admin role เดียว + RLS/migration, CI) ทดสอบกับ Supabase local stack; ยังไม่ได้ apply migration ที่ dev project และยังไม่ deploy ดู [M1-FOUNDATION.md](M1-FOUNDATION.md) ก่อนเริ่ม M2
+อัปเดต 2026-09-29: **M1 Foundation ทำแล้วบน branch `claude/vigilant-hypatia-czj87e`** (Next 16.3.7/React 19.3.0, tokens, shell, Auth Admin role เดียว + RLS/migration, CI) ทดสอบกับ Supabase local stack และ CI บน GitHub ผ่าน ([draft PR #2](https://github.com/telemartubonWebProduct/telemartUbon/pull/2)); 30 ก.ย. เจ้าของ apply migration ที่ dev project และสร้าง Admin คนแรกแล้ว (เจ้าของแจ้ง) ยังไม่ deploy ดู [M1-FOUNDATION.md](M1-FOUNDATION.md) ก่อนเริ่ม M2
 
 ## ข้อสรุปที่ต้องรักษา
 
