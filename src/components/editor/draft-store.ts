@@ -139,7 +139,7 @@ export class DraftStore {
   /** Saves now instead of after the pause (the "save" button, leaving the page). */
   flushAll() {
     for (const [documentId, meta] of Object.entries(this.state.meta) as [DocumentId, DocMeta][]) {
-      if (meta.status === "pending" || meta.status === "error") this.schedule(documentId, 0);
+      if (meta.status === "pending" || meta.status === "error" || meta.status === "invalid") this.schedule(documentId, 0);
     }
   }
 
@@ -265,6 +265,11 @@ export class DraftStore {
         savedAt: outcome.updatedAt,
       });
       if (changedSince) this.schedule(documentId, Math.min(this.delay, 300));
+      // A document that was blocked by this one (a featured package that was
+      // hidden, say) may be valid now: check it again.
+      for (const [other, otherMeta] of Object.entries(this.state.meta) as [DocumentId, DocMeta][]) {
+        if (other !== documentId && otherMeta.status === "invalid" && !this.timers.has(other)) this.schedule(other, 0);
+      }
       return;
     }
     switch (outcome.reason) {

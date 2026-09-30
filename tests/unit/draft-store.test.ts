@@ -7,12 +7,14 @@ import type { SaveOutcome } from "@/lib/content/drafts";
 
 const heading = ["hero", "heading"];
 
+/** A server that keeps one revision per document, like content_drafts. */
 function serverSaves() {
-  let revision = 0;
-  return vi.fn<SaveAction>(async ({ expectedRevision }) => {
+  const revisions = new Map<string, number>();
+  return vi.fn<SaveAction>(async ({ documentId, expectedRevision }) => {
+    const revision = revisions.get(documentId) ?? 0;
     if (expectedRevision !== revision) return { ok: false, reason: "conflict", current: null };
-    revision += 1;
-    return { ok: true, revision, updatedAt: `2026-09-30T10:00:0${revision}Z` };
+    revisions.set(documentId, revision + 1);
+    return { ok: true, revision: revision + 1, updatedAt: `2026-09-30T10:00:0${revision + 1}Z` };
   });
 }
 
@@ -117,6 +119,24 @@ describe("autosave", () => {
     await vi.advanceTimersByTimeAsync(800);
     expect(save).toHaveBeenCalledTimes(1);
     expect(store.metaOf("page:home").status).toBe("saved");
+  });
+
+  it("saves a document again once the document that blocked it is fixed", async () => {
+    const save = serverSaves();
+    const store = makeStore(save);
+    const featured = content.pages.home.featured.packageIds[0];
+    // Hiding a featured package is refused while the home page still features it.
+    store.edit(`package:${featured}`, ["review", "status"], "hidden");
+    await vi.advanceTimersByTimeAsync(800);
+    expect(store.metaOf(`package:${featured}`).status).toBe("invalid");
+    expect(save).not.toHaveBeenCalled();
+
+    const others = content.catalog.filter((item) => item.review.status !== "hidden" && item.id !== featured && item.category === "broadband-new");
+    store.edit("page:home", ["featured", "packageIds"], content.pages.home.featured.packageIds.map((id) => (id === featured ? others.find((item) => !content.pages.home.featured.packageIds.includes(item.id))!.id : id)));
+    // Fake timers run a zero-delay timer set during a tick one millisecond later.
+    await vi.advanceTimersByTimeAsync(810);
+    expect(save.mock.calls.map((call) => call[0].documentId)).toEqual(["page:home", `package:${featured}`]);
+    expect(store.metaOf(`package:${featured}`).status).toBe("saved");
   });
 
   it("reports a failed request and saves again on retry", async () => {
