@@ -1,7 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { blockThirdParty } from "./support/network";
+
 // The home hero shows the router poster first and swaps in the 3D model only
 // where it can run (docs/renovation/3D-MEDIA-PLAN.md).
+
+test.beforeEach(async ({ context, baseURL }) => {
+  await blockThirdParty(context, baseURL!);
+});
 
 const stage = (page: Page) => page.locator("[data-router-stage]");
 

@@ -2,6 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { localizePath, locales } from "@/lib/i18n/locales";
 
+import { blockThirdParty } from "./support/network";
+
 // Every public URL of the current site must keep working through the
 // renovation (docs/renovation/CURRENT-SITE-AUDIT.md, PLAN.md). Thai stays at
 // these URLs; English serves the same paths under /en.
@@ -16,6 +18,10 @@ const publicPaths = [
   "/wifiService",
   "/termsAndPrivacy",
 ];
+
+test.beforeEach(async ({ context, baseURL }) => {
+  await blockThirdParty(context, baseURL!);
+});
 
 function trackFailures(page: Page, origin: string) {
   const failures: string[] = [];

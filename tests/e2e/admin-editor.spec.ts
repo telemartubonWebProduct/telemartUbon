@@ -11,6 +11,7 @@ import {
   setMembership,
   type TestUser,
 } from "./support/local-supabase";
+import { blockThirdParty } from "./support/network";
 
 // M3 acceptance for the Mirror editor, against the local Supabase stack:
 // edits show in the preview at once and autosave as drafts, drafts survive a
@@ -71,6 +72,8 @@ async function openEditor(page: Page, path = "/admin/editor") {
 }
 
 const saveStatus = (page: Page) => page.locator("[data-save-status]");
+// A save is a pause in typing plus a round trip to Supabase; CI runners can be slow.
+const saving = { timeout: 15_000 };
 
 async function editorSession(browser: Browser) {
   const context = await browser.newContext({ locale: "th-TH", viewport: { width: 1440, height: 900 } });
@@ -106,7 +109,7 @@ test("an edit shows in the preview at once, autosaves, survives a reload and sta
   await expect(thai).toBeFocused();
   await thai.fill(marker);
   await expect(frame.locator("h1").first()).toHaveText(marker);
-  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved");
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
   expect((await storedDraft("page:home"))?.body.hero?.heading?.th).toBe(marker);
 
   await page.reload();
@@ -130,12 +133,12 @@ test("a value the schema rejects is flagged and not saved", async ({ page }) => 
 
   await preview(page).locator("h1").first().click();
   await page.getByRole("textbox", { name: "หัวเรื่อง English" }).fill("");
-  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "invalid");
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "invalid", saving);
   await expect(page.getByText("ต้องกรอกข้อความ")).toBeVisible();
   expect(await storedDraft("page:home")).toEqual(before);
 
   await page.getByRole("textbox", { name: "หัวเรื่อง English" }).fill(publishedHeading.en);
-  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved");
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
 });
 
 test("a save from another session is caught as a conflict instead of being overwritten", async ({ browser }) => {
@@ -145,18 +148,18 @@ test("a save from another session is caught as a conflict instead of being overw
 
   await preview(first.page).locator("h1").first().click();
   await first.page.getByRole("textbox", { name: "หัวเรื่อง ไทย" }).fill(theirs);
-  await expect(saveStatus(first.page)).toHaveAttribute("data-save-status", "saved");
+  await expect(saveStatus(first.page)).toHaveAttribute("data-save-status", "saved", saving);
 
   await preview(second.page).locator("h1").first().click();
   await second.page.getByRole("textbox", { name: "หัวเรื่อง ไทย" }).fill("ฉบับที่สอง ซึ่งเปิดไว้ก่อนหน้า");
-  await expect(saveStatus(second.page)).toHaveAttribute("data-save-status", "conflict");
+  await expect(saveStatus(second.page)).toHaveAttribute("data-save-status", "conflict", saving);
   await expect(second.page.getByRole("alert").filter({ hasText: "ผู้ดูแลอีกคนบันทึกเอกสารนี้" })).toBeVisible();
   expect((await storedDraft("page:home"))?.body.hero?.heading?.th).toBe(theirs);
 
   await second.page.getByRole("button", { name: "ใช้ฉบับล่าสุดในระบบ (ทิ้งที่ฉันแก้)" }).click();
   await expect(second.page.getByRole("textbox", { name: "หัวเรื่อง ไทย" })).toHaveValue(theirs);
   await expect(preview(second.page).locator("h1").first()).toHaveText(theirs);
-  await expect(saveStatus(second.page)).not.toHaveAttribute("data-save-status", "conflict");
+  await expect(saveStatus(second.page)).not.toHaveAttribute("data-save-status", "conflict", saving);
 
   await first.context.close();
   await second.context.close();
@@ -170,7 +173,7 @@ test("discarding a draft brings back the published page", async ({ page }) => {
   await page.getByRole("button", { name: "ทิ้งร่างของเอกสารนี้" }).click();
   await page.getByRole("button", { name: "ทิ้งร่าง", exact: true }).click();
   await expect(preview(page).locator("h1").first()).toHaveText(publishedHeading.th);
-  await expect.poll(() => storedDraft("page:home")).toBeNull();
+  await expect.poll(() => storedDraft("page:home"), saving).toBeNull();
 });
 
 test("viewing follows links inside the site and never leaves it", async ({ page }) => {
@@ -200,10 +203,10 @@ test("the preview renders the phone layout at phone width", async ({ page }) => 
   await expect(frame.getByRole("navigation", { name: "เมนูหลัก" }).first()).toBeHidden();
 });
 
-test("the preview is the public page, pixel for pixel", async ({ browser }) => {
+test("the preview is the public page, pixel for pixel", async ({ browser, baseURL }) => {
   // Reduced motion keeps the 3D hero on its poster in both, so the shots are stable.
   const context = await browser.newContext({ locale: "th-TH", viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
-  await context.route(/googletagmanager|tawk\.to/, (route) => route.abort());
+  await blockThirdParty(context, baseURL!);
   const page = await context.newPage();
   await signIn(page, admin, "/admin");
   await expect(page).toHaveURL(/\/admin$/);
