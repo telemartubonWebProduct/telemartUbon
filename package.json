@@ -17,7 +17,8 @@
     "db:lint": "supabase db lint --level warning --fail-on error",
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
-    "db:push:dev": "bash scripts/supabase/push-dev.sh"
+    "db:push:dev": "node scripts/supabase/push-dev.mjs",
+    "db:push:dev:apply": "node scripts/supabase/push-dev.mjs --apply"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

@@ -9,6 +9,8 @@ milestone reports live in [`docs/renovation/`](docs/renovation/) — start with
 
 - Node.js 24.18.0 (`.nvmrc`); `package-lock.json` is authoritative, install with `npm ci`.
 - Docker, only for the local Supabase stack (database, RLS and end-to-end auth tests).
+- Bash (Linux, macOS, WSL or Git Bash), only for `npm run test:e2e:local` and `scripts/supabase/local-env.sh`.
+  Everything else, including `npm run db:push:dev`, also runs from Windows cmd or PowerShell.
 
 ## Everyday commands
 
@@ -53,15 +55,30 @@ Local test emails (invites, password recovery) arrive in Mailpit at http://127.0
 ### Hosted dev project
 
 Migrations in `supabase/migrations/` are applied to the dev project `wdcbbjvxrcxuaabcipqo`
-(organization `telemart-ubon`) with a guarded script that verifies the project ref and organization first:
+(organization `telemart-ubon`) only through `scripts/supabase/push-dev.mjs`. Before the CLI touches a
+database it checks the project ref and organization through the Management API, and it ignores
+environment variables that would point the CLI at another project. It runs the same from cmd,
+PowerShell and bash. Set a personal access token (https://supabase.com/dashboard/account/tokens) for the
+current terminal only, never in `.env.local`:
 
-```bash
-SUPABASE_ACCESS_TOKEN=<personal access token> npm run db:push:dev             # verify target + dry run
-SUPABASE_ACCESS_TOKEN=<personal access token> npm run db:push:dev -- --apply  # confirm, then apply
+```text
+cmd         set SUPABASE_ACCESS_TOKEN=sbp_...
+PowerShell  $env:SUPABASE_ACCESS_TOKEN = "sbp_..."
+bash        export SUPABASE_ACCESS_TOKEN=sbp_...
 ```
 
-The first Admin is created by inviting the person (Dashboard → Authentication → Users → Invite) and then
-running `select private.grant_admin('person@example.com', 'Initial Admin');` in the SQL editor.
+```bash
+npm run db:push:dev         # verify the target, link, show pending migrations (dry run)
+npm run db:push:dev:apply   # the same, then type the ref to apply
+```
+
+No database password is needed: the Supabase CLI signs in with a temporary login role created from the
+token (or set `SUPABASE_DB_PASSWORD`).
+
+After the migration is applied, create the first Admin in Dashboard → Authentication → Users → Add user
+(create the user with a password, or send an invitation), then run
+`select private.grant_admin('person@example.com', 'Initial Admin');` in the SQL editor. `private.grant_admin`
+exists only once the migration is applied, and it only finds users that already exist in Authentication.
 
 ## Continuous integration
 

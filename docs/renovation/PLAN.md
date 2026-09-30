@@ -62,7 +62,7 @@ URL เดิมต้องคงไว้หรือมี redirect map ท�
 
 แต่ละ milestone ต้องส่ง demo ที่ตรวจได้และระบุข้อจำกัด ไม่ถือว่าติดตั้งแพ็กเกจหรือ build ผ่านเท่ากับ service เชื่อมสำเร็จหรือ deploy แล้ว
 
-ผล M1 (2026-09-29): lint/typecheck/build ผ่าน, unit 56/56, pgTAP RLS 45/45, Playwright 35/35 (รวม login/logout/recovery/invite/denied 13 ข้อกับ Supabase Auth ใน local stack), `npm audit` 19 → 0 และภาพหน้าเว็บเดิม 10 URL ตรงกับ build เดิม ส่วนที่ยังต้องใช้สิทธิ์เจ้าของ: apply migration และตั้งค่า Auth ที่ dev project, สิทธิ์ push GitHub ดูรายการใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
+ผล M1 (2026-09-29, อัปเดต 30 ก.ย.): lint/typecheck/build ผ่าน, unit 59/59, pgTAP RLS 45/45, Playwright 35/35 (รวม login/logout/recovery/invite/denied 13 ข้อกับ Supabase Auth ใน local stack), `npm audit` 19 → 0 และภาพหน้าเว็บเดิม 10 URL ตรงกับ build เดิม ส่วนที่ยังต้องใช้สิทธิ์เจ้าของ: apply migration และตั้งค่า Auth ที่ dev project, สิทธิ์ push GitHub ดูรายการใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
 
 ## ขอบเขตการจัดการทุกค่า
 

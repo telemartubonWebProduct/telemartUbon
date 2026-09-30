@@ -27,6 +27,7 @@
 6. `ci: add GitHub Actions…` — lint/typecheck/unit/build/audit และ Supabase local + pgTAP + Playwright
 7. `feat(auth): deny cross-site framing…` — ป้องกัน clickjacking หน้าหลังบ้าน
 8. `test(db): scope RLS count assertions…` — ให้ pgTAP ผ่านได้ทั้งฐานข้อมูลใหม่และฐานที่มีข้อมูลเดิม
+9. `fix(db): run the guarded dev push from Windows…` (30 ก.ย.) — เปลี่ยน `db:push:dev` จาก bash เป็น Node เพื่อให้รันจาก Windows cmd/PowerShell ได้ เพิ่ม `db:push:dev:apply` และลบ environment variable ที่ทำให้ CLI ไปที่ project อื่นได้
 
 ## ผลทดสอบล่าสุด
 
@@ -36,7 +37,7 @@
 | --- | --- | --- |
 | ESLint | `npm run lint` | ผ่าน ไม่มี warning |
 | TypeScript | `npm run typecheck` | ผ่าน |
-| Unit (Vitest) | `npm test` | 56/56 |
+| Unit (Vitest) | `npm test` | 59/59 (รวมเงื่อนไขตรวจ dev target ของ `db:push:dev`) |
 | Production build ไม่มีค่า Supabase | `npm run build` | ผ่าน; หลังบ้านแสดงข้อความว่ายังไม่ได้ตั้งค่า |
 | RLS/สิทธิ์ (pgTAP) | `npm run db:test` | 45/45 (ฐานใหม่และฐานที่มีข้อมูลเดิม) |
 | Database lint | `npm run db:lint` | ไม่มี error |
@@ -56,16 +57,23 @@ E2E ด้าน Auth ครอบคลุม: ผู้ไม่ได้เ�
 ## สิ่งที่ยังต้องตั้งค่าจริง (ต้องใช้สิทธิ์ของเจ้าของ)
 
 1. **GitHub** — push ไป `telemartubonWebProduct/telemartUbon` ถูกปฏิเสธ (403: Claude GitHub App ไม่มีสิทธิ์เขียน) ให้ reconnect GitHub ที่ https://claude.ai/connect-github และติดตั้ง Claude GitHub App ให้ organization/repository (หรือให้ owner ของ org ติดตั้ง) จากนั้นจึง push branch/เปิด PR และให้ CI รันจริงได้
-2. **Apply migration ที่ dev project** จากเครื่องที่มีสิทธิ์ (ไม่ใส่ token ลง repo หรือ environment variables ที่ทุกคนเห็น):
-   `SUPABASE_ACCESS_TOKEN=... npm run db:push:dev` (ตรวจ ref `wdcbbjvxrcxuaabcipqo` + organization `pfvlbpujcoqiqziehstu` แล้ว dry run) จากนั้น `npm run db:push:dev -- --apply` แล้วเปิด Security Advisor ตรวจอีกครั้ง
+2. **Apply migration ที่ dev project** (ต้องทำก่อนข้อ 4 เพราะ schema `private` และ `private.grant_admin` มาจาก migration นี้) จากเครื่องที่ checkout branch นี้แล้ว `npm ci` — ใช้ได้ทั้ง cmd, PowerShell และ bash:
+   1. สร้าง personal access token ที่ https://supabase.com/dashboard/account/tokens ด้วยบัญชีที่อยู่ใน organization telemart-ubon แล้วตั้งค่าเฉพาะ terminal ที่ใช้ (ไม่ใส่ `.env.local`, repo หรือ environment variables ที่ทุกคนเห็น): cmd `set SUPABASE_ACCESS_TOKEN=sbp_...` · PowerShell `$env:SUPABASE_ACCESS_TOKEN = "sbp_..."` · bash `export SUPABASE_ACCESS_TOKEN=sbp_...`
+   2. `npm run db:push:dev` — ตรวจ ref `wdcbbjvxrcxuaabcipqo` + organization `pfvlbpujcoqiqziehstu` ผ่าน Management API, link แล้ว dry run (ควรเห็น `20260929185408_admin_access_foundation.sql`)
+   3. `npm run db:push:dev:apply` — ทำซ้ำข้อ 2 แล้วให้พิมพ์ ref ยืนยันก่อน push และแสดง `migration list`
+   4. ไม่ต้องใช้รหัสฐานข้อมูล (CLI สร้าง login role ชั่วคราวจาก token; ถ้าต้องการใช้รหัสให้ตั้ง `SUPABASE_DB_PASSWORD`) จากนั้นเปิด Security Advisor ตรวจอีกครั้ง และ revoke token เมื่อไม่ใช้แล้ว
 3. **Supabase Auth ของ dev project** (Dashboard → Authentication):
    - ปิด “Allow new users to sign up” แต่เปิด Email provider ไว้ (ใช้สำหรับ login ด้วยรหัสผ่าน)
    - ตั้งความยาวรหัสผ่านขั้นต่ำ 12 และต้องมีตัวพิมพ์เล็ก/ใหญ่/ตัวเลข ให้ตรงกับแอป
    - URL Configuration: Site URL เป็น origin ที่ใช้ทดสอบ (เช่น `http://localhost:3000` หรือ staging URL) และเพิ่ม Redirect URLs ของ origin เหล่านั้น เช่น `http://localhost:3000/**`
    - Email Templates: ใช้เนื้อหาและหัวเรื่องจาก `supabase/templates/invite.html` และ `recovery.html` (ลิงก์ไป `/auth/confirm` แบบ token hash)
    - SMTP: อีเมลในตัวของ Supabase ส่งได้เฉพาะสมาชิกทีมและจำนวนจำกัด หากจะเชิญ Admin ที่ไม่ใช่สมาชิกทีม ต้องตั้ง custom SMTP
-4. **สร้าง Admin คนแรก**: Authentication → Users → Invite user แล้วรัน `select private.grant_admin('อีเมล', 'Initial Admin');` ใน SQL editor
-5. **Publishable key**: คัดลอกจาก Project Settings → API Keys ใส่ `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ใน `.env.local`/Claude Cloud environment (key นี้เปิดเผยได้) เพื่อทดสอบหลังบ้านกับ dev project จริง
+4. **สร้าง Admin คนแรก** (หลังข้อ 2): Authentication → Users → Add user แล้วเลือกอย่างใดอย่างหนึ่ง
+   - Create new user: ใส่อีเมลและรหัสผ่านอย่างน้อย 12 ตัวที่มีตัวพิมพ์เล็ก/ใหญ่/ตัวเลข และเลือก Auto Confirm User (ไม่ต้องพึ่งอีเมล)
+   - Send invitation: ลิงก์ในอีเมลชี้ไปที่ Site URL จึงต้องตั้งข้อ 3 (Site URL, Redirect URLs, template) และเปิดแอปที่ origin นั้นก่อน
+
+   จากนั้นรัน `select private.grant_admin('อีเมล', 'Initial Admin');` ใน SQL editor ถ้าขึ้น `schema "private" does not exist` แปลว่ายังไม่ได้ apply migration (ข้อ 2) ถ้าขึ้น `No Supabase Auth user has email ...` แปลว่ายังไม่มีผู้ใช้นั้นใน Authentication
+5. **Publishable key**: คัดลอกจาก Project Settings → API Keys ใส่ `NEXT_PUBLIC_SUPABASE_URL` และ `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ใน `.env.local`/Claude Cloud environment (ทั้งสองค่าเปิดเผยได้) แล้ว `npm run dev` และเข้า http://localhost:3000/admin/login เพื่อทดสอบหลังบ้านกับ dev project จริง
 6. **ยืนยันนโยบาย** ก่อนใช้งานจริงตาม ARCHITECTURE.md: รายชื่ออีเมล Admin, การเปิด MFA, ภาษา UI หลังบ้าน (ตอนนี้ภาษาไทย)
 7. งานของ milestone ถัดไปที่ยังไม่เริ่ม: GA4 property/สิทธิ์ Data API (M5), บัญชี Higgsfield (M2 สื่อ), Vercel project/env/แพลนและโดเมน (M6), ราคาและข้อมูลแพ็กเกจที่ธุรกิจยืนยัน (M2)
 
@@ -79,7 +87,9 @@ E2E ด้าน Auth ครอบคลุม: ผู้ไม่ได้เ�
 
 ## ข้อจำกัดและเรื่องที่ทราบ
 
-- การตรวจ project ref ทำได้ในระดับ: `https://wdcbbjvxrcxuaabcipqo.supabase.co` ตอบกลับจริง (401 เพราะไม่มี apikey) ส่วนการตรวจ organization อยู่ใน `scripts/supabase/push-dev.sh` ซึ่งต้องใช้ access token ของเจ้าของ
+- การตรวจ project ref ทำได้ในระดับ: `https://wdcbbjvxrcxuaabcipqo.supabase.co` ตอบกลับจริง (401 เพราะไม่มี apikey) ส่วนการตรวจ organization อยู่ใน `scripts/supabase/push-dev.mjs` (เงื่อนไขอยู่ใน `dev-target.mjs` ซึ่งมี unit test) ซึ่งต้องใช้ access token ของเจ้าของ; ทดสอบลำดับการทำงานทั้งหมดกับ Management API/CLI จำลองและตรวจว่า CLI 2.118.0 รับทุก flag แล้ว แต่ยังไม่ได้รันกับ dev project จริง
+- Supabase CLI 2.118.0 ให้ environment variable `SUPABASE_PROJECT_ID` มีผลเหนือ project ที่ link ไว้ (ทดสอบแล้ว) สคริปต์จึงลบตัวแปรที่เปลี่ยนเป้าหมายได้ (`SUPABASE_PROJECT_ID`, `SUPABASE_DB_URL`, `SUPABASE_API_URL`, `SUPABASE_DASHBOARD_URL`, `SUPABASE_PROFILE`, `SUPABASE_WORKDIR`) ก่อนเรียก CLI และส่ง `--workdir` เป็น root ของ repo เสมอ
+- `npm run test:e2e:local` และ `scripts/supabase/local-env.sh` ยังต้องใช้ bash (Linux/macOS/WSL/Git Bash); คำสั่งอื่นรวมถึง `db:push:dev` ใช้บน Windows cmd/PowerShell ได้
 - `/api/contact` compile ผ่านกับ Nodemailer 10 แต่ไม่ได้ทดสอบส่งอีเมลจริง (ไม่มี credentials) — M5 จะแทนด้วย lead flow
 - ยังไม่แก้ตามแผน M2/M5: meta description “Testing Prompt Thai font”, event `conversion` ที่ยิงทุกครั้งที่เปิดหน้าแรก, หน้า `/SoonContent` (ตัวอักษรแทบมองไม่เห็นเมื่อเครื่องใช้ dark mode)
 - Swiper 14 เป็น major upgrade: ตรวจแล้วว่า carousel เริ่มทำงานและภาพหน้าตรงกับเดิม แต่ยังไม่ได้ทดสอบการกด/เลื่อนด้วยมือบนมือถือจริง
