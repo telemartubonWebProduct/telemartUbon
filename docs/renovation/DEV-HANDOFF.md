@@ -6,6 +6,8 @@
 
 อัปเดต 2026-09-30: **M2 Public + Content Model ทำแล้วบน branch เดียวกัน** — หน้าเว็บใหม่ทั้งหมดภาษาไทย/อังกฤษพร้อมปุ่มสลับภาษา, content model, ภาพ Router Wi-Fi แบบภาพนิ่ง + 3D, SEO และ tests ราคาแพ็กเกจยังรอธุรกิจยืนยัน ดู [M2-PUBLIC-SITE.md](M2-PUBLIC-SITE.md) ก่อนเริ่ม M3
 
+อัปเดต 2026-09-30: **M3 Mirror CMS ทำแล้วบน branch เดียวกัน** — `/admin/editor` แสดงหน้าจริงในกรอบตัวอย่าง 3 ขนาดจอ × 2 ภาษา คลิกเลือกช่องแล้วแก้ในแผง ตัวอย่างเปลี่ยนทันที บันทึกร่างอัตโนมัติต่อเอกสาร (ตาราง `content_drafts` + RLS) พร้อมจับการชนกัน หน้าเว็บจริงยังไม่เปลี่ยนจนกว่า M4 (เผยแพร่) migration ของ M3 ต้องให้เจ้าของ apply ที่ dev project ด้วย `npm run db:push:dev` / `db:push:dev:apply` ดู [M3-MIRROR-EDITOR.md](M3-MIRROR-EDITOR.md) ก่อนเริ่ม M4
+
 ## ข้อสรุปที่ต้องรักษา
 
 | เรื่อง | ข้อสรุป |
@@ -55,6 +57,10 @@ NEXT_PUBLIC_SUPABASE_URL=https://wdcbbjvxrcxuaabcipqo.supabase.co
 ## ข้อความเริ่ม M3 ที่คัดลอกได้
 
 > ทำ M3 Mirror CMS ของ Telemart Ubon ต่อจาก M2 โดยอ่าน `CLAUDE.md`, `docs/renovation/M2-PUBLIC-SITE.md`, `ARCHITECTURE.md` (§3–§6), `PLAN.md` และ `DECISIONS.md` ก่อน. ย้ายเนื้อหาจาก `src/content` ไป Supabase ด้วย schema เดิมใน `src/lib/content/schema.ts` (draft ของ Admin แยกจาก published, RLS, migration + pgTAP ใน `supabase/`), ให้ Mirror Editor ใช้ component ใน `src/components/site` ชุดเดียวกับหน้าเว็บ และคง layout คงที่. ข้อความทุกช่องต้องมีทั้ง `th` และ `en`. ใช้ Supabase dev project `wdcbbjvxrcxuaabcipqo` เท่านั้นผ่าน `npm run db:push:dev`. รายงานสิ่งที่ทดสอบจริง ไม่ deploy หรือเปลี่ยน DNS.
+
+## ข้อความเริ่ม M4 ที่คัดลอกได้
+
+> ทำ M4 Publish + Operations ของ Telemart Ubon ต่อจาก M3 โดยอ่าน `CLAUDE.md`, `docs/renovation/M3-MIRROR-EDITOR.md`, `ARCHITECTURE.md` (§4–§6), `PLAN.md` และ `DECISIONS.md` ก่อน. ก่อนแตะ schema ให้รัน `npm run db:push:dev` (dry run) เพื่อตรวจว่า migration `content_drafts` ของ M3 ถูก apply ที่ `wdcbbjvxrcxuaabcipqo` แล้ว. ทำ publish จากร่าง (diff ก่อนเผยแพร่, release ที่ตรึงทุกเอกสาร, published pointer + audit ใน transaction เดียว), ให้หน้าเว็บสาธารณะอ่าน release ที่เผยแพร่พร้อม cache invalidation ที่ตรวจบน public URL, ประวัติ/ย้อนกลับ และการอัปโหลดรูปผ่าน Supabase Storage + RLS. คง layout คงที่และข้อความทุกช่อง `th`/`en`. รายงานสิ่งที่ทดสอบจริง ไม่ deploy หรือเปลี่ยน DNS.
 
 ## เกณฑ์เริ่มพัฒนาจาก cloud
 
