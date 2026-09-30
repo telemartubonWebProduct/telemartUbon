@@ -57,6 +57,7 @@
 4. `feat(editor): Admin-only draft preview and draft Server Actions` — `/admin/preview/<ภาษา>/<หน้า>` และ `saveDraftAction` / `discardDraftAction`
 5. `feat(editor): Mirror editor with a field panel, autosave and conflicts` — `/admin/editor`, แผงแก้ไขที่สร้างจาก schema, คลังสื่อ, สถานะ/ชนกัน/ทิ้งร่าง, tests
 6. `docs: …` — รายงานนี้และการตัดสินใจใน DECISIONS.md
+7. แก้หลังรีวิวตัวเอง: เอกสารที่ถูกปฏิเสธเพราะติดเอกสารอื่นจะบันทึกเองเมื่อเอกสารนั้นแก้แล้ว (`fix(editor): save a document again…`), editor เปิดแบบอ่านอย่างเดียวพร้อมคำอธิบายเมื่อฐานข้อมูลยังไม่มีตารางร่าง (`fix(editor): open read-only…`), และ e2e บล็อก request ที่ออกนอกเว็บ (Google Ads, Tawk) เพราะ CI ล้มจากการรอสคริปต์ภายนอกเกิน 30 วินาที (`test(e2e): keep third-party scripts out…`)
 
 โครงไฟล์หลัก: `src/components/editor/` (MirrorEditor, PreviewCanvas, FieldPanel, fields, MediaPicker, draft-store, protocol, schema-walk, labels, usage), `src/app/admin/(editor)/`, `src/lib/content/drafts.ts` + `draft-model.ts`, `supabase/migrations/20260930160641_content_drafts.sql`
 
