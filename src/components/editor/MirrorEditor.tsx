@@ -35,6 +35,8 @@ type MirrorEditorProps = {
   working: SiteContent;
   drafts: DraftRevision[];
   problems: DraftProblem[];
+  /** False when the database has no drafts table yet (M3 migration not applied). */
+  draftsAvailable: boolean;
   initialPage: PageDocumentId;
   initialLocale: Locale;
   channel: string;
@@ -68,7 +70,7 @@ function Toggle<T extends string>({ label, value, options, onChange }: { label: 
   );
 }
 
-export function MirrorEditor({ published, working, drafts, problems, initialPage, initialLocale, channel }: MirrorEditorProps) {
+export function MirrorEditor({ published, working, drafts, problems, draftsAvailable, initialPage, initialLocale, channel }: MirrorEditorProps) {
   const [store] = useState(() => new DraftStore({ published, working, drafts, save: saveDraftAction, discard: discardDraftAction }));
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const [pageId, setPageId] = useState(initialPage);
@@ -300,6 +302,12 @@ export function MirrorEditor({ published, working, drafts, problems, initialPage
         </div>
       </header>
 
+      {draftsAvailable ? null : (
+        <div role="alert" className="border-b border-tm-danger bg-tm-danger-wash px-4 py-2 text-tm-caption text-tm-danger">
+          ฐานข้อมูลนี้ยังไม่มีตารางร่างของ M3 จึงยังบันทึกไม่ได้ (ลองแก้ในตัวอย่างได้ แต่จะไม่ถูกเก็บ): ให้ผู้ดูแลระบบ apply migration{" "}
+          <code>20260930160641_content_drafts.sql</code> ด้วย <code>npm run db:push:dev:apply</code> แล้วรีโหลดหน้านี้
+        </div>
+      )}
       {problems.length > 0 ? (
         <div role="alert" className="border-b border-[#f59e0b] bg-[#fef3c7] px-4 py-2 text-tm-caption text-[#78350f]">
           ร่างบางเอกสารใช้ไม่ได้และถูกข้ามไป (แสดงฉบับที่เผยแพร่แทน):{" "}

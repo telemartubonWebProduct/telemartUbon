@@ -69,7 +69,7 @@ URL เดิมต้องคงไว้หรือมี redirect map ท�
 
 ผล M2 (2026-09-30): lint/typecheck/build ผ่าน, unit 79/79, Playwright 73/73 (9 หน้า × 2 ภาษา × desktop/มือถือ, สลับภาษา, anchor เดิม, 3D/poster fallback, Auth 13), `npm audit` 0; ราคา/เงื่อนไข 80 แพ็กเกจที่แสดงยัง `unverified` และซ่อน 19 รายการที่ข้อมูลขัดกัน รายการตรวจอยู่ใน [M2-PUBLIC-SITE.md](M2-PUBLIC-SITE.md)
 
-ผล M3 (2026-09-30): Mirror Editor ที่ `/admin/editor` — ตัวอย่างหน้าจริงใน iframe 3 ขนาดจอ × 2 ภาษา, คลิกเลือกช่องแล้วแก้ในแผง (ทุกช่องของเนื้อหามีตัวแก้ตาม schema), autosave เป็นร่างต่อเอกสารพร้อมจับการชนกัน, ทิ้งร่างได้; lint/typecheck/build ผ่าน, unit 114/114, pgTAP 84/84, Playwright ครบรวม editor 8 ข้อ; migration ร่างรอเจ้าของ apply ที่ dev project รายละเอียดใน [M3-MIRROR-EDITOR.md](M3-MIRROR-EDITOR.md)
+ผล M3 (2026-09-30): Mirror Editor ที่ `/admin/editor` — ตัวอย่างหน้าจริงใน iframe 3 ขนาดจอ × 2 ภาษา, คลิกเลือกช่องแล้วแก้ในแผง (ทุกช่องของเนื้อหามีตัวแก้ตาม schema), autosave เป็นร่างต่อเอกสารพร้อมจับการชนกัน, ทิ้งร่างได้; lint/typecheck/build ผ่าน, unit 116/116, pgTAP 84/84, Playwright ครบรวม editor 8 ข้อ; migration ร่างรอเจ้าของ apply ที่ dev project รายละเอียดใน [M3-MIRROR-EDITOR.md](M3-MIRROR-EDITOR.md)
 
 ## ขอบเขตการจัดการทุกค่า
 

@@ -20,13 +20,14 @@ export default async function EditorPage({ searchParams }: PageProps<"/admin/edi
   const pageId = typeof page === "string" && isPageDocumentId(page) ? page : "home";
   const lang = typeof locale === "string" && isLocale(locale) ? locale : "th";
 
-  const { content: working, drafts, problems } = await loadDraftContent(await createClient(), content);
+  const { content: working, drafts, problems, available } = await loadDraftContent(await createClient(), content);
   return (
     <MirrorEditor
       published={content}
       working={working}
       drafts={drafts.map((draft) => ({ documentId: draft.documentId, revision: draft.revision }))}
       problems={problems}
+      draftsAvailable={available}
       initialPage={pageId}
       initialLocale={lang}
       channel={randomUUID()}

@@ -68,7 +68,7 @@
 | --- | --- | --- |
 | ESLint | `npm run lint` | ผ่าน |
 | TypeScript | `npm run typecheck` | ผ่าน |
-| Unit (Vitest) | `npm test` | 114/114 (เพิ่ม: autosave/ชนกัน/ทิ้งร่าง 10, ทุกช่องมีตัวแก้และชื่อไทย + ข้อความ/ลิงก์ 10, draft model, theme, bindings) |
+| Unit (Vitest) | `npm test` | 116/116 (เพิ่ม: autosave/ชนกัน/ทิ้งร่าง 10, ฐานข้อมูลที่ยังไม่มีตารางร่าง 2, ทุกช่องมีตัวแก้และชื่อไทย + ข้อความ/ลิงก์ 10, draft model, theme, bindings) |
 | Database lint | `npm run db:lint` | ไม่มี error |
 | RLS/สิทธิ์ (pgTAP) | `npm run db:test` | 84/84 (M1 45 + ร่าง 39) |
 | Production build | `npm run build` | ผ่าน; หน้าสาธารณะยัง prerender เป็น static, `/admin/editor` และ `/admin/preview/...` render ต่อคำขอ |
@@ -78,7 +78,7 @@
 
 ## สิ่งที่เจ้าของต้องทำหรือตัดสิน
 
-1. **Apply migration ของ M3 ที่ dev project** (session นี้เข้า Supabase ที่ host ไม่ได้): จากเครื่องที่ตั้งค่าไว้ตาม M1 รัน `npm run db:push:dev` (dry run — ต้องเห็น `20260930160641_content_drafts.sql` เป็นรายการเดียวที่จะ apply ที่ `wdcbbjvxrcxuaabcipqo`) แล้วรัน `npm run db:push:dev:apply` จากนั้น editor ที่ deploy (Vercel preview) จึงบันทึกร่างได้ ถ้ายังไม่ apply ระบบจะแสดง “บันทึกไม่สำเร็จ”
+1. **Apply migration ของ M3 ที่ dev project** (session นี้เข้า Supabase ที่ host ไม่ได้): จากเครื่องที่ตั้งค่าไว้ตาม M1 รัน `npm run db:push:dev` (dry run — ต้องเห็น `20260930160641_content_drafts.sql` เป็นรายการเดียวที่จะ apply ที่ `wdcbbjvxrcxuaabcipqo`) แล้วรัน `npm run db:push:dev:apply` ถ้ายังไม่ apply หน้า editor ยังเปิดได้ (แสดงฉบับที่เผยแพร่) แต่ขึ้นแถบแดงว่าฐานข้อมูลยังไม่มีตารางร่าง และการแก้จะขึ้น “บันทึกไม่สำเร็จ” พร้อมชื่อ migration ที่ต้อง apply (ทดสอบแล้วกับ local stack ที่ซ่อนตารางไว้)
 2. **จำนวนและลำดับของรายการ** (คำถามที่ยังเปิดใน ARCHITECTURE.md §3): ตอนนี้เพิ่ม/ลบ/เรียงได้เฉพาะ “บรรทัดข้อความ” (รายละเอียด เงื่อนไข หมายเหตุ ย่อหน้า) ส่วนคำถามที่พบบ่อย เมนู การ์ดบริการ ขั้นตอน ลิงก์ footer และแพ็กเกจเด่นแก้ค่าได้ทุกช่องแต่เพิ่ม/ลบไม่ได้ ถ้าต้องการเพิ่มคำถาม FAQ หรือเมนูเองให้แจ้ง จะเปิดทีละรายการพร้อมกติกา (เช่น FAQ ไม่เกินกี่ข้อ)
 3. **อัปโหลดรูปใหม่** ต้องเปิด Supabase Storage (bucket + RLS + ตรวจชนิด/ขนาดไฟล์) — เสนอทำใน M4 พร้อม media usage ตอนนี้เลือกได้จากรูปที่นำเข้าจากเว็บเดิม
 4. **การเผยแพร่** (ร่าง → หน้าเว็บจริง), ประวัติ และย้อนกลับ เป็น M4 ตามแผน ตอนนี้ร่างเห็นเฉพาะใน editor

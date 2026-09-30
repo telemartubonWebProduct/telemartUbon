@@ -24,6 +24,19 @@ export type DiscardOutcome = { ok: true } | Exclude<SaveOutcome, { ok: true } | 
 
 type Row = Database["public"]["Tables"]["content_drafts"]["Row"];
 
+/** The database has no drafts table or functions yet (the M3 migration is not applied). */
+export class DraftsUnavailableError extends Error {
+  constructor() {
+    super("content_drafts is not installed in this database");
+  }
+}
+
+// PostgREST: table / function not in the schema cache; Postgres: undefined table / function.
+const notInstalled = new Set(["PGRST205", "PGRST202", "42P01", "42883"]);
+
+const notInstalledMessage =
+  "ฐานข้อมูลนี้ยังไม่มีตารางร่างของ M3 จึงบันทึกไม่ได้: ให้ผู้ดูแลระบบ apply migration 20260930160641_content_drafts.sql (npm run db:push:dev:apply)";
+
 function toRecord(row: Row): DraftRecord | null {
   if (!isDocumentId(row.document_id)) return null;
   return {
@@ -41,7 +54,10 @@ export async function readDrafts(supabase: Client): Promise<DraftRecord[]> {
     .from("content_drafts")
     .select("document_id, schema_version, body, revision, updated_at, updated_by, created_at")
     .order("document_id");
-  if (error) throw new Error(`Could not read drafts (${error.code ?? "unknown"})`);
+  if (error) {
+    if (notInstalled.has(error.code ?? "")) throw new DraftsUnavailableError();
+    throw new Error(`Could not read drafts (${error.code ?? "unknown"})`);
+  }
   return data.flatMap((row) => toRecord(row) ?? []);
 }
 
@@ -54,16 +70,26 @@ async function readDraft(supabase: Client, documentId: DocumentId): Promise<Draf
   return data ? toRecord(data) : null;
 }
 
-/** The editor's working content: published content plus the valid drafts. */
+/**
+ * The editor's working content: published content plus the valid drafts.
+ * `available` is false when the database has no drafts table yet; the editor
+ * then shows the published content and says why it cannot save.
+ */
 export async function loadDraftContent(
   supabase: Client,
   published: SiteContent,
-): Promise<{ content: SiteContent; drafts: DraftRecord[]; problems: DraftProblem[] }> {
-  const drafts = await readDrafts(supabase);
-  return { ...applyDrafts(published, drafts), drafts };
+): Promise<{ content: SiteContent; drafts: DraftRecord[]; problems: DraftProblem[]; available: boolean }> {
+  try {
+    const drafts = await readDrafts(supabase);
+    return { ...applyDrafts(published, drafts), drafts, available: true };
+  } catch (error) {
+    if (error instanceof DraftsUnavailableError) return { content: published, drafts: [], problems: [], available: false };
+    throw error;
+  }
 }
 
 function failure(error: { code?: string; message?: string }): SaveOutcome & { ok: false } {
+  if (notInstalled.has(error.code ?? "")) return { ok: false, reason: "error", message: notInstalledMessage };
   if (error.code === "42501") return { ok: false, reason: "denied", message: "บัญชีนี้ไม่มีสิทธิ์แก้ไขเนื้อหา" };
   if (error.code === "23514") return { ok: false, reason: "invalid", messages: ["ฐานข้อมูลไม่รับเนื้อหานี้ (รูปแบบหรือขนาดเกินกำหนด)"], issues: [] };
   return { ok: false, reason: "error", message: "บันทึกไม่สำเร็จ ลองอีกครั้ง" };
@@ -81,7 +107,8 @@ export async function saveDraft(
   expectedRevision: number,
   body: unknown,
 ): Promise<SaveOutcome> {
-  const { content } = await loadDraftContent(supabase, published);
+  const { content, available } = await loadDraftContent(supabase, published);
+  if (!available) return { ok: false, reason: "error", message: notInstalledMessage };
   const checked = validateDraft(content, documentId, body);
   if (!checked.ok) return { ok: false, reason: "invalid", messages: checked.messages, issues: checked.issues };
 
