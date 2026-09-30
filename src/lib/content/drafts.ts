@@ -5,7 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 
 import { isDocumentId, type DocumentId } from "./documents";
-import { applyDrafts, CONTENT_SCHEMA_VERSION, validateDraft, type DraftProblem, type DraftRecord } from "./draft-model";
+import { applyDrafts, CONTENT_SCHEMA_VERSION, validateDraft, type DraftProblem, type DraftRecord, type FieldIssue } from "./draft-model";
 import type { SiteContent } from "./schema";
 
 // Drafts in Supabase (supabase/migrations/20260930160641_content_drafts.sql).
@@ -17,7 +17,7 @@ type Client = SupabaseClient<Database>;
 export type SaveOutcome =
   | { ok: true; revision: number; updatedAt: string }
   | { ok: false; reason: "conflict"; current: DraftRecord | null }
-  | { ok: false; reason: "invalid"; messages: string[] }
+  | { ok: false; reason: "invalid"; messages: string[]; issues: FieldIssue[] }
   | { ok: false; reason: "denied" | "error"; message: string };
 
 export type DiscardOutcome = { ok: true } | Exclude<SaveOutcome, { ok: true } | { reason: "invalid" }>;
@@ -65,7 +65,7 @@ export async function loadDraftContent(
 
 function failure(error: { code?: string; message?: string }): SaveOutcome & { ok: false } {
   if (error.code === "42501") return { ok: false, reason: "denied", message: "บัญชีนี้ไม่มีสิทธิ์แก้ไขเนื้อหา" };
-  if (error.code === "23514") return { ok: false, reason: "invalid", messages: ["ฐานข้อมูลไม่รับเนื้อหานี้ (รูปแบบหรือขนาดเกินกำหนด)"] };
+  if (error.code === "23514") return { ok: false, reason: "invalid", messages: ["ฐานข้อมูลไม่รับเนื้อหานี้ (รูปแบบหรือขนาดเกินกำหนด)"], issues: [] };
   return { ok: false, reason: "error", message: "บันทึกไม่สำเร็จ ลองอีกครั้ง" };
 }
 
@@ -83,7 +83,7 @@ export async function saveDraft(
 ): Promise<SaveOutcome> {
   const { content } = await loadDraftContent(supabase, published);
   const checked = validateDraft(content, documentId, body);
-  if (!checked.ok) return { ok: false, reason: "invalid", messages: checked.messages };
+  if (!checked.ok) return { ok: false, reason: "invalid", messages: checked.messages, issues: checked.issues };
 
   const { data, error } = await supabase
     .rpc("save_content_draft", {

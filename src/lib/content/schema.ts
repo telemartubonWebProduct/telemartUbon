@@ -17,16 +17,19 @@ export type LocalizedText = z.infer<typeof localizedText>;
 
 /** Lowercase kebab-case id: stable across label edits. */
 const stableIdPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-export const stableId = z.string().regex(stableIdPattern, "lowercase kebab-case id");
+export const stableId = z.string().regex(stableIdPattern, "ใช้ตัวพิมพ์เล็ก a-z ตัวเลข และขีดกลางคั่นคำ");
 
 // References to other documents. Separate schema objects so the Mirror editor
 // can recognise them (by identity) and offer a picker instead of a text box.
-export const mediaRef = z.string().regex(stableIdPattern, "media id");
-export const benefitRef = z.string().regex(stableIdPattern, "benefit id");
-export const packageRef = z.string().regex(stableIdPattern, "package id");
+export const mediaRef = z.string().regex(stableIdPattern, "รหัสรูปไม่ถูกต้อง");
+export const benefitRef = z.string().regex(stableIdPattern, "รหัสสิทธิประโยชน์ไม่ถูกต้อง");
+export const packageRef = z.string().regex(stableIdPattern, "รหัสแพ็กเกจไม่ถูกต้อง");
 
 /** In-page anchor; some legacy anchors are camelCase (#socialInternet). */
-export const anchorId = z.string().regex(/^[A-Za-z][A-Za-z0-9-]*$/, "anchor id");
+export const anchorId = z.string().regex(/^[A-Za-z][A-Za-z0-9-]*$/, "ชื่อหมวดในหน้าใช้ a-z ตัวเลข และขีดกลาง");
+
+/** Links opened from the site: https only, so no script or data URL can reach an href. */
+export const httpsUrl = z.url({ protocol: /^https$/, hostname: z.regexes.domain, error: "ใช้ลิงก์ที่ขึ้นต้นด้วย https://" });
 
 // Media -----------------------------------------------------------------------
 
@@ -59,12 +62,12 @@ export const linkTarget = z.discriminatedUnion("kind", [
   /** A page of this site; the renderer adds the language prefix. */
   z.strictObject({
     kind: z.literal("page"),
-    path: z.string().regex(/^\/[A-Za-z0-9/-]*$/, "site path"),
+    path: z.string().regex(/^\/[A-Za-z0-9/-]*$/, "ที่อยู่หน้าในเว็บต้องขึ้นต้นด้วย /"),
     hash: anchorId.optional(),
   }),
   z.strictObject({
     kind: z.literal("external"),
-    url: z.url().refine((url) => url.startsWith("https://"), "external links use https"),
+    url: httpsUrl,
   }),
   /** One of the contact channels managed once in site settings. */
   z.strictObject({ kind: z.literal("contact"), channel: contactChannel }),
@@ -144,7 +147,7 @@ export const catalogPackage = z.strictObject({
   /** USSD code to subscribe from the phone, such as *900*7129#. */
   dialCode: z
     .string()
-    .regex(/^\*[0-9*]+#$/)
+    .regex(/^\*[0-9*]+#$/, "รหัสกดขึ้นต้นด้วย * และลงท้ายด้วย # เช่น *900*7129#")
     .optional(),
   image: mediaRef.optional(),
   /** Legacy record this package was imported from. */
@@ -202,18 +205,18 @@ const navItem = z.strictObject({
 export const siteSettings = z.strictObject({
   brand: z.strictObject({ name: localizedText, legalName: localizedText, logo: mediaRef }),
   contact: z.strictObject({
-    lineSales: z.url(),
-    lineService: z.url(),
-    lineId: z.string().regex(/^@[a-z0-9]+$/),
+    lineSales: httpsUrl,
+    lineService: httpsUrl,
+    lineId: z.string().regex(/^@[a-z0-9]+$/, "ไลน์ไอดีขึ้นต้นด้วย @ ตามด้วยตัวพิมพ์เล็กหรือตัวเลข"),
     lineQr: mediaRef,
     phones: z.array(
       z.strictObject({
-        number: z.string().regex(/^0[0-9]{8,9}$/),
+        number: z.string().regex(/^0[0-9]{8,9}$/, "เบอร์โทร 9–10 หลัก ขึ้นต้นด้วย 0 ไม่มีขีด"),
         label: localizedText,
       }),
     ),
     email: z.email(),
-    facebook: z.url(),
+    facebook: httpsUrl,
   }),
   navigation: z.array(navItem),
   headerCta: cta,
@@ -229,7 +232,7 @@ export const siteSettings = z.strictObject({
   theme,
   integrations: z.strictObject({
     googleAdsId: z.string().regex(/^AW-[0-9]+$/),
-    tawkSrc: z.url(),
+    tawkSrc: httpsUrl,
   }),
 });
 export type SiteSettings = z.infer<typeof siteSettings>;

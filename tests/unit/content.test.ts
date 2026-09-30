@@ -33,9 +33,9 @@ describe("site content", () => {
     broken.pages.home.mobile.columns[0].links[0].target = { kind: "page", path: "/monthy", hash: "no-such-section" };
     expect(contentProblems(broken)).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('unknown benefit "no-such-benefit"'),
-        expect.stringContaining('unknown package "no-such-package"'),
-        expect.stringContaining('"/monthy#no-such-section" has no such section'),
+        expect.stringContaining('ไม่มีสิทธิประโยชน์ "no-such-benefit"'),
+        expect.stringContaining('ไม่มีแพ็กเกจ "no-such-package"'),
+        expect.stringContaining('หน้า "/monthy" ไม่มีหมวด #no-such-section'),
       ]),
     );
   });

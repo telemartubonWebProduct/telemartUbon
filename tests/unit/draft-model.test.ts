@@ -37,7 +37,8 @@ describe("applying drafts", () => {
     expect(result).toBe(content);
     expect(problems.map((problem) => problem.documentId)).toEqual(["page:home", "page:solar", "package:no-such-package", "page:home"]);
     expect(problems[0].messages[0]).toContain("hero.heading.en");
-    expect(problems[3].messages[0]).toContain('unknown media "no-such-image"');
+    expect(problems[0].messages[0]).toContain("ต้องกรอกข้อความ");
+    expect(problems[3].messages[0]).toContain('ไม่มีรูป "no-such-image"');
   });
 });
 
@@ -52,7 +53,7 @@ describe("validating a save", () => {
     const withHidden = { ...home, featured: { ...home.featured, packageIds: [hiddenFeatured.id] } };
     const hidden = validateDraft(content, "page:home", withHidden);
     expect(hidden.ok).toBe(false);
-    expect(!hidden.ok && hidden.messages[0]).toContain("is hidden");
+    expect(!hidden.ok && hidden.messages[0]).toContain("ถูกซ่อน");
 
     const paleTheme = { ...content.site, theme: { ...defaultTheme, accent: "#ffb3b3" } };
     const pale = validateDraft(content, "site", paleTheme);
