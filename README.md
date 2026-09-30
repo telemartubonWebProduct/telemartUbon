@@ -3,7 +3,18 @@
 Next.js App Router site for Telemart Ubon: the public promotion pages (home internet, mobile
 packages, W&W Energy solar) and an invite-only back office on Supabase. The renovation plan, decisions and
 milestone reports live in [`docs/renovation/`](docs/renovation/) — start with
-[`DEV-HANDOFF.md`](docs/renovation/DEV-HANDOFF.md) and [`M1-FOUNDATION.md`](docs/renovation/M1-FOUNDATION.md).
+[`DEV-HANDOFF.md`](docs/renovation/DEV-HANDOFF.md), [`M1-FOUNDATION.md`](docs/renovation/M1-FOUNDATION.md) and
+[`M2-PUBLIC-SITE.md`](docs/renovation/M2-PUBLIC-SITE.md).
+
+## Public site
+
+The public pages are served in Thai at the site's existing URLs (`/`, `/broadband`, `/monthy#game` …) and in
+English under `/en`; the language switch in the header and footer links to the same page in the other language.
+Pages live in `src/app/[locale]` and render the validated content in `src/content` (site settings, page
+documents, media registry, package catalog) through `src/lib/content` with the shared components in
+`src/components/site`. Every visible string has a Thai and an English version, and a broken reference fails the
+build. `NEXT_PUBLIC_SITE_URL` sets the origin used for canonical links and the sitemap (default
+`https://www.telemartubon.com`).
 
 ## Requirements
 
@@ -21,7 +32,7 @@ milestone reports live in [`docs/renovation/`](docs/renovation/) — start with
 | `npm run typecheck` | Generates route types, then `tsc --noEmit` |
 | `npm test` | Vitest unit tests (`tests/unit`) |
 | `npm run build` / `npm start` | Production build / server |
-| `npm run test:e2e` | Playwright against an existing build (public URL smoke tests; auth tests skip without the local stack) |
+| `npm run test:e2e` | Playwright against an existing build (public pages in both languages, hero 3D fallbacks; auth tests skip without the local stack) |
 
 ## Back office and Supabase
 

@@ -112,7 +112,7 @@ npm แจ้ง lifecycle scripts ของ sharp/protobufjs ยังไม่
 |---|---|---|
 | `three` | `0.186.1` | dependency |
 | `@react-three/fiber` | `9.8.1` | dependency |
-| `@react-three/drei` | `10.7.9` | dependency |
+| `@react-three/drei` | `10.7.9` | dependency — ลบใน M2 เพราะไม่ได้ใช้ |
 | `@types/three` | `0.186.0` | dev dependency |
 
 ตรวจ `npm ls --depth=0` พบ versions ตรงและไม่เกิด peer conflict กับ React/react-dom 19.0.0; smoke import Fiber Canvas/Drei OrbitControls และสร้าง/dispose Three BoxGeometry ผ่าน Node ESM สำเร็จ Node smoke แจ้ง CJS deprecation ของ Three จาก dependency import path จึงยังต้องตรวจ browser bundle จริงในการสร้างฉาก ไม่ถือเป็นผล render

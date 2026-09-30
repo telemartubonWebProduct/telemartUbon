@@ -1,6 +1,6 @@
 # /grill-me — decision tree
 
-สถานะ 2026-09-30: Q1–Q5, Q8 และ Q9 ยืนยันแล้ว; Q6/Q7 ยืนยัน role/hosting แต่ภาษา/จำนวนบัญชี/งบยังไม่ระบุ ผู้ใช้สร้าง Supabase org/project แล้วและสั่งเตรียมพร้อมส่งต่อ Claude Cloud ค่า integration ที่ยังไม่มีเสนอ default สำหรับ dev โดยยังไม่อ้างว่าอนุมัติค่าจ่ายหรือการเปิด production
+สถานะ 2026-09-30: Q1–Q5, Q8 และ Q9 ยืนยันแล้ว; ผู้ใช้ขอเพิ่มโหมดสลับภาษา TH/EN ของหน้าเว็บ (ทำใน M2); Q6/Q7 ยืนยัน role/hosting แต่ภาษา/จำนวนบัญชี/งบยังไม่ระบุ ผู้ใช้สร้าง Supabase org/project แล้วและสั่งเตรียมพร้อมส่งต่อ Claude Cloud ค่า integration ที่ยังไม่มีเสนอ default สำหรับ dev โดยยังไม่อ้างว่าอนุมัติค่าจ่ายหรือการเปิด production
 
 ## สิ่งที่ผู้ใช้ระบุแล้ว
 
@@ -53,6 +53,20 @@
 - Auth: อีเมล + รหัสผ่าน แบบ invite-only (ปิดสมัครเอง); รหัสผ่านอย่างน้อย 12 ตัวอักษร มีตัวพิมพ์เล็ก/ใหญ่/ตัวเลข; เปลี่ยนรหัสผ่านแล้วออกจากระบบทุกอุปกรณ์; ลิงก์เชิญ/ลืมรหัสผ่านแบบ token hash ใช้ได้ในทุก browser; ยังไม่เปิด MFA (รอยืนยัน policy ก่อนใช้งานจริง)
 - สิทธิ์: `admin_memberships` เป็นแหล่งสิทธิ์หลัก ตรวจทุกคำขอด้วย RLS; ให้/ถอนสิทธิ์ผ่าน `private.grant_admin` / `private.revoke_admin` ใน SQL editor หรือ service role; ทุกการเปลี่ยนสิทธิ์ถูกบันทึกใน `audit_log` ซึ่งแก้/ลบไม่ได้
 - หลังบ้านใช้ภาษาไทยและ IBM Plex Sans Thai ตาม brief; หน้าหลังบ้านไม่ถูก index/cache/frame โดยเว็บอื่น
+
+## ค่าเริ่มต้นที่เลือกระหว่าง M2 (2026-09-30, แก้ได้)
+
+การตัดสินใจเชิง implementation ของ M2 ไม่ใช่คำตอบทางธุรกิจ ผลและรายการที่รอยืนยันอยู่ใน [M2-PUBLIC-SITE.md](M2-PUBLIC-SITE.md)
+
+- ภาษา (ผู้ใช้ขอโหมด TH/EN): ภาษาไทยอยู่ที่ URL เดิมทุกหน้า ภาษาอังกฤษอยู่ใต้ `/en`; ปุ่มสลับเป็นลิงก์ธรรมดาไปหน้าเดียวกันในอีกภาษา (สองภาษาเป็นคนละ root layout จึงใช้ client navigation ข้ามกันไม่ได้); `hreflang` th/en และ `x-default` เป็นไทย; `/th/*` redirect ไป URL ไทยเดิม; ข้อตกลงฉบับอังกฤษเป็นคำแปล ถ้าขัดกันให้ถือฉบับไทย
+- เนื้อหาใน M2 เก็บใน repo (`src/content`) ด้วย schema เดียวกับที่ M3 จะย้ายไป Supabase (draft/published) ทุกข้อความต้องมีทั้ง `th` และ `en`; build ล้มถ้า reference เสีย
+- UI stack: คง Tailwind 3.4 บน tokens ของ M1; เลิกใช้ MUI/Emotion/framer-motion/Swiper และ carousel อื่นทั้งหมด (brief ไม่ใช้ auto-carousel); ฟอนต์ IBM Plex Sans Thai
+- `/SoonContent` (หน้า placeholder ที่ไม่มีลิงก์ไปถึง) redirect ถาวรไปหน้าแรก
+- ปลายทางปุ่ม: ปุ่มแพ็กเกจ “สนใจแพ็กเกจนี้” → LINE ฝ่ายขาย (`lineSales`) เหมือนเว็บเดิม; ปุ่มใน header/hero → หน้าติดต่อ; ฟอร์มขอให้ติดต่อกลับทำใน M5 แล้วจึงเปลี่ยนปุ่ม header เป็น “ให้เจ้าหน้าที่ติดต่อกลับ” ตาม brief
+- Google Ads: คง base tag `AW-18007307609`; เลิกยิง event `conversion` ทุกครั้งที่เปิดหน้าแรก (M5 กำหนด conversion จริง); Tawk live chat คงไว้แต่โหลดหลังหน้าว่าง
+- แพ็กเกจ: แสดงรายการ `unverified` ใน dev/preview, ซ่อนรายการ `hidden` ที่ข้อมูลขัดกัน; ก่อน launch ต้องยืนยันราคาหรือกำหนดนโยบายแสดงรายการที่ยังไม่ยืนยัน
+- Hero: ภาพ Router Wi-Fi แบบ concept (ภาพนิ่ง SVG + โมเดล procedural three.js สัดส่วนเดียวกัน) พร้อมคำบรรยายว่าไม่ใช่รุ่นจริง; 3D โหลดเฉพาะเมื่อมี WebGL2, ไม่เปิด reduced motion/Save-Data; ไม่ใช้ `@react-three/drei`
+- 404 ใช้ `global-not-found` แสดงสองภาษาพร้อมกัน
 
 ## ต้นไม้ของรอบถัดไป (ยังไม่ถามจน prerequisite ชัด)
 

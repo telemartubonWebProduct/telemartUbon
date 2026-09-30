@@ -1,6 +1,8 @@
 # ข้อเสนอ 3D และสื่อ Hero: Router Wi-Fi ของทรู
 
-ตรวจข้อมูลวันที่ 29 กันยายน 2026 เอกสารนี้เป็นข้อเสนอเตรียม implementation และเกณฑ์ตรวจรับ ยังไม่ได้สร้างโมเดลหรือยืนยันผล render ใน browser
+ตรวจข้อมูลวันที่ 29 กันยายน 2026 เอกสารนี้เป็นข้อเสนอเตรียม implementation และเกณฑ์ตรวจรับ
+
+อัปเดต 30 ก.ย. (M2): สร้าง concept แล้ว — ภาพนิ่ง `public/media/router-concept.svg` (วาดด้วย `scripts/media/router-concept.py`) และโมเดล procedural three.js + Fiber สัดส่วน/มุมกล้องเดียวกัน (`src/components/site/home/`) ไม่มีไฟล์ GLB/HDR, ไม่อ้างรุ่นจริง, โหลดหลังหน้าว่างเฉพาะเครื่องที่มี WebGL2 และไม่ได้เลือก reduced motion, หยุด render เมื่อพ้นจอ ทดสอบใน Chromium headless แล้ว ยังต้องตรวจบน Safari iPhone/Chrome Android จริงและเปลี่ยนเป็นรุ่นจริงเมื่อได้ reference ที่อนุมัติ ดู [M2-PUBLIC-SITE.md](M2-PUBLIC-SITE.md)
 
 ผู้ใช้ยืนยันหมวดอุปกรณ์เป็น **Router Wi-Fi ของทรู** แล้ว แต่ยังไม่มี SKU/model ที่ยืนยัน จึงต้องเลือกรุ่นและภาพอ้างอิงก่อนสร้าง geometry ให้ตรงสินค้าจริง ณ เวลาสำรวจไม่พบไฟล์ `.glb`, `.gltf`, `.hdr`, `.exr` หรือ `.ktx2` ใน repository นอก dependency/build directories
 

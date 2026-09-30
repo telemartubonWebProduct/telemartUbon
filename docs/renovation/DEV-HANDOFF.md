@@ -2,7 +2,9 @@
 
 สถานะ 2026-09-30: เตรียม repo, dependency, แผน, Node 24 และ Claude Cloud setup บน remote branch [`codex/telemart-dev-handoff`](https://github.com/telemartubonWebProduct/telemartUbon/tree/codex/telemart-dev-handoff) เพื่อเริ่มพัฒนา **ยังไม่ได้รีโนเวทหน้าเว็บ/หลังบ้าน เชื่อม Auth/GA4/Higgsfield/Vercel หรือ deploy** ให้แยกหลักฐานแต่ละขั้นตาม `PLAN.md`
 
-อัปเดต 2026-09-29: **M1 Foundation ทำแล้วบน branch `claude/vigilant-hypatia-czj87e`** (Next 16.3.7/React 19.3.0, tokens, shell, Auth Admin role เดียว + RLS/migration, CI) ทดสอบกับ Supabase local stack และ CI บน GitHub ผ่าน ([draft PR #2](https://github.com/telemartubonWebProduct/telemartUbon/pull/2)); 30 ก.ย. เจ้าของ apply migration ที่ dev project และสร้าง Admin คนแรกแล้ว (เจ้าของแจ้ง) ยังไม่ deploy ดู [M1-FOUNDATION.md](M1-FOUNDATION.md) ก่อนเริ่ม M2
+อัปเดต 2026-09-29: **M1 Foundation ทำแล้วบน branch `claude/vigilant-hypatia-czj87e`** (Next 16.3.7/React 19.3.0, tokens, shell, Auth Admin role เดียว + RLS/migration, CI) ทดสอบกับ Supabase local stack และ CI บน GitHub ผ่าน ([draft PR #2](https://github.com/telemartubonWebProduct/telemartUbon/pull/2)); 30 ก.ย. เจ้าของ apply migration ที่ dev project และสร้าง Admin คนแรกแล้ว (เจ้าของแจ้ง) ยังไม่ deploy ดู [M1-FOUNDATION.md](M1-FOUNDATION.md)
+
+อัปเดต 2026-09-30: **M2 Public + Content Model ทำแล้วบน branch เดียวกัน** — หน้าเว็บใหม่ทั้งหมดภาษาไทย/อังกฤษพร้อมปุ่มสลับภาษา, content model, ภาพ Router Wi-Fi แบบภาพนิ่ง + 3D, SEO และ tests ราคาแพ็กเกจยังรอธุรกิจยืนยัน ดู [M2-PUBLIC-SITE.md](M2-PUBLIC-SITE.md) ก่อนเริ่ม M3
 
 ## ข้อสรุปที่ต้องรักษา
 
@@ -24,7 +26,7 @@
 
 ## สิ่งที่เตรียมใน repository
 
-- `.nvmrc` pin Node `24.18.0`, `package-lock.json` พร้อม Supabase JS/SSR, Zod, GA Data, Three/Fiber/Drei. `.env.example` มีเฉพาะ URL สาธารณะและชื่อค่าที่ต้องกำหนด ไม่มี secret.
+- `.nvmrc` pin Node `24.18.0`, `package-lock.json` พร้อม Supabase JS/SSR, Zod, GA Data, Three/Fiber (M2 ลบ Drei ที่ไม่ได้ใช้). `.env.example` มีเฉพาะ URL สาธารณะและชื่อค่าที่ต้องกำหนด ไม่มี secret.
 - `scripts/cloud/environment-setup.sh` เป็นเนื้อหาสำหรับช่อง Setup script ติดตั้ง Node จาก official nodejs.org พร้อมตรวจ SHA256 โดยไม่พึ่ง checkout; `.claude/settings.json` เรียก `session-start.sh` เพื่อใส่ Node 24 ใน PATH และ `npm ci --include=dev` ตาม lockfile ใน session ใหม่/ที่ resume. `setup.sh` ใช้ทดสอบ repo ใน Linux local/container.
 - `CLAUDE.md` ชี้ข้อกำหนดและทักษะใน repo. `.agents/skills` เป็นไฟล์อ้างอิงที่ checkout ได้ ไม่ใช่การยืนยันว่า Claude slash skills หรือ Higgsfield connector ถูกติดตั้งใน Claude Cloud.
 - Repo เดิมเป็น Next `15.1.11`, React `19.0.0`. เป้าหมาย Next 16/React 19 และ audit 19 รายการอยู่ใน M1; อย่าอ้างว่าการลง libs ทำให้ upgrade เสร็จ.
@@ -49,6 +51,10 @@ NEXT_PUBLIC_SUPABASE_URL=https://wdcbbjvxrcxuaabcipqo.supabase.co
 ## ข้อความเริ่ม M2 ที่คัดลอกได้
 
 > ทำ M2 Public + Content Model ของ Telemart Ubon ต่อจาก M1 โดยอ่าน `CLAUDE.md`, `docs/renovation/M1-FOUNDATION.md`, `PLAN.md`, `ARCHITECTURE.md`, `FREE-DESIGN-BRIEF.md`, `3D-MEDIA-PLAN.md` และ `CURRENT-SITE-AUDIT.md` ก่อน. ใช้ design tokens ใน `src/styles/tokens.css` และ route group `(public)`; รักษา URL เดิมทั้งหมด (smoke test ใน `tests/e2e/public-routes.spec.ts`). ราคา/โปร/เงื่อนไขใช้ข้อมูลที่ธุรกิจยืนยันเท่านั้น. ก่อนแตะ Supabase ให้ตรวจว่า migration ของ M1 ถูก apply ที่ `wdcbbjvxrcxuaabcipqo` แล้ว และใช้ `npm run db:push:dev` เท่านั้น. รายงานสิ่งที่ทดสอบจริง ไม่ deploy หรือเปลี่ยน DNS.
+
+## ข้อความเริ่ม M3 ที่คัดลอกได้
+
+> ทำ M3 Mirror CMS ของ Telemart Ubon ต่อจาก M2 โดยอ่าน `CLAUDE.md`, `docs/renovation/M2-PUBLIC-SITE.md`, `ARCHITECTURE.md` (§3–§6), `PLAN.md` และ `DECISIONS.md` ก่อน. ย้ายเนื้อหาจาก `src/content` ไป Supabase ด้วย schema เดิมใน `src/lib/content/schema.ts` (draft ของ Admin แยกจาก published, RLS, migration + pgTAP ใน `supabase/`), ให้ Mirror Editor ใช้ component ใน `src/components/site` ชุดเดียวกับหน้าเว็บ และคง layout คงที่. ข้อความทุกช่องต้องมีทั้ง `th` และ `en`. ใช้ Supabase dev project `wdcbbjvxrcxuaabcipqo` เท่านั้นผ่าน `npm run db:push:dev`. รายงานสิ่งที่ทดสอบจริง ไม่ deploy หรือเปลี่ยน DNS.
 
 ## เกณฑ์เริ่มพัฒนาจาก cloud
 

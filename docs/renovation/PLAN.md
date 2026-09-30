@@ -1,6 +1,8 @@
 # แผนรีโนเวท Telemart Ubon
 
-สถานะ 2026-09-29 (อัปเดต 30 ก.ย.): **M1 Foundation เสร็จในส่วนโค้ดและทดสอบกับ Supabase local stack และ CI บน GitHub แล้ว** (Next 16.3.7/React 19.3.0, design tokens, shell, Auth Admin role เดียว + RLS/migration, CI) เจ้าของ apply migration กับ dev project `wdcbbjvxrcxuaabcipqo` และสร้าง Admin คนแรกแล้ว (เจ้าของแจ้ง 30 ก.ย.) ไม่ได้ deploy และไม่ได้เปลี่ยน DNS — ผลและสิ่งที่ต้องตั้งค่าต่ออยู่ใน [M1-FOUNDATION.md](M1-FOUNDATION.md) ขั้นถัดไปคือ M2
+สถานะ 2026-09-29 (อัปเดต 30 ก.ย.): **M1 Foundation เสร็จในส่วนโค้ดและทดสอบกับ Supabase local stack และ CI บน GitHub แล้ว** (Next 16.3.7/React 19.3.0, design tokens, shell, Auth Admin role เดียว + RLS/migration, CI) เจ้าของ apply migration กับ dev project `wdcbbjvxrcxuaabcipqo` และสร้าง Admin คนแรกแล้ว (เจ้าของแจ้ง 30 ก.ย.) ไม่ได้ deploy และไม่ได้เปลี่ยน DNS — ผลและสิ่งที่ต้องตั้งค่าต่ออยู่ใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
+
+อัปเดต 30 ก.ย.: **M2 Public + Content Model เสร็จในส่วนโค้ดและทดสอบแล้ว** ทุกหน้าสร้างใหม่แบบ A+B+C เป็นภาษาไทย (URL เดิม) และอังกฤษ (`/en`) พร้อมปุ่มสลับภาษา, content model/catalog, ภาพ Router Wi-Fi แบบภาพนิ่ง + 3D และ SEO ยกเว้นเกณฑ์ “ราคา/โปรตรวจโดยธุรกิจ” ที่ยังรอเจ้าของ — ดู [M2-PUBLIC-SITE.md](M2-PUBLIC-SITE.md) ขั้นถัดไปคือ M3
 
 ## เป้าหมายที่รับจากผู้ใช้
 
@@ -29,6 +31,7 @@ Mirror Editor ต้องแสดงหน้าเดียวกับเว
 - [คำถามและการตัดสินใจที่ยังเปิด](DECISIONS.md)
 - [ชุดส่งต่องานพัฒนา](DEV-HANDOFF.md) และ [ตั้งค่า Claude Cloud](CLAUDE-CLOUD-SETUP.md)
 - [รายงานผล M1 Foundation](M1-FOUNDATION.md)
+- [รายงานผล M2 Public + Content Model และรายการที่เจ้าของต้องตรวจ](M2-PUBLIC-SITE.md)
 
 ## ชุดหน้าที่จะเปลี่ยน
 
@@ -64,6 +67,8 @@ URL เดิมต้องคงไว้หรือมี redirect map ท�
 
 ผล M1 (2026-09-29, อัปเดต 30 ก.ย.): lint/typecheck/build ผ่าน, unit 59/59, pgTAP RLS 45/45, Playwright 35/35 (รวม login/logout/recovery/invite/denied 13 ข้อกับ Supabase Auth ใน local stack), `npm audit` 19 → 0 และภาพหน้าเว็บเดิม 10 URL ตรงกับ build เดิม CI บน GitHub ผ่านทั้ง 2 jobs ใน draft PR #2; migration และ Admin คนแรกทำแล้วที่ dev project (เจ้าของแจ้ง 30 ก.ย.) ส่วนที่ยังเหลือดูใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
 
+ผล M2 (2026-09-30): lint/typecheck/build ผ่าน, unit 79/79, Playwright 73/73 (9 หน้า × 2 ภาษา × desktop/มือถือ, สลับภาษา, anchor เดิม, 3D/poster fallback, Auth 13), `npm audit` 0; ราคา/เงื่อนไข 80 แพ็กเกจที่แสดงยัง `unverified` และซ่อน 19 รายการที่ข้อมูลขัดกัน รายการตรวจอยู่ใน [M2-PUBLIC-SITE.md](M2-PUBLIC-SITE.md)
+
 ## ขอบเขตการจัดการทุกค่า
 
 - คอนเทนต์: หัวเรื่อง คำอธิบาย ราคา หน่วยความเร็ว เงื่อนไข FAQ labels เมนู footer และข้อความฟอร์ม
@@ -76,7 +81,7 @@ URL เดิมต้องคงไว้หรือมี redirect map ท�
 
 ติดตั้งเตรียมเฉพาะ libraries ที่ requirement ชัดเจนแบบ exact pin: Supabase JS/SSR, Zod, GA Data client และ Three.js/React Three Fiber/Drei พร้อม Three types และ lockfile รายละเอียดผลจริงอยู่ TOOLING-SETUP.md ยังไม่ได้สร้างโมเดลหรือเชื่อม service
 
-M1 อัปเกรดแล้วเป็น Next `16.3.7` / React `19.3.0` (จาก Next `15.1.11`) พร้อม test tooling (Vitest, Playwright, Supabase CLI) โดยไม่ใช้ `npm audit fix --force` ส่วน Tailwind 4, MUI/motion ชุดใหม่และ editor libraries ตัดสินใน M2/M3 ตามดีไซน์ใหม่ รายละเอียดใน [M1-FOUNDATION.md](M1-FOUNDATION.md)
+M1 อัปเกรดแล้วเป็น Next `16.3.7` / React `19.3.0` (จาก Next `15.1.11`) พร้อม test tooling (Vitest, Playwright, Supabase CLI) โดยไม่ใช้ `npm audit fix --force` M2 คง Tailwind 3.4 และเลิกใช้ MUI/Emotion/framer-motion/Swiper กับ Drei (รายละเอียดใน [M2-PUBLIC-SITE.md](M2-PUBLIC-SITE.md)); editor libraries ตัดสินใน M3
 
 Node local คือ `24.18.0`; Vercel เลือก Node LTS major `24.x` และ platform จัดการ patch ต้องตรวจ runtime จาก deployment จริง `next lint` ต้องย้ายเป็น ESLint CLI เมื่อ upgrade เพราะ Next 16 ไม่รัน lint แบบเดิม
 

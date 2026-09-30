@@ -150,6 +150,18 @@ export const media = {
     source: "วาดสำหรับเว็บนี้ (scripts/media/router-concept.py)",
   },
 
+  "og-image": {
+    src: "/media/og-image.png",
+    width: 1200,
+    height: 630,
+    kind: "illustration",
+    alt: {
+      th: "โลโก้เทเลมาร์ทกับภาพประกอบเราเตอร์ Wi-Fi",
+      en: "Telemart logo with an illustrated Wi-Fi router",
+    },
+    source: "สร้างจาก logo.webp และ router-concept.svg (scripts/media/og-image.mjs)",
+  },
+
   // Apply with an agent
   "agent-support": asset(
     "/assets/HomeInternet/home-tol-Applywithagent.webp",

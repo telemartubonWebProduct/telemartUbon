@@ -135,7 +135,8 @@ export const site: SiteSettings = {
       "แพ็กเกจเน็ตบ้านทรู เน็ตมือถือ และโซลาร์เซลล์ W&W Energy คุยกับเจ้าหน้าที่ทาง LINE หรือโทรได้จากทุกจังหวัด",
       "True home internet, mobile packages and W&W Energy solar. Talk to our team on LINE or by phone from any province in Thailand.",
     ),
-    image: "telemart-logo",
+    // Shown when a page is shared on LINE or Facebook; pages can set their own.
+    image: "og-image",
   },
   integrations: {
     googleAdsId: "AW-18007307609",
