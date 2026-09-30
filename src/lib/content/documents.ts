@@ -164,3 +164,13 @@ export const pagePaths: Record<PageDocumentId, string> = {
   "apply-with-agent": "/wifiService",
   terms: "/termsAndPrivacy",
 };
+
+/** The page document shown at a public path ("/broadband"), if any. */
+export function pageIdForPath(path: string): PageDocumentId | null {
+  const entry = Object.entries(pagePaths).find(([, value]) => value === path);
+  return entry ? (entry[0] as PageDocumentId) : null;
+}
+
+export function isPageDocumentId(value: string): value is PageDocumentId {
+  return (pageDocumentIds as readonly string[]).includes(value);
+}

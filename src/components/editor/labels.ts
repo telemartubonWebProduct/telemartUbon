@@ -1,0 +1,311 @@
+import { decodeBinding, getAt } from "@/lib/content/paths";
+import type { DocumentId, PageDocumentId } from "@/lib/content/documents";
+import { readDocument } from "@/lib/content/documents";
+import type { LocalizedText, SiteContent } from "@/lib/content/schema";
+
+// Thai names for what Admins see in the Mirror editor. A field without a name
+// here falls back to its key, so a new schema field is still editable.
+
+export const pageLabels: Record<PageDocumentId, string> = {
+  home: "หน้าแรก",
+  "broadband-new": "เน็ตบ้าน ลูกค้าใหม่",
+  "broadband-existing": "เน็ตบ้าน ลูกค้าเดิม",
+  "mobile-monthly": "มือถือรายเดือน",
+  "mobile-prepaid": "มือถือเติมเงิน",
+  solar: "โซลาร์เซลล์",
+  contact: "ติดต่อเรา",
+  "apply-with-agent": "สมัครผ่านตัวแทน",
+  terms: "ข้อตกลงและนโยบาย",
+};
+
+const labels: Record<string, string> = {
+  heading: "หัวเรื่อง",
+  description: "คำอธิบาย",
+  title: "ชื่อ",
+  name: "ชื่อ",
+  note: "ข้อความเล็กใต้ปุ่ม",
+  notes: "หมายเหตุท้ายหมวด",
+  label: "ข้อความ",
+  target: "ปลายทาง",
+  style: "รูปแบบปุ่ม",
+  tone: "พื้นหลังของส่วนนี้",
+  image: "รูป",
+  images: "รูปประกอบ",
+  visual: "ภาพหลัก",
+  visualNote: "คำบรรยายใต้ภาพ",
+  primaryCta: "ปุ่มหลัก",
+  secondaryCta: "ปุ่มรอง",
+  cta: "ปุ่ม",
+  packageCta: "ปุ่มของแต่ละแพ็กเกจ",
+  viewAll: "ปุ่มดูทั้งหมด",
+  headerCta: "ปุ่มใน header",
+  items: "รายการ",
+  question: "คำถาม",
+  answer: "คำตอบ",
+  provider: "ผู้ให้บริการ",
+  icon: "ไอคอน",
+  audience: "เหมาะกับ",
+  speed: "ความเร็ว",
+  download: "ดาวน์โหลด",
+  upload: "อัปโหลด",
+  value: "ค่า",
+  unit: "หน่วย",
+  allowance: "การใช้งาน",
+  validity: "ระยะเวลา",
+  contract: "สัญญา",
+  price: "ราคา",
+  amount: "ราคาเสนอ (บาท)",
+  regularAmount: "ราคาปกติ (บาท)",
+  per: "คิดราคา",
+  vat: "VAT",
+  benefits: "สิทธิประโยชน์",
+  details: "รายละเอียด",
+  conditions: "เงื่อนไข",
+  dialCode: "รหัสกดสมัคร",
+  review: "การตรวจข้อมูลโดยธุรกิจ",
+  status: "สถานะ",
+  alt: "คำอธิบายรูป (alt)",
+  seo: "การค้นหาและการแชร์ (SEO)",
+  noindex: "ไม่ให้ search engine แสดงหน้านี้",
+  body: "เนื้อหา",
+  paragraphs: "ย่อหน้า",
+  list: "รายการย่อย",
+  disclaimer: "หมายเหตุฉบับแปล",
+  intro: "คำนำ",
+  sections: "หมวด",
+  groups: "กลุ่มแพ็กเกจ",
+  packageIds: "แพ็กเกจที่แสดง",
+  columns: "คอลัมน์",
+  links: "ลิงก์",
+  overview: "ลิงก์ดูทั้งหมด",
+  children: "เมนูย่อย",
+  navigation: "เมนู",
+  brand: "แบรนด์",
+  legalName: "ชื่อนิติบุคคล",
+  logo: "โลโก้",
+  contact: "ช่องทางติดต่อ",
+  lineSales: "ลิงก์ LINE ฝ่ายขาย",
+  lineService: "ลิงก์ LINE ฝ่ายบริการ",
+  lineId: "ไลน์ไอดี",
+  lineQr: "รูป QR ของ LINE",
+  phones: "เบอร์โทร",
+  number: "เบอร์",
+  email: "อีเมล",
+  facebook: "ลิงก์เฟซบุ๊ก",
+  footer: "ส่วนท้ายของเว็บ",
+  about: "ข้อความแนะนำ",
+  copyright: "ลิขสิทธิ์",
+  contactBand: "แถบติดต่อท้ายหน้า",
+  ui: "ข้อความของระบบ",
+  theme: "สีของเว็บ",
+  accent: "สีแบรนด์ (ปุ่มหลัก)",
+  ink: "สีตัวอักษร",
+  muted: "สีตัวอักษรรอง",
+  surface: "สีพื้นเทา",
+  line: "สีเส้นขอบ",
+  siteName: "ชื่อเว็บไซต์",
+  hero: "ส่วนเปิดหน้า",
+  services: "เลือกบริการ",
+  featured: "แพ็กเกจเด่น",
+  mobile: "แพ็กเสริมมือถือ",
+  steps: "ขั้นตอน",
+  solar: "โซลาร์เซลล์",
+  faq: "คำถามที่พบบ่อย",
+  stats: "ผลงาน",
+  process: "ขั้นตอนติดตั้ง",
+  packages: "แพ็กเกจ",
+  bundle: "โปรร่วม",
+  knowledge: "ความรู้พื้นฐาน",
+  articles: "บทความ",
+  channels: "ช่องทางติดต่อ",
+  channel: "ช่องทาง",
+  callback: "แถบขอให้ติดต่อกลับ",
+  kind: "ชนิด",
+  hash: "หมวดในหน้า",
+  url: "ลิงก์",
+  integrations: "การเชื่อมต่อ (Google Ads, แชต)",
+  source: "ที่มาของข้อมูล",
+  category: "หมวดสินค้า",
+  group: "กลุ่ม",
+  layout: "รูปแบบการ์ด",
+  src: "ไฟล์",
+  width: "กว้าง (px)",
+  height: "สูง (px)",
+  path: "ที่อยู่หน้า",
+  id: "รหัส",
+};
+
+// The same key means something else in these places.
+const contextLabels: Record<string, string> = {
+  "seo.title": "ชื่อหน้า (title)",
+  "seo.description": "คำอธิบายหน้า (description)",
+  "seo.image": "รูปเมื่อแชร์ลิงก์",
+  "brand.name": "ชื่อแบรนด์",
+  "ui.skipToContent": "ลิงก์ข้ามไปเนื้อหา (ใช้กับคีย์บอร์ด)",
+  "ui.menu": "ปุ่มเปิดเมนู",
+  "ui.closeMenu": "ปุ่มปิดเมนู",
+  "ui.mainNavigation": "ชื่อเมนูหลัก (โปรแกรมอ่านหน้าจอ)",
+  "ui.languageSwitch": "ชื่อตัวเลือกภาษา",
+  "ui.speed": "หัวข้อ ความเร็ว",
+  "ui.audience": "หัวข้อ เหมาะกับ",
+  "ui.allowance": "หัวข้อ การใช้งาน",
+  "ui.validity": "หัวข้อ ระยะเวลา",
+  "ui.contract": "หัวข้อ สัญญา",
+  "ui.benefits": "หัวข้อ สิทธิประโยชน์",
+  "ui.details": "หัวข้อ รายละเอียด",
+  "ui.conditions": "หัวข้อ เงื่อนไข",
+  "ui.dialCode": "หัวข้อ รหัสกดสมัคร",
+  "ui.perMonth": "หน่วย ต่อเดือน",
+  "ui.baht": "หน่วย บาท",
+  "ui.vatExcluded": "ข้อความ ไม่รวม VAT",
+  "ui.vatIncluded": "ข้อความ รวม VAT",
+  "ui.regularPrice": "ข้อความ ราคาปกติ",
+  "ui.offerPrice": "ข้อความ ราคาเสนอ",
+  "ui.emptyGroup": "ข้อความเมื่อหมวดไม่มีแพ็กเกจ",
+  "ui.jumpTo": "ข้อความ ไปยังหมวด",
+  "ui.contents": "หัวข้อ สารบัญ",
+  "ui.call": "ปุ่ม โทร",
+  "ui.email": "คำว่า อีเมล",
+  "ui.chatOnLine": "ปุ่ม แชต LINE",
+  "ui.lineId": "คำว่า ไลน์ไอดี",
+  "ui.facebook": "คำว่า เฟซบุ๊ก",
+  "ui.opensInNewTab": "คำบอกว่าเปิดแท็บใหม่ (โปรแกรมอ่านหน้าจอ)",
+  "ui.footerContact": "หัวข้อ ติดต่อ ในส่วนท้าย",
+  "review.notes": "บันทึกการตรวจ (ไม่แสดงบนเว็บ)",
+  "speed.download": "ดาวน์โหลด",
+  "hero.note": "ข้อความเล็กใต้ปุ่ม",
+  "callback.note": "ข้อความ",
+  "about.body": "ย่อหน้า",
+  "bundle.items": "รายการในโปร",
+  "stats.items": "ตัวเลข",
+};
+
+/** Name of the field `key`; `parent` is the key of the object that holds it. */
+export function fieldLabel(key: string, parent?: string): string {
+  return (parent && contextLabels[`${parent}.${key}`]) ?? labels[key] ?? key;
+}
+
+const valueLabels: Record<string, string> = {
+  canvas: "ขาว",
+  surface: "เทาอ่อน",
+  wash: "สีแบรนด์อ่อน",
+  ink: "ดำ",
+  primary: "ปุ่มหลัก (สีแบรนด์)",
+  secondary: "ปุ่มรอง (เส้นขอบ)",
+  month: "ต่อเดือน",
+  package: "ต่อแพ็กเกจ",
+  once: "จ่ายครั้งเดียว",
+  included: "รวม VAT แล้ว",
+  excluded: "ไม่รวม VAT",
+  unknown: "ไม่ระบุ (ไม่แสดงบรรทัด VAT)",
+  verified: "ธุรกิจยืนยันแล้ว",
+  unverified: "ยังไม่ยืนยัน (แสดงบนเว็บ)",
+  hidden: "ซ่อนจากหน้าเว็บ",
+  page: "หน้าในเว็บนี้",
+  external: "เว็บอื่น (https)",
+  contact: "ช่องทางติดต่อ",
+  "line-sales": "LINE ฝ่ายขาย",
+  "line-service": "LINE ฝ่ายบริการ",
+  "phone-sales": "โทรหาฝ่ายขาย",
+  email: "อีเมล",
+  facebook: "เฟซบุ๊ก",
+  router: "เราเตอร์",
+  "router-upgrade": "เราเตอร์ + ลูกศรเพิ่มสปีด",
+  phone: "มือถือ",
+  solar: "แผงโซลาร์",
+  compare: "เทียบกันเป็นแถว",
+  compact: "การ์ดกะทัดรัด",
+  product: "รูปสินค้า",
+  brand: "โลโก้",
+  photo: "ภาพถ่าย",
+  promo: "ภาพโปรโมชัน",
+  generated: "ภาพประกอบ (AI)",
+  illustration: "ภาพวาด",
+};
+
+export function valueLabel(value: string): string {
+  return valueLabels[value] ?? value;
+}
+
+function isLocalized(value: unknown): value is LocalizedText {
+  return typeof value === "object" && value !== null && typeof (value as LocalizedText).th === "string";
+}
+
+function shorten(text: string, max = 48): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  return clean.length > max ? `${clean.slice(0, max - 1)}…` : clean;
+}
+
+/** A short name for one item of a list, from its own text. */
+export function itemLabel(item: unknown, index: number): string {
+  if (isLocalized(item)) return shorten(item.th) || `รายการที่ ${index + 1}`;
+  if (typeof item === "string") return shorten(item) || `รายการที่ ${index + 1}`;
+  if (typeof item === "object" && item !== null) {
+    const record = item as Record<string, unknown>;
+    for (const key of ["title", "question", "heading", "label", "name"]) {
+      const value = record[key];
+      if (isLocalized(value) && value.th.trim()) return shorten(value.th);
+    }
+    if (typeof record.number === "string") return record.number;
+    if (typeof record.value === "string") return record.value;
+    if (typeof record.category === "string" && typeof record.group === "string") return `${record.category} / ${record.group}`;
+    if (typeof record.id === "string") return record.id;
+  }
+  return `รายการที่ ${index + 1}`;
+}
+
+/** Name of a whole document, such as "หน้าแรก" or "แพ็กเกจ True Gigatex 1Gbps". */
+export function documentLabel(content: SiteContent, documentId: DocumentId): string {
+  if (documentId === "site") return "ตั้งค่าทั้งเว็บ";
+  const [kind, key] = documentId.split(":") as [string, string];
+  const body = readDocument(content, documentId) as Record<string, unknown> | undefined;
+  switch (kind) {
+    case "page":
+      return pageLabels[key as PageDocumentId] ?? key;
+    case "package":
+      return `แพ็กเกจ ${isLocalized(body?.name) ? shorten(body.name.th) : key}`;
+    case "media":
+      return `รูป ${isLocalized(body?.alt) ? shorten(body.alt.th, 36) : key}`;
+    case "benefit":
+      return `สิทธิประโยชน์ ${isLocalized(body?.label) ? shorten(body.label.th) : key}`;
+    default:
+      return documentId;
+  }
+}
+
+/** Short name of the field a binding points at, for the highlight in the preview. */
+export function bindingLabel(content: SiteContent, binding: string): string {
+  const decoded = decodeBinding(binding);
+  if (!decoded) return "";
+  const { documentId, path } = decoded;
+  if (path.length === 0) return documentLabel(content, documentId);
+  const body = readDocument(content, documentId);
+  for (let index = path.length - 1; index >= 0; index -= 1) {
+    const key = path[index];
+    const parent = getAt(body, path.slice(0, index));
+    if (Array.isArray(parent)) {
+      const item = getAt(body, path.slice(0, index + 1));
+      const position = parent.indexOf(item);
+      return itemLabel(item, position === -1 ? 0 : position);
+    }
+    if (key in labels || `${path[index - 1]}.${key}` in contextLabels) return fieldLabel(key, path[index - 1]);
+  }
+  return documentLabel(content, documentId);
+}
+
+/** Readable name of a path inside a document, such as "คำถามที่พบบ่อย › สมัครได้ไหม › คำตอบ › English". */
+export function pathLabel(body: unknown, path: readonly string[]): string {
+  const parts: string[] = [];
+  path.forEach((segment, index) => {
+    const parent = getAt(body, path.slice(0, index));
+    if (Array.isArray(parent)) {
+      const item = getAt(body, path.slice(0, index + 1));
+      parts.push(itemLabel(item, Math.max(parent.indexOf(item), 0)));
+    } else if (segment === "th" || segment === "en") {
+      parts.push(segment === "th" ? "ไทย" : "English");
+    } else {
+      parts.push(fieldLabel(segment, path[index - 1]));
+    }
+  });
+  return parts.join(" › ");
+}

@@ -78,3 +78,59 @@ export function setAt(value: unknown, path: readonly string[], next: unknown): u
   }
   throw new Error(`Cannot set "${segment}" on a ${value === null ? "null" : typeof value}`);
 }
+
+/**
+ * A path from a schema issue (list items by index) as a binding path (items
+ * of object lists by id), so an error can be shown at the field it concerns.
+ */
+export function bindingPath(value: unknown, path: readonly (string | number)[]): string[] {
+  const result: string[] = [];
+  let current = value;
+  for (const segment of path) {
+    if (Array.isArray(current) && typeof segment === "number") {
+      const item = current[segment];
+      result.push(isRecord(item) && typeof item.id === "string" ? item.id : String(segment));
+      current = item;
+    } else {
+      result.push(String(segment));
+      current = isRecord(current) ? current[String(segment)] : undefined;
+    }
+  }
+  return result;
+}
+
+/**
+ * Where two versions of a document differ, as binding paths (at most `limit`).
+ * Items of object lists are matched by id, other lists by position.
+ */
+export function diffPaths(a: unknown, b: unknown, limit = 12): string[][] {
+  const out: string[][] = [];
+  const visit = (left: unknown, right: unknown, path: string[]) => {
+    if (out.length >= limit || Object.is(left, right)) return;
+    if (Array.isArray(left) && Array.isArray(right)) {
+      const byId = [...left, ...right].every((item) => isRecord(item) && typeof item.id === "string");
+      if (byId) {
+        const ids = new Set([...left, ...right].map((item) => (item as { id: string }).id));
+        for (const id of ids) {
+          visit(
+            left.find((item) => (item as { id: string }).id === id),
+            right.find((item) => (item as { id: string }).id === id),
+            [...path, id],
+          );
+        }
+      } else if (left.length !== right.length) {
+        out.push(path);
+      } else {
+        left.forEach((item, index) => visit(item, right[index], [...path, String(index)]));
+      }
+      return;
+    }
+    if (isRecord(left) && isRecord(right)) {
+      for (const key of new Set([...Object.keys(left), ...Object.keys(right)])) visit(left[key], right[key], [...path, key]);
+      return;
+    }
+    out.push(path);
+  };
+  visit(a, b, []);
+  return out;
+}

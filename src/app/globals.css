@@ -81,6 +81,13 @@
     color: var(--tm-color-ink);
   }
 
+  /* Mirror editor preview (src/components/editor/PreviewCanvas.tsx): in edit
+     mode every field on the page can be clicked. Outlines are drawn in an
+     overlay, so nothing here changes the layout. */
+  .tm-preview-edit [data-edit] {
+    cursor: pointer;
+  }
+
   /* In-page anchors land below the sticky header. */
   .tm-site [id] {
     scroll-margin-top: 5.5rem;
