@@ -3,6 +3,12 @@ import { IBM_Plex_Sans_Thai } from "next/font/google";
 
 import { readSupabasePublicEnv } from "@/lib/env";
 
+import "@/styles/tokens.css";
+import "../globals.css";
+
+// Root layout of the back office. The public site has its own root layout in
+// src/app/[locale], so neither loads the other's fonts, tags or scripts;
+// moving between the two is a full page load.
 const plexThai = IBM_Plex_Sans_Thai({
   subsets: ["thai", "latin"],
   weight: ["400", "500", "600", "700"],
@@ -20,9 +26,13 @@ export const metadata: Metadata = {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${plexThai.variable} tm-admin`}>
-      {readSupabasePublicEnv() ? children : <SupabaseNotConfigured />}
-    </div>
+    <html lang="th">
+      <body>
+        <div className={`${plexThai.variable} tm-admin`}>
+          {readSupabasePublicEnv() ? children : <SupabaseNotConfigured />}
+        </div>
+      </body>
+    </html>
   );
 }
 
