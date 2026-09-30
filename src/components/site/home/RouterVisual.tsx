@@ -2,6 +2,8 @@ import Image from "next/image";
 
 import type { MediaAsset } from "@/lib/content/schema";
 
+import { RouterStage } from "./RouterStage";
+
 type RouterVisualProps = { poster: MediaAsset; alt: string; note: string };
 
 /**
@@ -13,13 +15,17 @@ export function RouterVisual({ poster, alt, note }: RouterVisualProps) {
   return (
     <figure className="w-full">
       <div className="relative w-full" style={{ aspectRatio: `${poster.width} / ${poster.height}` }}>
-        <Image
-          src={poster.src}
-          alt={alt}
-          fill
-          preload
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className="tm-reveal object-contain"
+        <RouterStage
+          poster={
+            <Image
+              src={poster.src}
+              alt={alt}
+              fill
+              preload
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="tm-reveal object-contain"
+            />
+          }
         />
       </div>
       <figcaption className="mt-2 text-center text-tm-caption text-tm-muted">{note}</figcaption>
