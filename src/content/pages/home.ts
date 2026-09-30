@@ -40,6 +40,7 @@ export const home: HomePage = {
     },
     visual: "router-concept",
     visualNote: t("ภาพประกอบ ไม่ใช่รุ่นที่ติดตั้งจริง", "Illustration, not the exact model you receive"),
+    tone: "canvas",
   },
   services: {
     heading: t("เลือกบริการที่ต้องการ", "What are you looking for?"),
@@ -74,6 +75,7 @@ export const home: HomePage = {
         target: page("/wEnergy"),
       },
     ],
+    tone: "canvas",
   },
   featured: {
     heading: t("แพ็กเกจเน็ตบ้านลูกค้าใหม่", "Home internet for new customers"),
@@ -94,6 +96,7 @@ export const home: HomePage = {
       target: page("/broadband"),
       style: "secondary",
     },
+    tone: "surface",
   },
   mobile: {
     heading: t("แพ็กเสริมเน็ตมือถือ", "Mobile add-ons"),
@@ -122,6 +125,7 @@ export const home: HomePage = {
         ],
       },
     ],
+    tone: "canvas",
   },
   steps: {
     heading: t("สมัครง่ายใน 3 ขั้นตอน", "Three steps to get connected"),
@@ -148,6 +152,7 @@ export const home: HomePage = {
         ),
       },
     ],
+    tone: "canvas",
   },
   solar: {
     heading: t("โซลาร์เซลล์บนหลังคาบ้าน", "Rooftop solar"),
@@ -163,6 +168,7 @@ export const home: HomePage = {
       target: page("/wEnergy"),
       style: "secondary",
     },
+    tone: "canvas",
   },
   faq: {
     heading: t("คำถามที่พบบ่อย", "Common questions"),
@@ -200,5 +206,6 @@ export const home: HomePage = {
         ),
       },
     ],
+    tone: "canvas",
   },
 };

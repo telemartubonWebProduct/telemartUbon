@@ -1,15 +1,12 @@
 import type { ReactNode } from "react";
 
-import { content } from "@/lib/content";
-import { tx } from "@/lib/content/render";
-import type { Locale } from "@/lib/i18n/locales";
-
 import { ContactBand } from "./ContactBand";
+import type { RenderContext } from "./context";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 
 type PageShellProps = {
-  locale: Locale;
+  ctx: RenderContext;
   /** Unprefixed path of the page, used for the current menu item and the language switch. */
   path: string;
   children: ReactNode;
@@ -18,21 +15,21 @@ type PageShellProps = {
 };
 
 /** Header, main landmark, closing contact band and footer shared by every public page. */
-export function PageShell({ locale, path, children, contactBand = true }: PageShellProps) {
+export function PageShell({ ctx, path, children, contactBand = true }: PageShellProps) {
   return (
     <>
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-tm-control focus:bg-tm-ink focus:px-4 focus:py-3 focus:text-tm-on-ink"
       >
-        {tx(content.site.ui.skipToContent, locale)}
+        {ctx.t(ctx.site.ui.skipToContent)}
       </a>
-      <SiteHeader locale={locale} path={path} />
+      <SiteHeader ctx={ctx} path={path} />
       <main id="main" tabIndex={-1} className="focus-visible:outline-none">
         {children}
       </main>
-      {contactBand ? <ContactBand locale={locale} /> : null}
-      <SiteFooter locale={locale} path={path} />
+      {contactBand ? <ContactBand ctx={ctx} /> : null}
+      <SiteFooter ctx={ctx} path={path} />
     </>
   );
 }

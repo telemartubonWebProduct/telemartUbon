@@ -29,6 +29,14 @@
   --tm-color-focus: #000000;
   --tm-color-focus-inverse: #ffffff;
 
+  /* The black section tone swaps the palette inside a section (see globals.css).
+     Derived from the theme's ink colour: ink, ink + 10% white, ink + 25% white. */
+  --tm-tone-ink-canvas: #000000;
+  --tm-tone-ink-text: #ffffff;
+  --tm-tone-ink-muted: #d4d4d8;
+  --tm-tone-ink-surface: #1a1a1a;
+  --tm-tone-ink-line: #404040;
+
   /* Type: IBM Plex Sans Thai for headings and body. Thai stacks vowels and tone
      marks, so line heights stay generous. Containers that load the font through
      next/font redeclare this with var(--font-plex-thai) first. */

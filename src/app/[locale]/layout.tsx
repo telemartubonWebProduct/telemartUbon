@@ -4,6 +4,7 @@ import Script from "next/script";
 
 import { content } from "@/lib/content";
 import { tx } from "@/lib/content/render";
+import { themeVariables } from "@/lib/content/theme";
 import { locales } from "@/lib/i18n/locales";
 import { pageLocale } from "@/lib/i18n/page";
 import { siteUrl } from "@/lib/seo/metadata";
@@ -50,7 +51,8 @@ export default async function PublicRootLayout({ children, params }: LayoutProps
 
   return (
     <html lang={locale} className={plexThai.variable}>
-      <body className="tm-site">
+      {/* Theme colours from site settings; the default theme adds nothing. */}
+      <body className="tm-site" style={themeVariables(content.site.theme)}>
         {children}
         {/* Google Ads base tag, as on the old site. Conversion events are defined in M5. */}
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} strategy="afterInteractive" />

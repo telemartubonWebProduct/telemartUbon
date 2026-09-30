@@ -1,24 +1,21 @@
 import Image from "next/image";
 
-import { content, getMedia, packageById } from "@/lib/content";
-import { tx } from "@/lib/content/render";
-import type { Locale } from "@/lib/i18n/locales";
-
+import type { RenderContext } from "../context";
 import { PlusIcon, serviceIcons } from "../icons";
 import { CtaLink, TargetLink } from "../links";
 import { PackageCompare } from "../PackageCompare";
 import { Steps } from "../Steps";
 
-const home = () => content.pages.home;
+const doc = "page:home" as const;
 
 /** Four ways in, in one divided panel; solar is marked as W&W Energy's service. */
-export function ServiceChooser({ locale }: { locale: Locale }) {
-  const { services } = home();
+export function ServiceChooser({ ctx }: { ctx: RenderContext }) {
+  const { services } = ctx.content.pages.home;
   return (
-    <section aria-labelledby="services-heading" className="border-t border-tm-line py-14 lg:py-20">
+    <section aria-labelledby="services-heading" className="border-t border-tm-line py-14 lg:py-20" data-tone={services.tone} {...ctx.bind(doc, "services")}>
       <div className="tm-container">
-        <h2 id="services-heading" className="text-tm-h2 font-semibold">
-          {tx(services.heading, locale)}
+        <h2 id="services-heading" className="text-tm-h2 font-semibold" {...ctx.bind(doc, "services", "heading")}>
+          {ctx.t(services.heading)}
         </h2>
         <ul
           role="list"
@@ -26,18 +23,27 @@ export function ServiceChooser({ locale }: { locale: Locale }) {
         >
           {services.items.map((item) => {
             const Icon = serviceIcons[item.icon];
+            const bind = (...path: string[]) => ctx.bind(doc, "services", "items", item.id, ...path);
             return (
               <li key={item.id} className="bg-tm-canvas">
                 <TargetLink
+                  ctx={ctx}
                   target={item.target}
-                  locale={locale}
-                  site={content.site}
+                  bind={bind()}
                   className="grid h-full grid-cols-[auto_minmax(0,1fr)] gap-x-4 p-5 transition-colors duration-tm-fast hover:bg-tm-surface sm:flex sm:flex-col sm:gap-3 sm:p-6 lg:p-7"
                 >
                   <Icon className="row-span-3 text-[2.5rem] sm:text-[2.75rem]" />
-                  <h3 className="text-tm-h4 font-semibold sm:mt-2">{tx(item.title, locale)}</h3>
-                  <p className="mt-1 text-tm-muted sm:mt-0">{tx(item.description, locale)}</p>
-                  {item.provider ? <p className="mt-2 text-tm-small font-semibold sm:mt-auto sm:pt-2">{tx(item.provider, locale)}</p> : null}
+                  <h3 className="text-tm-h4 font-semibold sm:mt-2" {...bind("title")}>
+                    {ctx.t(item.title)}
+                  </h3>
+                  <p className="mt-1 text-tm-muted sm:mt-0" {...bind("description")}>
+                    {ctx.t(item.description)}
+                  </p>
+                  {item.provider ? (
+                    <p className="mt-2 text-tm-small font-semibold sm:mt-auto sm:pt-2" {...bind("provider")}>
+                      {ctx.t(item.provider)}
+                    </p>
+                  ) : null}
                 </TargetLink>
               </li>
             );
@@ -48,58 +54,76 @@ export function ServiceChooser({ locale }: { locale: Locale }) {
   );
 }
 
-export function FeaturedPackages({ locale }: { locale: Locale }) {
-  const { featured } = home();
-  const items = featured.packageIds.map(packageById);
+export function FeaturedPackages({ ctx }: { ctx: RenderContext }) {
+  const { featured } = ctx.content.pages.home;
+  const items = featured.packageIds.map(ctx.packageById);
   return (
-    <section aria-labelledby="featured-heading" className="bg-tm-surface py-14 lg:py-20">
+    <section aria-labelledby="featured-heading" className="py-14 lg:py-20" data-tone={featured.tone} {...ctx.bind(doc, "featured")}>
       <div className="tm-container">
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
           <div className="max-w-[40rem]">
-            <h2 id="featured-heading" className="text-tm-h2 font-semibold">
-              {tx(featured.heading, locale)}
+            <h2 id="featured-heading" className="text-tm-h2 font-semibold" {...ctx.bind(doc, "featured", "heading")}>
+              {ctx.t(featured.heading)}
             </h2>
-            <p className="mt-2 text-tm-muted">{tx(featured.description, locale)}</p>
+            <p className="mt-2 text-tm-muted" {...ctx.bind(doc, "featured", "description")}>
+              {ctx.t(featured.description)}
+            </p>
           </div>
-          <CtaLink cta={featured.viewAll} locale={locale} site={content.site} />
+          <CtaLink ctx={ctx} cta={featured.viewAll} bind={ctx.bind(doc, "featured", "viewAll")} />
         </div>
         <div className="mt-8">
-          <PackageCompare items={items} locale={locale} cta={featured.packageCta} variant="compare" className="lg:grid-cols-3" />
+          <PackageCompare
+            ctx={ctx}
+            items={items}
+            cta={featured.packageCta}
+            ctaBind={ctx.bind(doc, "featured", "packageCta")}
+            variant="compare"
+            className="lg:grid-cols-3"
+          />
         </div>
       </div>
     </section>
   );
 }
 
-export function MobileAddons({ locale }: { locale: Locale }) {
-  const { mobile } = home();
+export function MobileAddons({ ctx }: { ctx: RenderContext }) {
+  const { mobile } = ctx.content.pages.home;
   return (
-    <section aria-labelledby="mobile-heading" className="py-14 lg:py-20">
+    <section aria-labelledby="mobile-heading" className="py-14 lg:py-20" data-tone={mobile.tone} {...ctx.bind(doc, "mobile")}>
       <div className="tm-container">
-        <h2 id="mobile-heading" className="text-tm-h2 font-semibold">
-          {tx(mobile.heading, locale)}
+        <h2 id="mobile-heading" className="text-tm-h2 font-semibold" {...ctx.bind(doc, "mobile", "heading")}>
+          {ctx.t(mobile.heading)}
         </h2>
-        <p className="mt-2 max-w-[40rem] text-tm-muted">{tx(mobile.description, locale)}</p>
+        <p className="mt-2 max-w-[40rem] text-tm-muted" {...ctx.bind(doc, "mobile", "description")}>
+          {ctx.t(mobile.description)}
+        </p>
         <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-8">
           {mobile.columns.map((column) => (
             <div key={column.id}>
-              <h3 className="text-tm-h4 font-semibold">{tx(column.heading, locale)}</h3>
+              <h3 className="text-tm-h4 font-semibold" {...ctx.bind(doc, "mobile", "columns", column.id, "heading")}>
+                {ctx.t(column.heading)}
+              </h3>
               <ul className="mt-3 divide-y divide-tm-line border-y border-tm-line">
                 {column.links.map((entry) => (
                   <li key={entry.id}>
                     <TargetLink
+                      ctx={ctx}
                       target={entry.target}
-                      locale={locale}
-                      site={content.site}
+                      bind={ctx.bind(doc, "mobile", "columns", column.id, "links", entry.id)}
                       className="flex min-h-[3.25rem] items-center py-2 text-tm-lead hover:underline hover:decoration-tm-red hover:decoration-2 hover:underline-offset-[0.35em]"
                     >
-                      {tx(entry.label, locale)}
+                      {ctx.t(entry.label)}
                     </TargetLink>
                   </li>
                 ))}
               </ul>
-              <TargetLink target={column.overview.target} locale={locale} site={content.site} className="tm-link mt-4 inline-block font-semibold">
-                {tx(column.overview.label, locale)}
+              <TargetLink
+                ctx={ctx}
+                target={column.overview.target}
+                bind={ctx.bind(doc, "mobile", "columns", column.id, "overview")}
+                className="tm-link mt-4 inline-block font-semibold"
+              >
+                {ctx.t(column.overview.label)}
               </TargetLink>
             </div>
           ))}
@@ -109,60 +133,72 @@ export function MobileAddons({ locale }: { locale: Locale }) {
   );
 }
 
-export function HomeSteps({ locale }: { locale: Locale }) {
-  const { steps } = home();
+export function HomeSteps({ ctx }: { ctx: RenderContext }) {
+  const { steps } = ctx.content.pages.home;
   return (
     <Steps
+      ctx={ctx}
       id="home-steps"
-      heading={tx(steps.heading, locale)}
-      items={steps.items.map((item) => ({ id: item.id, title: tx(item.title, locale), description: tx(item.description, locale) }))}
+      doc={doc}
+      base={["steps"]}
+      itemsKey="items"
+      heading={steps.heading}
+      items={steps.items}
+      tone={steps.tone}
     />
   );
 }
 
-export function SolarTeaser({ locale }: { locale: Locale }) {
-  const { solar } = home();
-  const image = getMedia(solar.image);
+export function SolarTeaser({ ctx }: { ctx: RenderContext }) {
+  const { solar } = ctx.content.pages.home;
+  const image = ctx.media(solar.image);
   return (
-    <section aria-labelledby="solar-teaser-heading" className="border-t border-tm-line py-14 lg:py-20">
+    <section aria-labelledby="solar-teaser-heading" className="border-t border-tm-line py-14 lg:py-20" data-tone={solar.tone} {...ctx.bind(doc, "solar")}>
       <div className="tm-container grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center lg:gap-14">
         <Image
           src={image.src}
           width={image.width}
           height={image.height}
-          alt={tx(image.alt, locale)}
+          alt={ctx.t(image.alt)}
           sizes="(min-width: 1024px) 40rem, 100vw"
           className="aspect-[16/10] w-full rounded-tm-panel object-cover"
+          {...ctx.bind(doc, "solar", "image")}
         />
         <div className="max-w-[34rem]">
-          <h2 id="solar-teaser-heading" className="text-tm-h2 font-semibold">
-            {tx(solar.heading, locale)}
+          <h2 id="solar-teaser-heading" className="text-tm-h2 font-semibold" {...ctx.bind(doc, "solar", "heading")}>
+            {ctx.t(solar.heading)}
           </h2>
-          <p className="mt-3 text-tm-lead text-tm-muted">{tx(solar.description, locale)}</p>
-          <p className="mt-4 font-semibold">{tx(solar.provider, locale)}</p>
-          <CtaLink cta={solar.cta} locale={locale} site={content.site} className="mt-6" />
+          <p className="mt-3 text-tm-lead text-tm-muted" {...ctx.bind(doc, "solar", "description")}>
+            {ctx.t(solar.description)}
+          </p>
+          <p className="mt-4 font-semibold" {...ctx.bind(doc, "solar", "provider")}>
+            {ctx.t(solar.provider)}
+          </p>
+          <CtaLink ctx={ctx} cta={solar.cta} className="mt-6" bind={ctx.bind(doc, "solar", "cta")} />
         </div>
       </div>
     </section>
   );
 }
 
-export function Faq({ locale }: { locale: Locale }) {
-  const { faq } = home();
+export function Faq({ ctx }: { ctx: RenderContext }) {
+  const { faq } = ctx.content.pages.home;
   return (
-    <section aria-labelledby="faq-heading" className="border-t border-tm-line py-14 lg:py-20">
+    <section aria-labelledby="faq-heading" className="border-t border-tm-line py-14 lg:py-20" data-tone={faq.tone} {...ctx.bind(doc, "faq")}>
       <div className="tm-container grid gap-6 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-14">
-        <h2 id="faq-heading" className="text-tm-h2 font-semibold">
-          {tx(faq.heading, locale)}
+        <h2 id="faq-heading" className="text-tm-h2 font-semibold" {...ctx.bind(doc, "faq", "heading")}>
+          {ctx.t(faq.heading)}
         </h2>
         <div className="tm-faq divide-y divide-tm-line border-y border-tm-line">
           {faq.items.map((item) => (
-            <details key={item.id} id={`faq-${item.id}`}>
+            <details key={item.id} id={`faq-${item.id}`} {...ctx.bind(doc, "faq", "items", item.id)}>
               <summary className="flex min-h-tm-control items-center justify-between gap-6 py-5 text-tm-lead font-medium">
-                {tx(item.question, locale)}
+                <span {...ctx.bind(doc, "faq", "items", item.id, "question")}>{ctx.t(item.question)}</span>
                 <PlusIcon data-open-icon="" className="shrink-0 text-[1.35em]" />
               </summary>
-              <p className="max-w-[44rem] pb-6 text-tm-muted">{tx(item.answer, locale)}</p>
+              <p className="max-w-[44rem] pb-6 text-tm-muted" {...ctx.bind(doc, "faq", "items", item.id, "answer")}>
+                {ctx.t(item.answer)}
+              </p>
             </details>
           ))}
         </div>

@@ -29,6 +29,7 @@ export const solarPage: SolarPage = {
       target: { kind: "contact", channel: "line-sales" },
       style: "primary",
     },
+    tone: "canvas",
   },
   about: {
     heading: t("สินค้าและบริการ", "Products and services"),
@@ -39,6 +40,7 @@ export const solarPage: SolarPage = {
       ),
     ],
     image: "solar-products",
+    tone: "canvas",
   },
   stats: {
     heading: t("ผลงานของเรา", "Our track record"),
@@ -64,6 +66,7 @@ export const solarPage: SolarPage = {
       { id: "permit", title: t("ขออนุญาต", "Permits"), description: t("ประสานงานเป็นตัวแทนยื่นขออนุญาตกับการไฟฟ้า", "We apply to the electricity authority for you.") },
       { id: "after-sales", title: t("บริการหลังการขาย", "After-sales service"), description: t("ทีม Call Center และทีมวิศวกรพร้อมให้บริการทั่วประเทศ", "Call-centre staff and engineers support you nationwide.") },
     ],
+    tone: "canvas",
   },
   packages: {
     id: "solar",
@@ -93,6 +96,7 @@ export const solarPage: SolarPage = {
         "Free system maintenance and panel cleaning for 2 years.",
       ),
     ],
+    tone: "surface",
   },
   bundle: {
     heading: t("ติดตั้งโซลาร์เซลล์วันนี้ รับเน็ตบ้านทรูออนไลน์ฟรี 36 เดือน", "Install solar now and get True Online home internet free for 36 months"),
@@ -103,6 +107,7 @@ export const solarPage: SolarPage = {
       t("ฟรี ค่าแรกเข้า (มูลค่า 2,000 บาท)", "Free joining fee (worth 2,000 baht)"),
     ],
     image: "true-online-logo",
+    tone: "canvas",
   },
   knowledge: {
     heading: t("ความรู้พื้นฐานโซลาร์เซลล์", "Solar basics"),
@@ -236,5 +241,6 @@ export const solarPage: SolarPage = {
         images: [],
       },
     ],
+    tone: "canvas",
   },
 };

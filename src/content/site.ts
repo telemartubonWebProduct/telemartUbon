@@ -1,4 +1,5 @@
 import type { LinkTarget, SiteSettings } from "@/lib/content/schema";
+import { defaultTheme } from "@/lib/content/theme";
 
 import { t } from "./catalog/helpers";
 
@@ -93,6 +94,7 @@ export const site: SiteSettings = {
       "ถามเรื่องแพ็กเกจหรือให้ช่วยเลือกได้ทาง LINE และโทรศัพท์ รับเรื่องจากทุกจังหวัด เจ้าหน้าที่ตรวจพื้นที่ติดตั้งตามที่อยู่ของคุณก่อนยืนยัน",
       "Ask about packages or get help choosing on LINE or by phone. We take requests from every province and check installation at your address before confirming.",
     ),
+    tone: "surface",
   },
   ui: {
     skipToContent: t("ข้ามไปยังเนื้อหา", "Skip to content"),
@@ -138,6 +140,7 @@ export const site: SiteSettings = {
     // Shown when a page is shared on LINE or Facebook; pages can set their own.
     image: "og-image",
   },
+  theme: defaultTheme,
   integrations: {
     googleAdsId: "AW-18007307609",
     tawkSrc: "https://embed.tawk.to/67c0738b25eb41190eae9189/1il3s6mmf",

@@ -1,44 +1,50 @@
 import Image from "next/image";
 
-import { content, getMedia } from "@/lib/content";
-import { formatPhone, isCurrent, resolveLink, telHref, tx } from "@/lib/content/render";
-import type { Locale } from "@/lib/i18n/locales";
+import { formatPhone, isCurrent, telHref } from "@/lib/content/render";
 
+import type { RenderContext } from "./context";
 import { CallIcon, MailIcon } from "./icons";
 import { LanguageSwitch } from "./LanguageSwitch";
-import { SmartLink, TargetLink } from "./links";
+import { ContactLink, TargetLink } from "./links";
 
-export function SiteFooter({ locale, path }: { locale: Locale; path: string }) {
-  const { site } = content;
+export function SiteFooter({ ctx, path }: { ctx: RenderContext; path: string }) {
+  const { site } = ctx;
   const { ui, contact } = site;
-  const qr = getMedia(contact.lineQr);
-  const newTab = tx(ui.opensInNewTab, locale);
+  const qr = ctx.media(contact.lineQr);
   const year = new Date().getFullYear();
 
   return (
     <footer className="tm-on-ink bg-tm-ink text-tm-on-ink">
       <div className="tm-container grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.25fr)] lg:gap-10">
         <div>
-          <p className="text-tm-h4 font-semibold">{tx(site.brand.name, locale)}</p>
-          <p className="mt-3 max-w-[22rem] text-tm-small text-tm-on-ink-muted">{tx(site.footer.about, locale)}</p>
+          <p className="text-tm-h4 font-semibold" {...ctx.bind("site", "brand", "name")}>
+            {ctx.t(site.brand.name)}
+          </p>
+          <p className="mt-3 max-w-[22rem] text-tm-small text-tm-on-ink-muted" {...ctx.bind("site", "footer", "about")}>
+            {ctx.t(site.footer.about)}
+          </p>
         </div>
 
         {site.footer.groups.map((group) => (
           <nav key={group.id} aria-labelledby={`footer-${group.id}`}>
-            <h2 id={`footer-${group.id}`} className="text-tm-small font-semibold text-tm-on-ink-muted">
-              {tx(group.heading, locale)}
+            <h2
+              id={`footer-${group.id}`}
+              className="text-tm-small font-semibold text-tm-on-ink-muted"
+              {...ctx.bind("site", "footer", "groups", group.id, "heading")}
+            >
+              {ctx.t(group.heading)}
             </h2>
             <ul className="mt-3 grid gap-1">
               {group.links.map((entry) => (
                 <li key={entry.id}>
                   <TargetLink
+                    ctx={ctx}
                     target={entry.target}
-                    locale={locale}
-                    site={site}
                     current={isCurrent(entry.target, path)}
+                    bind={ctx.bind("site", "footer", "groups", group.id, "links", entry.id)}
                     className="inline-flex min-h-tm-control items-center py-1 hover:underline hover:decoration-tm-red hover:decoration-2 hover:underline-offset-[0.35em] aria-[current=page]:underline aria-[current=page]:underline-offset-[0.35em]"
                   >
-                    {tx(entry.label, locale)}
+                    {ctx.t(entry.label)}
                   </TargetLink>
                 </li>
               ))}
@@ -47,57 +53,74 @@ export function SiteFooter({ locale, path }: { locale: Locale; path: string }) {
         ))}
 
         <section aria-labelledby="footer-contact">
-          <h2 id="footer-contact" className="text-tm-small font-semibold text-tm-on-ink-muted">
-            {tx(ui.footerContact, locale)}
+          <h2 id="footer-contact" className="text-tm-small font-semibold text-tm-on-ink-muted" {...ctx.bind("site", "ui", "footerContact")}>
+            {ctx.t(ui.footerContact)}
           </h2>
           <div className="mt-4 flex items-start gap-4">
             <Image
               src={qr.src}
               width={qr.width}
               height={qr.height}
-              alt={tx(qr.alt, locale)}
+              alt={ctx.t(qr.alt)}
               className="h-24 w-24 shrink-0 rounded-tm-control bg-tm-canvas p-1"
+              {...ctx.bind("site", "contact", "lineQr")}
             />
             <div>
-              <p className="text-tm-small text-tm-on-ink-muted">{tx(ui.lineId, locale)}</p>
-              <p className="text-tm-lead font-semibold">{contact.lineId}</p>
-              <SmartLink
-                link={resolveLink({ kind: "contact", channel: "line-sales" }, locale, site)}
+              <p className="text-tm-small text-tm-on-ink-muted" {...ctx.bind("site", "ui", "lineId")}>
+                {ctx.t(ui.lineId)}
+              </p>
+              <p className="text-tm-lead font-semibold" {...ctx.bind("site", "contact", "lineId")}>
+                {contact.lineId}
+              </p>
+              <ContactLink
+                ctx={ctx}
+                channel="line-sales"
                 ctaId="footer-line"
-                newTabLabel={newTab}
                 className="tm-button tm-button-secondary mt-2"
+                bind={ctx.bind("site", "contact", "lineSales")}
               >
-                {tx(ui.chatOnLine, locale)}
-              </SmartLink>
+                {ctx.t(ui.chatOnLine)}
+              </ContactLink>
             </div>
           </div>
           <ul className="mt-6 grid gap-1">
-            {contact.phones.map((phone) => (
+            {contact.phones.map((phone, index) => (
               <li key={phone.number}>
-                <a href={telHref(phone.number)} data-cta="footer-call" className="inline-flex min-h-tm-control items-center gap-2 hover:underline">
+                <a
+                  href={telHref(phone.number)}
+                  data-cta="footer-call"
+                  className="inline-flex min-h-tm-control items-center gap-2 hover:underline"
+                  {...ctx.bind("site", "contact", "phones", index)}
+                >
                   <CallIcon className="text-[1.1em]" />
-                  <span className="sr-only">{tx(ui.call, locale)} </span>
+                  <span className="sr-only">{ctx.t(ui.call)} </span>
                   <span className="tm-num font-semibold">{formatPhone(phone.number)}</span>
-                  <span className="text-tm-small text-tm-on-ink-muted">{tx(phone.label, locale)}</span>
+                  <span className="text-tm-small text-tm-on-ink-muted">{ctx.t(phone.label)}</span>
                 </a>
               </li>
             ))}
             <li>
-              <a href={`mailto:${contact.email}`} data-cta="footer-email" className="inline-flex min-h-tm-control items-center gap-2 break-all hover:underline">
+              <a
+                href={`mailto:${contact.email}`}
+                data-cta="footer-email"
+                className="inline-flex min-h-tm-control items-center gap-2 break-all hover:underline"
+                {...ctx.bind("site", "contact", "email")}
+              >
                 <MailIcon className="shrink-0 text-[1.1em]" />
-                <span className="sr-only">{tx(ui.email, locale)} </span>
+                <span className="sr-only">{ctx.t(ui.email)} </span>
                 {contact.email}
               </a>
             </li>
             <li>
-              <SmartLink
-                link={resolveLink({ kind: "contact", channel: "facebook" }, locale, site)}
+              <ContactLink
+                ctx={ctx}
+                channel="facebook"
                 ctaId="footer-facebook"
-                newTabLabel={newTab}
                 className="inline-flex min-h-tm-control items-center hover:underline"
+                bind={ctx.bind("site", "contact", "facebook")}
               >
-                {tx(ui.facebook, locale)}
-              </SmartLink>
+                {ctx.t(ui.facebook)}
+              </ContactLink>
             </li>
           </ul>
         </section>
@@ -105,10 +128,10 @@ export function SiteFooter({ locale, path }: { locale: Locale; path: string }) {
 
       <div className="border-t border-tm-muted">
         <div className="tm-container flex flex-col-reverse gap-4 py-6 text-tm-small text-tm-on-ink-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © {year} {tx(site.footer.copyright, locale)}
+          <p {...ctx.bind("site", "footer", "copyright")}>
+            © {year} {ctx.t(site.footer.copyright)}
           </p>
-          <LanguageSwitch locale={locale} path={path} label={tx(ui.languageSwitch, locale)} tone="ink" />
+          <LanguageSwitch locale={ctx.locale} path={path} label={ctx.t(ui.languageSwitch)} tone="ink" />
         </div>
       </div>
     </footer>

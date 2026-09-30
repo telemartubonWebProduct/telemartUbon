@@ -1,17 +1,23 @@
-import { tx } from "@/lib/content/render";
+import type { DocumentId } from "@/lib/content/documents";
 import type { PackagePage } from "@/lib/content/schema";
-import type { Locale } from "@/lib/i18n/locales";
 
+import type { RenderContext } from "./context";
 import { PackageSections } from "./PackageSections";
-import { PageHero } from "./PageHero";
+import { heroBinds, PageHero } from "./PageHero";
 import { PageShell } from "./PageShell";
 
 /** One template for every package page: hero, section links, sections. */
-export function PackagePageView({ page, locale }: { page: PackagePage; locale: Locale }) {
+export function PackagePageView({ ctx, page }: { ctx: RenderContext; page: PackagePage }) {
   return (
-    <PageShell locale={locale} path={page.path}>
-      <PageHero heading={tx(page.hero.heading, locale)} description={tx(page.hero.description, locale)} />
-      <PackageSections page={page} locale={locale} />
+    <PageShell ctx={ctx} path={page.path}>
+      <PageHero
+        ctx={ctx}
+        heading={page.hero.heading}
+        description={page.hero.description}
+        tone={page.hero.tone}
+        binds={heroBinds(ctx, `page:${page.id}` as DocumentId, "hero")}
+      />
+      <PackageSections ctx={ctx} page={page} />
     </PageShell>
   );
 }

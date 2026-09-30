@@ -55,6 +55,32 @@
     outline-color: var(--tm-color-focus-inverse);
   }
 
+  /* Section backgrounds chosen in the content (site settings > theme). Text,
+     lines and panels inside a section follow the tone through the tokens, so
+     every combination keeps the contrast checked in src/lib/content/theme.ts. */
+  .tm-site [data-tone="canvas"] {
+    background-color: var(--tm-color-canvas);
+  }
+
+  .tm-site [data-tone="surface"] {
+    background-color: var(--tm-color-surface);
+  }
+
+  .tm-site [data-tone="wash"] {
+    background-color: var(--tm-color-red-wash);
+  }
+
+  .tm-site [data-tone="ink"] {
+    --tm-color-canvas: var(--tm-tone-ink-canvas);
+    --tm-color-ink: var(--tm-tone-ink-text);
+    --tm-color-ink-muted: var(--tm-tone-ink-muted);
+    --tm-color-surface: var(--tm-tone-ink-surface);
+    --tm-color-line: var(--tm-tone-ink-line);
+    --tm-color-focus: var(--tm-tone-ink-text);
+    background-color: var(--tm-color-canvas);
+    color: var(--tm-color-ink);
+  }
+
   /* In-page anchors land below the sticky header. */
   .tm-site [id] {
     scroll-margin-top: 5.5rem;
@@ -104,7 +130,7 @@
 
   .tm-button-secondary:hover {
     background: var(--tm-color-ink);
-    color: var(--tm-color-on-ink);
+    color: var(--tm-color-canvas);
   }
 
   .tm-on-ink .tm-button-secondary {

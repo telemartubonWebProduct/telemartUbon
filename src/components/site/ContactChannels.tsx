@@ -1,38 +1,45 @@
 import Image from "next/image";
 
-import { content, getMedia } from "@/lib/content";
-import { formatPhone, resolveLink, telHref, tx } from "@/lib/content/render";
+import { formatPhone, telHref } from "@/lib/content/render";
 import type { ContactPage } from "@/lib/content/schema";
-import type { Locale } from "@/lib/i18n/locales";
 
+import type { RenderContext } from "./context";
 import { CallIcon, MailIcon } from "./icons";
-import { SmartLink } from "./links";
+import { ContactLink } from "./links";
 
-type Channel = ContactPage["channels"][number];
+type Channel = ContactPage["channels"]["items"][number];
 
-function ChannelAction({ channel, locale }: { channel: Channel; locale: Locale }) {
-  const { site } = content;
-  const { ui, contact } = site;
-  const newTab = tx(ui.opensInNewTab, locale);
+function ChannelAction({ ctx, channel }: { ctx: RenderContext; channel: Channel }) {
+  const { ui, contact } = ctx.site;
 
   switch (channel.channel) {
     case "line-sales":
     case "line-service": {
-      const qr = getMedia(contact.lineQr);
+      const qr = ctx.media(contact.lineQr);
       return (
         <div className="flex flex-wrap items-center gap-5">
-          <Image src={qr.src} width={qr.width} height={qr.height} alt={tx(qr.alt, locale)} className="h-28 w-28 rounded-tm-control border border-tm-line" />
+          <Image
+            src={qr.src}
+            width={qr.width}
+            height={qr.height}
+            alt={ctx.t(qr.alt)}
+            className="h-28 w-28 rounded-tm-control border border-tm-line"
+            {...ctx.bind("site", "contact", "lineQr")}
+          />
           <div>
-            <p className="text-tm-small text-tm-muted">{tx(ui.lineId, locale)}</p>
-            <p className="text-tm-lead font-semibold">{contact.lineId}</p>
-            <SmartLink
-              link={resolveLink({ kind: "contact", channel: channel.channel }, locale, site)}
+            <p className="text-tm-small text-tm-muted">{ctx.t(ui.lineId)}</p>
+            <p className="text-tm-lead font-semibold" {...ctx.bind("site", "contact", "lineId")}>
+              {contact.lineId}
+            </p>
+            <ContactLink
+              ctx={ctx}
+              channel={channel.channel}
               ctaId={`contact-${channel.id}`}
-              newTabLabel={newTab}
               className="tm-button tm-button-primary mt-3"
+              bind={ctx.bind("site", "contact", channel.channel === "line-sales" ? "lineSales" : "lineService")}
             >
-              {tx(ui.chatOnLine, locale)}
-            </SmartLink>
+              {ctx.t(ui.chatOnLine)}
+            </ContactLink>
           </div>
         </div>
       );
@@ -40,15 +47,20 @@ function ChannelAction({ channel, locale }: { channel: Channel; locale: Locale }
     case "phone-sales":
       return (
         <ul className="grid gap-2">
-          {contact.phones.map((phone) => (
+          {contact.phones.map((phone, index) => (
             <li key={phone.number}>
-              <a href={telHref(phone.number)} data-cta={`contact-${channel.id}`} className="tm-button tm-button-secondary w-full justify-between sm:w-auto sm:min-w-[16rem]">
+              <a
+                href={telHref(phone.number)}
+                data-cta={`contact-${channel.id}`}
+                className="tm-button tm-button-secondary w-full justify-between sm:w-auto sm:min-w-[16rem]"
+                {...ctx.bind("site", "contact", "phones", index)}
+              >
                 <span className="inline-flex items-center gap-2">
                   <CallIcon className="text-[1.15em]" />
-                  <span className="sr-only">{tx(ui.call, locale)} </span>
+                  <span className="sr-only">{ctx.t(ui.call)} </span>
                   <span className="tm-num">{formatPhone(phone.number)}</span>
                 </span>
-                <span className="text-tm-small font-normal">{tx(phone.label, locale)}</span>
+                <span className="text-tm-small font-normal">{ctx.t(phone.label)}</span>
               </a>
             </li>
           ))}
@@ -56,58 +68,66 @@ function ChannelAction({ channel, locale }: { channel: Channel; locale: Locale }
       );
     case "email":
       return (
-        <a href={`mailto:${contact.email}`} data-cta={`contact-${channel.id}`} className="tm-link inline-flex items-center gap-2 break-all text-tm-lead font-semibold">
+        <a
+          href={`mailto:${contact.email}`}
+          data-cta={`contact-${channel.id}`}
+          className="tm-link inline-flex items-center gap-2 break-all text-tm-lead font-semibold"
+          {...ctx.bind("site", "contact", "email")}
+        >
           <MailIcon className="shrink-0" />
           {contact.email}
         </a>
       );
     case "facebook":
       return (
-        <SmartLink
-          link={resolveLink({ kind: "contact", channel: "facebook" }, locale, site)}
+        <ContactLink
+          ctx={ctx}
+          channel="facebook"
           ctaId={`contact-${channel.id}`}
-          newTabLabel={newTab}
           className="tm-button tm-button-secondary"
+          bind={ctx.bind("site", "contact", "facebook")}
         >
-          {tx(ui.facebook, locale)}
-        </SmartLink>
+          {ctx.t(ui.facebook)}
+        </ContactLink>
       );
   }
 }
 
-export function ContactChannels({ page, locale }: { page: ContactPage; locale: Locale }) {
-  const { site } = content;
+export function ContactChannels({ ctx, page }: { ctx: RenderContext; page: ContactPage }) {
+  const { channels, callback } = page;
+  const lineChannel = channels.items.find((item) => item.channel === "line-sales" || item.channel === "line-service")?.channel ?? "line-sales";
   return (
     <>
-      <section aria-labelledby="channels-heading" className="py-12 lg:py-16">
+      <section aria-labelledby="channels-heading" className="py-12 lg:py-16" data-tone={channels.tone} {...ctx.bind("page:contact", "channels")}>
         <div className="tm-container">
-          <h2 id="channels-heading" className="text-tm-h2 font-semibold">
-            {tx(page.channelsHeading, locale)}
+          <h2 id="channels-heading" className="text-tm-h2 font-semibold" {...ctx.bind("page:contact", "channels", "heading")}>
+            {ctx.t(channels.heading)}
           </h2>
           <ul role="list" className="mt-8 grid gap-px overflow-hidden rounded-tm-panel border border-tm-line bg-tm-line md:grid-cols-2">
-            {page.channels.map((channel) => (
-              <li key={channel.id} className="flex flex-col items-start gap-5 bg-tm-canvas p-6 lg:p-8">
+            {channels.items.map((channel) => (
+              <li key={channel.id} className="flex flex-col items-start gap-5 bg-tm-canvas p-6 lg:p-8" {...ctx.bind("page:contact", "channels", "items", channel.id)}>
                 <div>
-                  <h3 className="text-tm-h3 font-semibold">{tx(channel.title, locale)}</h3>
-                  <p className="mt-1 text-tm-muted">{tx(channel.description, locale)}</p>
+                  <h3 className="text-tm-h3 font-semibold" {...ctx.bind("page:contact", "channels", "items", channel.id, "title")}>
+                    {ctx.t(channel.title)}
+                  </h3>
+                  <p className="mt-1 text-tm-muted" {...ctx.bind("page:contact", "channels", "items", channel.id, "description")}>
+                    {ctx.t(channel.description)}
+                  </p>
                 </div>
-                <ChannelAction channel={channel} locale={locale} />
+                <ChannelAction ctx={ctx} channel={channel} />
               </li>
             ))}
           </ul>
         </div>
       </section>
-      <section aria-label={tx(site.contactBand.heading, locale)} className="bg-tm-surface">
+      <section aria-label={ctx.t(ctx.site.contactBand.heading)} data-tone={callback.tone} {...ctx.bind("page:contact", "callback")}>
         <div className="tm-container flex flex-col gap-5 py-10 md:flex-row md:items-center md:justify-between">
-          <p className="max-w-[40rem] text-tm-lead">{tx(page.formNote, locale)}</p>
-          <SmartLink
-            link={resolveLink({ kind: "contact", channel: page.channels.find((c) => c.channel.startsWith("line"))?.channel ?? "line-sales" }, locale, site)}
-            ctaId="contact-callback-line"
-            newTabLabel={tx(site.ui.opensInNewTab, locale)}
-            className="tm-button tm-button-primary shrink-0"
-          >
-            {tx(site.ui.chatOnLine, locale)}
-          </SmartLink>
+          <p className="max-w-[40rem] text-tm-lead" {...ctx.bind("page:contact", "callback", "note")}>
+            {ctx.t(callback.note)}
+          </p>
+          <ContactLink ctx={ctx} channel={lineChannel} ctaId="contact-callback-line" className="tm-button tm-button-primary shrink-0">
+            {ctx.t(ctx.site.ui.chatOnLine)}
+          </ContactLink>
         </div>
       </section>
     </>

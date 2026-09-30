@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
-import { PackagePageView } from "@/components/site/PackagePageView";
-import { getPackagePage } from "@/lib/content";
+import { renderContext } from "@/components/site/context";
+import { PageView } from "@/components/site/pages/PageView";
+import { content, getPackagePage } from "@/lib/content";
 import { pageLocale } from "@/lib/i18n/page";
 import { pageMetadata } from "@/lib/seo/metadata";
 
@@ -12,5 +13,5 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/broadban
 }
 
 export default async function Page({ params }: PageProps<"/[locale]/broadband-old">) {
-  return <PackagePageView page={page} locale={await pageLocale(params)} />;
+  return <PageView ctx={renderContext(content, await pageLocale(params))} pageId="broadband-existing" />;
 }

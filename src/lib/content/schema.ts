@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { theme, tone } from "./theme";
+
 // Content model of the public site (docs/renovation/ARCHITECTURE.md §3, §5).
 // Pages are fixed templates: documents fill named slots, and each repeatable
 // item has a stable id so the Mirror editor (M3) can bind fields as
@@ -14,7 +16,14 @@ export const localizedText = z.strictObject({
 export type LocalizedText = z.infer<typeof localizedText>;
 
 /** Lowercase kebab-case id: stable across label edits. */
-export const stableId = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "lowercase kebab-case id");
+const stableIdPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+export const stableId = z.string().regex(stableIdPattern, "lowercase kebab-case id");
+
+// References to other documents. Separate schema objects so the Mirror editor
+// can recognise them (by identity) and offer a picker instead of a text box.
+export const mediaRef = z.string().regex(stableIdPattern, "media id");
+export const benefitRef = z.string().regex(stableIdPattern, "benefit id");
+export const packageRef = z.string().regex(stableIdPattern, "package id");
 
 /** In-page anchor; some legacy anchors are camelCase (#socialInternet). */
 export const anchorId = z.string().regex(/^[A-Za-z][A-Za-z0-9-]*$/, "anchor id");
@@ -77,7 +86,7 @@ export type Link = z.infer<typeof link>;
 export const seo = z.strictObject({
   title: localizedText,
   description: localizedText,
-  image: stableId.optional(),
+  image: mediaRef.optional(),
   noindex: z.boolean().optional(),
 });
 export type Seo = z.infer<typeof seo>;
@@ -107,7 +116,7 @@ export type Price = z.infer<typeof price>;
 
 export const benefit = z.strictObject({
   label: localizedText,
-  icon: stableId,
+  icon: mediaRef,
 });
 export type Benefit = z.infer<typeof benefit>;
 
@@ -129,7 +138,7 @@ export const catalogPackage = z.strictObject({
   validity: localizedText.optional(),
   contract: localizedText.optional(),
   price,
-  benefits: z.array(stableId),
+  benefits: z.array(benefitRef),
   details: z.array(localizedText),
   conditions: z.array(localizedText),
   /** USSD code to subscribe from the phone, such as *900*7129#. */
@@ -137,7 +146,7 @@ export const catalogPackage = z.strictObject({
     .string()
     .regex(/^\*[0-9*]+#$/)
     .optional(),
-  image: stableId.optional(),
+  image: mediaRef.optional(),
   /** Legacy record this package was imported from. */
   source: z.strictObject({ file: z.string().min(1), entry: z.string().min(1) }),
   review: z.strictObject({ status: reviewStatus, notes: z.array(z.string().min(1)) }),
@@ -191,12 +200,12 @@ const navItem = z.strictObject({
 });
 
 export const siteSettings = z.strictObject({
-  brand: z.strictObject({ name: localizedText, legalName: localizedText, logo: stableId }),
+  brand: z.strictObject({ name: localizedText, legalName: localizedText, logo: mediaRef }),
   contact: z.strictObject({
     lineSales: z.url(),
     lineService: z.url(),
     lineId: z.string().regex(/^@[a-z0-9]+$/),
-    lineQr: stableId,
+    lineQr: mediaRef,
     phones: z.array(
       z.strictObject({
         number: z.string().regex(/^0[0-9]{8,9}$/),
@@ -213,9 +222,11 @@ export const siteSettings = z.strictObject({
     groups: z.array(z.strictObject({ id: stableId, heading: localizedText, links: z.array(link) })),
     copyright: localizedText,
   }),
-  contactBand: z.strictObject({ heading: localizedText, description: localizedText }),
+  contactBand: z.strictObject({ heading: localizedText, description: localizedText, tone }),
   ui,
-  seo: z.strictObject({ siteName: localizedText, description: localizedText, image: stableId }),
+  seo: z.strictObject({ siteName: localizedText, description: localizedText, image: mediaRef }),
+  /** Brand colours; every text/background pair must keep 4.5:1. */
+  theme,
   integrations: z.strictObject({
     googleAdsId: z.string().regex(/^AW-[0-9]+$/),
     tawkSrc: z.url(),
@@ -240,13 +251,14 @@ const packageSection = z.strictObject({
   description: localizedText.optional(),
   groups: z.array(packageGroup).min(1),
   notes: z.array(localizedText),
+  tone,
 });
 
 export const packagePage = z.strictObject({
   id: stableId,
   path: z.string().startsWith("/"),
   seo,
-  hero: z.strictObject({ heading: localizedText, description: localizedText }),
+  hero: z.strictObject({ heading: localizedText, description: localizedText, tone }),
   /** Card layout: "compare" lines fields up across cards, "compact" suits long lists. */
   layout: z.enum(["compare", "compact"]),
   packageCta: cta,
@@ -265,9 +277,10 @@ export const homePage = z.strictObject({
     primaryCta: cta,
     secondaryCta: cta,
     /** Router picture: the poster, and the fallback of the 3D model. */
-    visual: stableId,
+    visual: mediaRef,
     /** Visible line under the picture, such as "illustration, not the installed model". */
     visualNote: localizedText,
+    tone,
   }),
   services: z.strictObject({
     heading: localizedText,
@@ -283,13 +296,15 @@ export const homePage = z.strictObject({
         }),
       )
       .length(4),
+    tone,
   }),
   featured: z.strictObject({
     heading: localizedText,
     description: localizedText,
-    packageIds: z.array(stableId).min(1).max(4),
+    packageIds: z.array(packageRef).min(1).max(4),
     packageCta: cta,
     viewAll: cta,
+    tone,
   }),
   mobile: z.strictObject({
     heading: localizedText,
@@ -297,21 +312,25 @@ export const homePage = z.strictObject({
     columns: z
       .array(z.strictObject({ id: stableId, heading: localizedText, overview: link, links: z.array(link) }))
       .length(2),
+    tone,
   }),
   steps: z.strictObject({
     heading: localizedText,
     items: z.array(z.strictObject({ id: stableId, title: localizedText, description: localizedText })).length(3),
+    tone,
   }),
   solar: z.strictObject({
     heading: localizedText,
     description: localizedText,
     provider: localizedText,
-    image: stableId,
+    image: mediaRef,
     cta,
+    tone,
   }),
   faq: z.strictObject({
     heading: localizedText,
     items: z.array(z.strictObject({ id: stableId, question: localizedText, answer: localizedText })).min(1),
+    tone,
   }),
 });
 export type HomePage = z.infer<typeof homePage>;
@@ -324,10 +343,11 @@ export const solarPage = z.strictObject({
     heading: localizedText,
     description: localizedText,
     provider: localizedText,
-    image: stableId,
+    image: mediaRef,
     cta,
+    tone,
   }),
-  about: z.strictObject({ heading: localizedText, body: z.array(localizedText), image: stableId }),
+  about: z.strictObject({ heading: localizedText, body: z.array(localizedText), image: mediaRef, tone }),
   stats: z.strictObject({
     heading: localizedText,
     items: z.array(z.strictObject({ id: stableId, value: z.string().min(1), label: localizedText })),
@@ -335,8 +355,9 @@ export const solarPage = z.strictObject({
   process: z.strictObject({
     heading: localizedText,
     description: localizedText,
-    image: stableId,
+    image: mediaRef,
     steps: z.array(z.strictObject({ id: stableId, title: localizedText, description: localizedText })),
+    tone,
   }),
   packages: z.strictObject({
     id: anchorId,
@@ -344,12 +365,14 @@ export const solarPage = z.strictObject({
     group: stableId,
     packageCta: cta,
     notes: z.array(localizedText),
+    tone,
   }),
   bundle: z.strictObject({
     heading: localizedText,
     description: localizedText,
     items: z.array(localizedText),
-    image: stableId,
+    image: mediaRef,
+    tone,
   }),
   knowledge: z.strictObject({
     heading: localizedText,
@@ -359,9 +382,10 @@ export const solarPage = z.strictObject({
         title: localizedText,
         body: z.array(localizedText),
         list: z.array(localizedText),
-        images: z.array(stableId),
+        images: z.array(mediaRef),
       }),
     ),
+    tone,
   }),
 });
 export type SolarPage = z.infer<typeof solarPage>;
@@ -370,20 +394,24 @@ export const contactPage = z.strictObject({
   id: z.literal("contact"),
   path: z.literal("/service"),
   seo,
-  hero: z.strictObject({ heading: localizedText, description: localizedText }),
-  channelsHeading: localizedText,
-  /** Contact channels in display order; addresses come from site settings. */
-  channels: z
-    .array(
-      z.strictObject({
-        id: stableId,
-        channel: contactChannel,
-        title: localizedText,
-        description: localizedText,
-      }),
-    )
-    .min(1),
-  formNote: localizedText,
+  hero: z.strictObject({ heading: localizedText, description: localizedText, tone }),
+  channels: z.strictObject({
+    heading: localizedText,
+    /** Contact channels in display order; addresses come from site settings. */
+    items: z
+      .array(
+        z.strictObject({
+          id: stableId,
+          channel: contactChannel,
+          title: localizedText,
+          description: localizedText,
+        }),
+      )
+      .min(1),
+    tone,
+  }),
+  /** Band under the channels asking visitors to request a call back. */
+  callback: z.strictObject({ note: localizedText, tone }),
 });
 export type ContactPage = z.infer<typeof contactPage>;
 
@@ -394,13 +422,15 @@ export const agentPage = z.strictObject({
   hero: z.strictObject({
     heading: localizedText,
     description: localizedText,
-    image: stableId,
+    image: mediaRef,
     primaryCta: cta,
     secondaryCta: cta,
+    tone,
   }),
   steps: z.strictObject({
     heading: localizedText,
     items: z.array(z.strictObject({ id: stableId, title: localizedText, description: localizedText })).length(3),
+    tone,
   }),
 });
 export type AgentPage = z.infer<typeof agentPage>;
@@ -422,3 +452,22 @@ export const legalPage = z.strictObject({
   disclaimer: localizedText,
 });
 export type LegalPage = z.infer<typeof legalPage>;
+
+// Whole site ----------------------------------------------------------------------
+
+/** Everything the public site renders. Published content and a draft share this shape. */
+export const siteContent = z.strictObject({
+  site: siteSettings,
+  media: z.record(stableId, mediaAsset),
+  benefits: z.record(stableId, benefit),
+  catalog: z.array(catalogPackage),
+  pages: z.strictObject({
+    home: homePage,
+    packages: z.array(packagePage),
+    solar: solarPage,
+    contact: contactPage,
+    agent: agentPage,
+    terms: legalPage,
+  }),
+});
+export type SiteContent = z.infer<typeof siteContent>;

@@ -5,8 +5,9 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { ChevronDownIcon, CloseIcon, MenuIcon } from "./icons";
 
-export type NavLinkView = { id: string; label: string; href: string; external: boolean; current: boolean };
-export type NavItemView = NavLinkView | { id: string; label: string; current: boolean; children: NavLinkView[] };
+/** `binding` is the Mirror editor's field binding; set only in the editor preview. */
+export type NavLinkView = { id: string; label: string; href: string; external: boolean; current: boolean; binding?: string };
+export type NavItemView = NavLinkView | { id: string; label: string; current: boolean; children: NavLinkView[]; binding?: string };
 
 type SiteNavProps = {
   items: NavItemView[];
@@ -34,7 +35,15 @@ function NavAnchor({
 }) {
   if (link.external) {
     return (
-      <a href={link.href} className={className} data-cta={ctaId} target="_blank" rel="noopener noreferrer" onClick={onNavigate}>
+      <a
+        href={link.href}
+        className={className}
+        data-cta={ctaId}
+        data-edit={link.binding}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onNavigate}
+      >
         {link.label}
         <span className="sr-only"> ({newTab})</span>
       </a>
@@ -42,13 +51,20 @@ function NavAnchor({
   }
   if (!link.href.startsWith("/")) {
     return (
-      <a href={link.href} className={className} data-cta={ctaId} onClick={onNavigate}>
+      <a href={link.href} className={className} data-cta={ctaId} data-edit={link.binding} onClick={onNavigate}>
         {link.label}
       </a>
     );
   }
   return (
-    <Link href={link.href} className={className} data-cta={ctaId} aria-current={link.current ? "page" : undefined} onClick={onNavigate}>
+    <Link
+      href={link.href}
+      className={className}
+      data-cta={ctaId}
+      data-edit={link.binding}
+      aria-current={link.current ? "page" : undefined}
+      onClick={onNavigate}
+    >
       {link.label}
     </Link>
   );
@@ -101,6 +117,7 @@ export function SiteNav({ items, labels, cta, languageSwitch }: SiteNavProps) {
                   className={`${desktopLink} inline-flex items-center gap-1 ${item.current ? "font-semibold underline decoration-tm-red decoration-2 underline-offset-[0.45em]" : ""}`}
                   aria-expanded={openMenu === item.id}
                   aria-controls={`${panelId}-${item.id}`}
+                  data-edit={item.binding}
                   onClick={() => setOpenMenu((open) => (open === item.id ? null : item.id))}
                 >
                   {item.label}
@@ -161,7 +178,9 @@ export function SiteNav({ items, labels, cta, languageSwitch }: SiteNavProps) {
             {items.map((item) =>
               "children" in item ? (
                 <li key={item.id}>
-                  <p className="text-tm-small font-semibold text-tm-muted">{item.label}</p>
+                  <p className="text-tm-small font-semibold text-tm-muted" data-edit={item.binding}>
+                    {item.label}
+                  </p>
                   <ul className="mt-1">
                     {item.children.map((child) => (
                       <li key={child.id}>
