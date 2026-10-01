@@ -1,4 +1,4 @@
-import { documentSchema, isDocumentId, readDocument, writeDocument, type DocumentId } from "./documents";
+import { documentSchema, isCollectionDocument, isDocumentId, isTombstone, readDocument, writeDocument, type DocumentId } from "./documents";
 import type { SiteContent } from "./schema";
 import { thaiErrorMap } from "./messages";
 import { contentProblems } from "./validate";
@@ -14,6 +14,8 @@ import { contentProblems } from "./validate";
  * (promos), and service tiles have pictures.
  */
 export const CONTENT_SCHEMA_VERSION = 3;
+// R4 added documents (catalog order, new packages/media/benefits, tombstones)
+// without changing any document's shape, so drafts of version 3 still read.
 
 export type DraftRecord = {
   documentId: DocumentId;
@@ -36,8 +38,15 @@ function issueMessages(issues: FieldIssue[]): string[] {
   return issues.map((issue) => (issue.path.length ? `${issue.path.join(".")}: ${issue.message}` : issue.message));
 }
 
-/** Parses one document body against its schema, with Thai messages. */
+/**
+ * Parses one document body against its schema, with Thai messages. A
+ * tombstone of a package, picture or benefit parses to undefined: the
+ * document is removed.
+ */
 export function parseDocument(documentId: DocumentId, body: unknown): Parsed {
+  if (isTombstone(body)) {
+    return isCollectionDocument(documentId) ? { ok: true, value: undefined } : { ok: false, messages: ["ลบเอกสารนี้ไม่ได้"], issues: [] };
+  }
   const result = documentSchema(documentId).safeParse(body, { error: thaiErrorMap });
   if (result.success) return { ok: true, value: result.data };
   const issues: FieldIssue[] = [];
@@ -53,17 +62,25 @@ export function parseDocument(documentId: DocumentId, body: unknown): Parsed {
   return { ok: false, messages: issueMessages(issues), issues };
 }
 
+/** Whether a draft can apply to this content: the document exists, or it is a package, picture or benefit (added). */
+function canApply(content: SiteContent, documentId: string): documentId is DocumentId {
+  return isDocumentId(documentId) && (isCollectionDocument(documentId) || readDocument(content, documentId) !== undefined);
+}
+
 /**
  * The content an Admin sees in the editor: the published content with every
  * valid draft applied. Drafts that no longer fit (an unknown document, another
  * schema version, a body the schema rejects, or references that break) are
  * left out and reported, so one bad draft cannot break the whole preview.
+ * New documents are added before the package order applies, so a new package
+ * can be ordered too.
  */
 export function applyDrafts(published: SiteContent, drafts: readonly DraftRecord[]): { content: SiteContent; problems: DraftProblem[] } {
   let content = published;
   const problems: DraftProblem[] = [];
-  for (const draft of drafts) {
-    if (!isDocumentId(draft.documentId) || readDocument(published, draft.documentId) === undefined) {
+  const ordered = [...drafts.filter((draft) => draft.documentId !== "catalog"), ...drafts.filter((draft) => draft.documentId === "catalog")];
+  for (const draft of ordered) {
+    if (!canApply(published, draft.documentId)) {
       problems.push({ documentId: draft.documentId, messages: ["ไม่มีเอกสารนี้ในเนื้อหาที่เผยแพร่แล้ว"] });
       continue;
     }
@@ -76,6 +93,8 @@ export function applyDrafts(published: SiteContent, drafts: readonly DraftRecord
       problems.push({ documentId: draft.documentId, messages: parsed.messages });
       continue;
     }
+    // Removing a document that is already gone changes nothing.
+    if (parsed.value === undefined && readDocument(content, draft.documentId) === undefined) continue;
     const next = writeDocument(content, draft.documentId, parsed.value);
     const broken = contentProblems(next);
     if (broken.length > 0) {
@@ -92,9 +111,11 @@ export function applyDrafts(published: SiteContent, drafts: readonly DraftRecord
  * draft: the schema of the document, then the references across the site.
  */
 export function validateDraft(current: SiteContent, documentId: DocumentId, body: unknown): Parsed {
-  if (readDocument(current, documentId) === undefined) return { ok: false, messages: ["ไม่มีเอกสารนี้ในเนื้อหาของเว็บ"], issues: [] };
+  if (!canApply(current, documentId)) return { ok: false, messages: ["ไม่มีเอกสารนี้ในเนื้อหาของเว็บ"], issues: [] };
   const parsed = parseDocument(documentId, body);
   if (!parsed.ok) return parsed;
-  const broken = contentProblems(writeDocument(current, documentId, parsed.value));
+  // Removed already (the editor's own content): check nothing still points at it.
+  const next = parsed.value === undefined && readDocument(current, documentId) === undefined ? current : writeDocument(current, documentId, parsed.value);
+  const broken = contentProblems(next);
   return broken.length > 0 ? { ok: false, messages: broken, issues: [] } : parsed;
 }

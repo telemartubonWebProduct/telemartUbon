@@ -28,9 +28,16 @@ const createdUserIds: string[] = [];
 const documents = ["page:home", "page:contact", "site"];
 const publishedHeading = content.pages.home.hero.beats[0].heading;
 
+/** Every draft goes: tests add packages, pictures and the package order (R4) besides the documents above. */
 async function clearDrafts() {
-  const { error } = await serviceClient().from("content_drafts").delete().in("document_id", documents);
+  const { error } = await serviceClient().from("content_drafts").delete().neq("document_id", "");
   if (error) throw error;
+}
+
+async function draftIds() {
+  const { data, error } = await serviceClient().from("content_drafts").select("document_id");
+  if (error) throw error;
+  return data.map((row) => row.document_id);
 }
 
 async function storedDraft(documentId: string) {
@@ -258,6 +265,93 @@ test("the editor shows every tab of recommended packages, and a card's package c
   await page.getByRole("button", { name: "ทิ้งร่าง", exact: true }).click();
   await expect(frame.locator(`[data-package="${card.packageId}"]`)).toBeVisible();
   await expect.poll(() => storedDraft("page:home"), saving).toBeNull();
+});
+
+test("a list grows, moves and shrinks from the editor, within the page's limits", async ({ page }) => {
+  await clearDrafts();
+  const items = content.pages.home.faq.items;
+  await signIn(page, admin);
+  await openEditor(page);
+  const frame = preview(page);
+  await frame.locator("#faq-heading").click();
+  await page.getByRole("button", { name: /^รายการ/ }).click();
+  await page.getByRole("button", { name: /^\+ เพิ่มรายการ/ }).click();
+  await expect(frame.locator(".tm-faq details")).toHaveCount(items.length + 1);
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
+  let stored = (await storedDraft("page:home")) as unknown as { body: typeof content.pages.home } | null;
+  const added = stored!.body.faq.items.at(-1)!;
+  expect(added.id).not.toBe(items.at(-1)!.id);
+  expect(added.question).toEqual(items.at(-1)!.question);
+
+  // Back to the list: move the copy up one, then remove it.
+  await page.getByRole("navigation", { name: "ตำแหน่งของช่องที่เลือก" }).getByRole("button", { name: "รายการ", exact: true }).click();
+  await page.getByRole("button", { name: `เลื่อนขึ้น: ${items.at(-1)!.question.th}` }).last().click();
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
+  stored = (await storedDraft("page:home")) as unknown as { body: typeof content.pages.home } | null;
+  expect(stored!.body.faq.items.map((item) => item.id).at(-2)).toBe(added.id);
+  await page.getByRole("button", { name: `ลบ: ${items.at(-1)!.question.th}` }).nth(0).click();
+  await expect(frame.locator(".tm-faq details")).toHaveCount(items.length);
+
+  // The services row is exactly four tiles: it reorders but neither grows nor shrinks.
+  await frame.locator("#services-heading").click();
+  await page.getByRole("button", { name: /^รายการ/ }).click();
+  await expect(page.getByRole("button", { name: /^\+ เพิ่ม/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^ลบ:/ })).toHaveCount(0);
+  await clearDrafts();
+});
+
+test("packages are added, shown and removed from the package list; a shown package needs a price", async ({ page }) => {
+  await clearDrafts();
+  await signIn(page, admin);
+  await openEditor(page, "/admin/editor?page=broadband-new");
+  const frame = preview(page);
+  await page.getByRole("button", { name: "แพ็กเกจและสิทธิประโยชน์" }).click();
+  await page.getByRole("button", { name: "+ เพิ่มแพ็กเกจในกลุ่มนี้" }).first().click();
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
+  const created = (await draftIds()).find((id) => id.startsWith("package:"))!.slice("package:".length);
+  expect(await draftIds()).toContain("catalog");
+
+  // Shown with no price: refused until a price is typed.
+  await page.getByRole("button", { name: "แพ็กเกจและสิทธิประโยชน์" }).click();
+  await page.getByRole("button", { name: "แสดง: แพ็กเกจใหม่" }).click();
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "invalid", saving);
+  await page.getByRole("button", { name: /แพ็กเกจใหม่/ }).first().click();
+  await page.getByLabel("ราคาเสนอ (บาท)").fill("555");
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
+  await expect(frame.locator(`[data-package="${created}"]`)).toBeVisible();
+
+  await page.getByRole("button", { name: "แพ็กเกจและสิทธิประโยชน์" }).click();
+  await page.getByRole("button", { name: "ลบ: แพ็กเกจใหม่" }).click();
+  await expect(frame.locator(`[data-package="${created}"]`)).toHaveCount(0);
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
+
+  // A package a home card shows cannot go.
+  const shown = content.catalog.find((item) => item.id === content.pages.home.promos.tabs[0].items[0].packageId)!;
+  await page.getByRole("button", { name: `ลบ: ${shown.name.th}` }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "การ์ดโปรในหน้าแรกยังใช้อยู่" })).toBeVisible();
+  await clearDrafts();
+});
+
+test("a picture uploaded from the editor joins the library and shows on the card", async ({ page }) => {
+  await clearDrafts();
+  const card = content.pages.home.promos.tabs[0].items[0];
+  await signIn(page, admin);
+  await openEditor(page);
+  const frame = preview(page);
+  await frame.locator(`[data-package="${card.packageId}"] img`).first().click();
+  await page.getByRole("button", { name: /^เปลี่ยน/ }).first().click();
+  const dialog = page.getByRole("dialog", { name: "เลือกรูปจากคลังสื่อ" });
+  await dialog.getByLabel(/ไฟล์รูป/).setInputFiles("public/assets/HomeInternet/home-tol-newcustomer.webp");
+  await dialog.getByLabel("คำอธิบายรูป ไทย").fill("รูปทดสอบอัปโหลด");
+  await dialog.getByLabel("คำอธิบายรูป English").fill("Uploaded test picture");
+  await dialog.getByRole("button", { name: "อัปโหลดและเลือกรูปนี้" }).click();
+  await expect(dialog).toBeHidden({ timeout: 20_000 });
+  await expect(frame.locator(`[data-package="${card.packageId}"] img`).first()).toHaveAttribute("src", /storage%2Fv1%2Fobject%2Fpublic%2Fmedia%2Fuploads/);
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
+  const ids = await draftIds();
+  expect(ids.some((id) => id.startsWith("media:upload-"))).toBe(true);
+  expect(ids).toContain("page:home");
+  await clearDrafts();
 });
 
 test("the home conversion is edited in the site settings, only for the site's own Google Ads account", async ({ page }) => {

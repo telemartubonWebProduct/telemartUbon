@@ -62,6 +62,8 @@ describe("validating a save", () => {
     expect(!pale.ok && pale.messages.join(" ")).toContain("4.5:1");
 
     expect(validateDraft(content, "page:home", { ...home, extra: true }).ok).toBe(false);
-    expect(validateDraft(content, "media:no-such-media", content.media["telemart-logo"]).ok).toBe(false);
+    // A new picture is fine; a broken one is not.
+    expect(validateDraft(content, "media:new-picture", content.media["telemart-logo"]).ok).toBe(true);
+    expect(validateDraft(content, "media:new-picture", { ...content.media["telemart-logo"], width: -1 }).ok).toBe(false);
   });
 });

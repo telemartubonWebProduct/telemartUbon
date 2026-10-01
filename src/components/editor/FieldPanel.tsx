@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { ZodType } from "zod";
 
-import { documentSchema, readDocument, type DocumentId } from "@/lib/content/documents";
+import { documentSchema, isCollectionDocument, readDocument, type DocumentId } from "@/lib/content/documents";
 import { parseDocument, validateDraft, type FieldIssue } from "@/lib/content/draft-model";
 import { bindingPath, decodeBinding, diffPaths, encodeBinding, getAt } from "@/lib/content/paths";
 import type { CatalogPackage, SiteContent } from "@/lib/content/schema";
@@ -33,7 +33,9 @@ import {
   type FieldContext,
 } from "./fields";
 import { documentLabel, fieldLabel, itemLabel, pageLabels, pathLabel, valueLabel } from "./labels";
+import { arrayBounds, moveItem, newItem, removeItem } from "./list-edit";
 import { defOf, enumOptions, fieldKind, isReadOnly, objectFields, schemaAt, unwrap, type FieldKind } from "./schema-walk";
+import { CatalogManager } from "./CatalogManager";
 import { benefitUsage, mediaUsage, packagePages } from "./usage";
 
 // The side panel of the Mirror editor. It shows the object that holds the
@@ -294,22 +296,67 @@ function ObjectView({ schema, path, node }: { schema: ZodType; path: string[]; n
   );
 }
 
+const segmentOf = (item: unknown, index: number) =>
+  typeof item === "object" && item !== null && typeof (item as { id?: unknown }).id === "string" ? (item as { id: string }).id : String(index);
+
 function ListView({ schema, path, node }: { schema: ZodType; path: string[]; node: NodeProps }) {
   const list = (getAt(node.body, path) as unknown[]) ?? [];
   const element = unwrap(defOf(unwrap(schema).schema).element!).schema;
   const kind = fieldKind(element);
+  const { min, max } = arrayBounds(schema);
+  const fixed = min === max;
+  const name = fieldLabel(path.at(-1) ?? "");
+  const set = (next: unknown[]) => node.store.edit(node.documentId, path, next);
+  const add = () => {
+    const item = newItem(list);
+    set([...list, item]);
+    if (kind === "object") node.ctx.select(encodeBinding(node.documentId, [...path, segmentOf(item, list.length)]));
+  };
   return (
     <div className="grid gap-2">
       {list.map((item, index) => {
-        const segment = typeof item === "object" && item !== null && typeof (item as { id?: unknown }).id === "string" ? (item as { id: string }).id : String(index);
+        const segment = segmentOf(item, index);
         const itemPath = [...path, segment];
         const binding = encodeBinding(node.documentId, itemPath);
-        if (kind === "object") {
-          return <DrillRow key={segment} label={itemLabel(item, index)} issues={countIssues(node.issues, itemPath)} binding={binding} onOpen={() => node.ctx.select(binding)} />;
-        }
-        return <FieldRow key={segment} name={itemLabel(item, index)} field={element} path={itemPath} node={node} />;
+        const label = itemLabel(item, index);
+        const row =
+          kind === "object" ? (
+            <DrillRow label={label} issues={countIssues(node.issues, itemPath)} binding={binding} onOpen={() => node.ctx.select(binding)} />
+          ) : (
+            <FieldRow name={label} field={element} path={itemPath} node={node} />
+          );
+        if (fixed && list.length < 2) return <div key={segment}>{row}</div>;
+        return (
+          <div key={segment} className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-1.5">
+            {row}
+            <div className="flex flex-col gap-1 pt-1" role="group" aria-label={`จัดรายการ ${label}`}>
+              <button type="button" className={smallButton} aria-label={`เลื่อนขึ้น: ${label}`} disabled={index === 0} onClick={() => set(moveItem(list, index, index - 1))}>
+                ↑
+              </button>
+              <button type="button" className={smallButton} aria-label={`เลื่อนลง: ${label}`} disabled={index === list.length - 1} onClick={() => set(moveItem(list, index, index + 1))}>
+                ↓
+              </button>
+              {fixed ? null : (
+                <button type="button" className={smallButton} aria-label={`ลบ: ${label}`} disabled={list.length <= min} onClick={() => set(removeItem(list, index))}>
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+        );
       })}
-      <p className="text-tm-caption text-tm-muted">จำนวนและลำดับของรายการนี้ยังกำหนดในระบบ (รอเจ้าของตัดสินว่าจะให้เพิ่ม/ลบจากหน้านี้หรือไม่)</p>
+      {fixed ? null : (
+        <button type="button" className={`${smallButton} justify-self-start`} disabled={list.length >= max || list.length === 0} onClick={add}>
+          + เพิ่ม{name} (คัดลอกจากรายการสุดท้าย)
+        </button>
+      )}
+      <p className="text-tm-caption text-tm-muted">
+        {fixed
+          ? `รายการนี้มี ${min} รายการพอดีตามรูปแบบหน้า เรียงลำดับได้แต่เพิ่ม/ลบไม่ได้`
+          : max === Number.POSITIVE_INFINITY
+            ? `ต้องมีอย่างน้อย ${Math.max(min, 0)} รายการ`
+            : `มีได้ ${min}–${max} รายการ`}
+      </p>
     </div>
   );
 }
@@ -450,7 +497,36 @@ export function FieldPanel({ state, store, published, selection, onSelect, local
     element.querySelector<HTMLElement>("textarea, input, select, button[role=radio][aria-checked=true], button")?.focus({ preventScroll: true });
   }, [selection.seq, selection.from, focusBinding]);
 
-  if (body === undefined) return <p className="p-4 text-tm-small">ไม่พบเอกสารนี้</p>;
+  if (body === undefined) {
+    // A package, picture or benefit removed in this draft: say so, and offer it back.
+    if (!isCollectionDocument(documentId) || publishedBody === undefined) return <p className="p-4 text-tm-small">ไม่พบเอกสารนี้</p>;
+    return (
+      <div className="grid gap-3 p-1">
+        <p className="text-tm-small font-semibold">{documentLabel(published, documentId)}</p>
+        <p className="text-tm-small">ลบในร่างแล้ว: หายจากหน้าเว็บเมื่อเผยแพร่</p>
+        {meta.messages.length > 0 ? (
+          <ul role="alert" className="grid gap-1 rounded-tm-control bg-tm-danger-wash px-3 py-2 text-tm-caption text-tm-danger">
+            {meta.messages.map((message) => (
+              <li key={message}>{message}</li>
+            ))}
+          </ul>
+        ) : null}
+        <DiscardButton documentId={documentId} meta={meta} store={store} />
+      </div>
+    );
+  }
+
+  if (documentId === "catalog") {
+    return (
+      <div ref={panelRef} className="grid gap-4">
+        <div className="border-b border-tm-line pb-3">
+          <h2 className="text-tm-h4 font-semibold">{documentLabel(state.content, documentId)}</h2>
+          <p className={`text-tm-caption ${statusLine(meta).tone}`}>{statusLine(meta).text}</p>
+        </div>
+        <CatalogManager content={state.content} published={published} store={store} onSelect={onSelect} />
+      </div>
+    );
+  }
 
   const crumbs = container.map((_, index) => container.slice(0, index + 1));
   const containerSchema = schemaAt(root, container)!;

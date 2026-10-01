@@ -142,6 +142,24 @@ describe("autosave", () => {
     expect(store.metaOf(`package:${featured}`).status).toBe("saved");
   });
 
+  it("saves a new package, its place in the order and its removal once each (R4)", async () => {
+    const save = serverSaves();
+    const store = makeStore(save);
+    const fresh = { ...content.catalog[0], id: "fresh", review: { status: "hidden" as const, notes: ["ใหม่"] } };
+    store.create("package:fresh", fresh);
+    store.replace("catalog", { order: ["fresh", ...content.catalog.map((item) => item.id)] });
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(save.mock.calls.map((call) => call[0].documentId).sort()).toEqual(["catalog", "package:fresh"]);
+    expect(store.getSnapshot().content.catalog[0].id).toBe("fresh");
+    expect(store.metaOf("catalog").status).toBe("saved");
+
+    store.remove("package:fresh");
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(save).toHaveBeenCalledTimes(3);
+    expect(save.mock.calls[2][0]).toMatchObject({ documentId: "package:fresh", body: { $deleted: true } });
+    expect(store.getSnapshot().content.catalog.some((item) => item.id === "fresh")).toBe(false);
+  });
+
   it("reports a failed request and saves again on retry", async () => {
     const save = vi.fn<SaveAction>().mockRejectedValueOnce(new Error("network")).mockResolvedValue({ ok: true, revision: 1, updatedAt: "2026-09-30T10:00:01Z" });
     const store = makeStore(save);

@@ -4,7 +4,7 @@ import { Component, useCallback, useDeferredValue, useEffect, useMemo, useState,
 
 import { renderContext } from "@/components/site/context";
 import { PageView } from "@/components/site/pages/PageView";
-import { isDocumentId, pageIdForPath, readDocument, writeDocument, type PageDocumentId } from "@/lib/content/documents";
+import { isCollectionDocument, isDocumentId, isTombstone, pageIdForPath, readDocument, writeDocument, type PageDocumentId } from "@/lib/content/documents";
 import type { SiteContent } from "@/lib/content/schema";
 import { themeVariables } from "@/lib/content/theme";
 import { splitLocale, type Locale } from "@/lib/i18n/locales";
@@ -192,7 +192,13 @@ export function PreviewCanvas({ initialContent, initialPage, initialLocale, chan
         case "document": {
           const { documentId, body } = message;
           if (!isDocumentId(documentId)) return;
-          setContent((current) => (readDocument(current, documentId) === undefined ? current : writeDocument(current, documentId, body)));
+          setContent((current) => {
+            // Packages, pictures and benefits can be new or removed (a tombstone); other documents always exist.
+            const value = isTombstone(body) ? undefined : body;
+            const exists = readDocument(current, documentId) !== undefined;
+            if (!exists && (value === undefined || !isCollectionDocument(documentId))) return current;
+            return writeDocument(current, documentId, value);
+          });
           break;
         }
         case "view":

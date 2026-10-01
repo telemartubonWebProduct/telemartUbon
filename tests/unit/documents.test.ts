@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { renderContext } from "@/components/site/context";
 import { content } from "@/lib/content";
 import { documentIds, documentSchema, isDocumentId, readDocument, writeDocument } from "@/lib/content/documents";
+import { applyDrafts, CONTENT_SCHEMA_VERSION, validateDraft } from "@/lib/content/draft-model";
 import { decodeBinding, encodeBinding, getAt, setAt } from "@/lib/content/paths";
 
 describe("content documents", () => {
@@ -12,7 +13,8 @@ describe("content documents", () => {
     expect(ids).toContain("page:home");
     expect(ids).toContain("package:fiber-500-499");
     expect(ids).toContain("media:router-concept");
-    expect(ids.length).toBe(1 + 9 + content.catalog.length + Object.keys(content.media).length + Object.keys(content.benefits).length);
+    expect(ids).toContain("catalog");
+    expect(ids.length).toBe(2 + 9 + content.catalog.length + Object.keys(content.media).length + Object.keys(content.benefits).length);
     for (const id of ids) {
       expect(isDocumentId(id), id).toBe(true);
       expect(documentSchema(id).safeParse(readDocument(content, id)).success, id).toBe(true);
@@ -31,7 +33,47 @@ describe("content documents", () => {
     const repriced = writeDocument(content, `package:${item.id}`, { ...item, price: { ...item.price, amount: 1 } });
     expect(repriced.catalog[0].price.amount).toBe(1);
     expect(repriced.catalog[1]).toBe(content.catalog[1]);
-    expect(() => writeDocument(content, "package:no-such-package", item)).toThrow();
+    expect(() => writeDocument(content, "site", undefined)).toThrow();
+  });
+
+  it("add and remove packages, pictures and benefits, but never pages", () => {
+    const item = { ...content.catalog[0], id: "new-package", review: { status: "hidden" as const, notes: ["ใหม่"] } };
+    const added = writeDocument(content, "package:new-package", item);
+    expect(added.catalog.at(-1)).toEqual(item);
+    expect(writeDocument(added, "package:new-package", undefined).catalog).toEqual(content.catalog);
+    const media = writeDocument(content, "media:new-picture", content.media["telemart-logo"]);
+    expect(media.media["new-picture"]).toEqual(content.media["telemart-logo"]);
+    expect(Object.keys(writeDocument(media, "media:new-picture", undefined).media)).toEqual(Object.keys(content.media));
+    expect(() => writeDocument(content, "page:home", undefined)).toThrow();
+  });
+
+  it("reorder the catalog through its own document", () => {
+    const [first, second, ...rest] = content.catalog.map((entry) => entry.id);
+    const swapped = writeDocument(content, "catalog", { order: [second, first] });
+    expect(swapped.catalog.map((entry) => entry.id)).toEqual([second, first, ...rest]);
+    expect(readDocument(swapped, "catalog")).toEqual({ order: [second, first, ...rest] });
+  });
+
+  it("apply a tombstone, a new document and the order together, the order last", () => {
+    const victim = content.catalog.find((entry) => !content.pages.home.promos.tabs.some((tab) => tab.items.some((card) => card.packageId === entry.id)))!;
+    const fresh = { ...content.catalog[0], id: "fresh", review: { status: "hidden" as const, notes: ["ใหม่"] } };
+    const draft = (documentId: string, body: unknown) => ({ documentId, body, schemaVersion: CONTENT_SCHEMA_VERSION, revision: 1, updatedAt: "", updatedBy: null }) as never;
+    const { content: next, problems } = applyDrafts(content, [
+      draft("catalog", { order: ["fresh"] }),
+      draft(`package:${victim.id}`, { $deleted: true }),
+      draft("package:fresh", fresh),
+    ]);
+    expect(problems).toEqual([]);
+    expect(next.catalog[0].id).toBe("fresh");
+    expect(next.catalog.some((entry) => entry.id === victim.id)).toBe(false);
+  });
+
+  it("refuse to remove what the site still shows", () => {
+    const shown = content.pages.home.promos.tabs[0].items[0].packageId;
+    const checked = validateDraft(content, `package:${shown}`, { $deleted: true });
+    expect(checked.ok).toBe(false);
+    expect(!checked.ok && checked.messages.join(" ")).toContain(shown);
+    expect(validateDraft(content, "page:home", { $deleted: true }).ok).toBe(false);
   });
 
   it("reject ids that are not documents", () => {

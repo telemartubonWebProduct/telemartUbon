@@ -119,6 +119,7 @@ const labels: Record<string, string> = {
   tabs: "แท็บหมวด",
   packageId: "แพ็กเกจ",
   remark: "หมายเหตุใต้การ์ด",
+  order: "ลำดับแพ็กเกจ",
   mobile: "แพ็กเสริมมือถือ",
   steps: "ขั้นตอน",
   solar: "โซลาร์เซลล์",
@@ -307,6 +308,7 @@ export function itemLabel(item: unknown, index: number): string {
 /** Name of a whole document, such as "หน้าแรก" or "แพ็กเกจ True Gigatex 1Gbps". */
 export function documentLabel(content: SiteContent, documentId: DocumentId): string {
   if (documentId === "site") return "ตั้งค่าทั้งเว็บ";
+  if (documentId === "catalog") return "แพ็กเกจและสิทธิประโยชน์";
   const [kind, key] = documentId.split(":") as [string, string];
   const body = readDocument(content, documentId) as Record<string, unknown> | undefined;
   switch (kind) {

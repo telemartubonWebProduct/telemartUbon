@@ -1,4 +1,4 @@
-import { readDocument, writeDocument, type DocumentId } from "@/lib/content/documents";
+import { readDocument, TOMBSTONE, writeDocument, type DocumentId } from "@/lib/content/documents";
 import { parseDocument, validateDraft, type DraftRecord, type FieldIssue } from "@/lib/content/draft-model";
 import type { DiscardOutcome, SaveOutcome } from "@/lib/content/drafts";
 import { setAt } from "@/lib/content/paths";
@@ -127,7 +127,17 @@ export class DraftStore {
     this.replace(documentId, body);
   }
 
-  /** Replaces a whole document body. */
+  /** Adds a package, picture or benefit; it saves like any other change. */
+  create(documentId: DocumentId, body: unknown) {
+    this.replace(documentId, body);
+  }
+
+  /** Removes a package, picture or benefit (a tombstone draft); discarding the draft brings it back. */
+  remove(documentId: DocumentId) {
+    this.replace(documentId, undefined);
+  }
+
+  /** Replaces a whole document body; undefined removes a package, picture or benefit. */
   replace(documentId: DocumentId, body: unknown) {
     const meta = this.metaOf(documentId);
     const status = meta.status === "conflict" ? "conflict" : "pending";
@@ -235,7 +245,7 @@ export class DraftStore {
       if (meta.status !== "saved") this.setMeta(documentId, { ...meta, status: "saved", messages: [], issues: [] });
       return;
     }
-    const checked = validateDraft(this.state.content, documentId, body);
+    const checked = validateDraft(this.state.content, documentId, body === undefined ? TOMBSTONE : body);
     if (!checked.ok) {
       this.setMeta(documentId, { ...meta, status: "invalid", messages: checked.messages, issues: checked.issues });
       return;
@@ -245,7 +255,7 @@ export class DraftStore {
     this.setMeta(documentId, { ...meta, status: "saving", messages: [], issues: [] });
     let outcome: SaveOutcome;
     try {
-      outcome = await this.saveAction({ documentId, expectedRevision: meta.revision, body });
+      outcome = await this.saveAction({ documentId, expectedRevision: meta.revision, body: body === undefined ? TOMBSTONE : body });
     } catch {
       outcome = { ok: false, reason: "error", message: offline };
     } finally {

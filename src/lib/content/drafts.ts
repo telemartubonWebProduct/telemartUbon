@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/lib/supabase/database.types";
 
-import { isDocumentId, type DocumentId } from "./documents";
+import { isDocumentId, TOMBSTONE, type DocumentId } from "./documents";
 import { applyDrafts, CONTENT_SCHEMA_VERSION, validateDraft, type DraftProblem, type DraftRecord, type FieldIssue } from "./draft-model";
 import type { SiteContent } from "./schema";
 
@@ -117,7 +117,8 @@ export async function saveDraft(
       p_document_id: documentId,
       p_expected_revision: expectedRevision,
       p_schema_version: CONTENT_SCHEMA_VERSION,
-      p_body: checked.value as Database["public"]["Tables"]["content_drafts"]["Insert"]["body"],
+      // A removed package, picture or benefit is stored as a tombstone.
+      p_body: (checked.value === undefined ? TOMBSTONE : checked.value) as Database["public"]["Tables"]["content_drafts"]["Insert"]["body"],
     })
     .single();
   if (error) {

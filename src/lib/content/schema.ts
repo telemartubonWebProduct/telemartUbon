@@ -53,8 +53,20 @@ export const frameSequence = z.strictObject({
 });
 export type FrameSequence = z.infer<typeof frameSequence>;
 
+/**
+ * Where a picture lives: a file of this site ("/…"), or one uploaded from the
+ * editor to the Supabase Storage bucket `media` (https; plain http only on the
+ * local test stack).
+ */
+export const mediaSrc = z
+  .string()
+  .regex(
+    /^(\/(?!\/).*|https:\/\/[a-z0-9.-]+\/storage\/v1\/object\/public\/media\/[A-Za-z0-9/._-]+|http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/storage\/v1\/object\/public\/media\/[A-Za-z0-9/._-]+)$/,
+    "ที่อยู่ไฟล์รูปต้องเป็นไฟล์ของเว็บ หรือไฟล์ที่อัปโหลดในคลังสื่อ",
+  );
+
 export const mediaAsset = z.strictObject({
-  src: z.string().startsWith("/"),
+  src: mediaSrc,
   width: z.number().int().positive(),
   height: z.number().int().positive(),
   alt: localizedText,

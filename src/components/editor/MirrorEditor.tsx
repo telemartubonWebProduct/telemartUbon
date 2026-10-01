@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { discardDraftAction, saveDraftAction } from "@/app/admin/(editor)/editor/actions";
-import { pageDocumentIds, type DocumentId, type PageDocumentId } from "@/lib/content/documents";
+import { uploadMediaAction } from "@/app/admin/(editor)/editor/media-actions";
+import { pageDocumentIds, TOMBSTONE, type DocumentId, type PageDocumentId } from "@/lib/content/documents";
 import type { DraftProblem } from "@/lib/content/draft-model";
 import type { SiteContent } from "@/lib/content/schema";
 import type { Locale } from "@/lib/i18n/locales";
@@ -132,7 +133,10 @@ export function MirrorEditor({ published, working, drafts, problems, draftsAvail
   }, [channel, select, openPage]);
 
   // Every edit goes to the preview at once.
-  useEffect(() => store.watchDocuments((documentId, body) => send({ type: "document", channel, documentId, body })), [store, send, channel]);
+  useEffect(
+    () => store.watchDocuments((documentId, body) => send({ type: "document", channel, documentId, body: body === undefined ? TOMBSTONE : body })),
+    [store, send, channel],
+  );
 
   // A (re)loaded preview gets the working content, then what to show.
   useEffect(() => {
@@ -264,6 +268,9 @@ export function MirrorEditor({ published, working, drafts, problems, draftsAvail
         <button type="button" className="min-h-8 rounded-tm-control border border-white/25 px-2.5 text-tm-caption font-semibold hover:border-white" onClick={() => select("site")}>
           ตั้งค่าทั้งเว็บ
         </button>
+        <button type="button" className="min-h-8 rounded-tm-control border border-white/25 px-2.5 text-tm-caption font-semibold hover:border-white" onClick={() => select("catalog")}>
+          แพ็กเกจและสิทธิประโยชน์
+        </button>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <p role="status" aria-live="polite" data-save-status={summary.status} className={`rounded-tm-pill px-3 py-1 text-tm-caption font-semibold ${statusTone}`}>
             {summary.status === "clean" ? (drafted.length > 0 ? "ร่างบันทึกไว้แล้ว" : "ตรงกับฉบับที่เผยแพร่") : summaryText[summary.status]}
@@ -365,7 +372,20 @@ export function MirrorEditor({ published, working, drafts, problems, draftsAvail
         </aside>
       </div>
 
-      {picker ? <MediaPicker content={state.content} current={picker.current} onPick={picker.onPick} onClose={() => setPicker(null)} /> : null}
+      {picker ? (
+        <MediaPicker
+          content={state.content}
+          current={picker.current}
+          onPick={picker.onPick}
+          onClose={() => setPicker(null)}
+          onUpload={async (form) => {
+            const outcome = await uploadMediaAction(form);
+            // The new picture joins the library as a draft, saved and checked like any edit.
+            if (outcome.ok) store.create(`media:${outcome.id}`, outcome.asset);
+            return outcome;
+          }}
+        />
+      ) : null}
     </div>
   );
 }

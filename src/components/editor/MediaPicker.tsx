@@ -3,14 +3,15 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-import type { MediaAsset, SiteContent } from "@/lib/content/schema";
+import type { UploadOutcome } from "@/app/admin/(editor)/editor/media-actions";
+import { mediaKind, type MediaAsset, type SiteContent } from "@/lib/content/schema";
 
 import { smallButton, inputClass } from "./fields";
 import { valueLabel } from "./labels";
 
-// Chooses a picture from the site's media library. Uploading new files is not
-// part of M3 (docs/renovation/M3-MIRROR-EDITOR.md): the library holds the
-// imported assets with their provenance.
+// Chooses a picture from the site's media library, or uploads a new one (R4):
+// the upload is re-encoded on the server, stored in Supabase Storage and added
+// to the library as a draft, then chosen.
 
 type MediaPickerProps = {
   content: SiteContent;
@@ -18,9 +19,70 @@ type MediaPickerProps = {
   current: string | undefined;
   onPick: (id: string) => void;
   onClose: () => void;
+  /** Uploads a file and adds it to the library; absent when uploads are unavailable. */
+  onUpload?: (form: FormData) => Promise<UploadOutcome>;
 };
 
-export function MediaPicker({ content, current, onPick, onClose }: MediaPickerProps) {
+function UploadForm({ onUpload, onDone }: { onUpload: NonNullable<MediaPickerProps["onUpload"]>; onDone: (id: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  return (
+    <form
+      className="grid gap-2 border-b border-tm-line px-5 py-3"
+      aria-labelledby="media-upload-title"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        setBusy(true);
+        setMessage(null);
+        const outcome = await onUpload(new FormData(event.currentTarget)).catch(() => ({ ok: false as const, message: "อัปโหลดไม่สำเร็จ ลองอีกครั้ง" }));
+        setBusy(false);
+        if (outcome.ok) onDone(outcome.id);
+        else setMessage(outcome.message);
+      }}
+    >
+      <h3 id="media-upload-title" className="text-tm-small font-semibold">
+        อัปโหลดรูปใหม่
+      </h3>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="grid gap-1 text-tm-caption font-medium">
+          ไฟล์รูป (JPEG, PNG, WebP, AVIF ไม่เกิน 8 MB)
+          <input name="file" type="file" required accept="image/jpeg,image/png,image/webp,image/avif" className="text-tm-caption" />
+        </label>
+        <label className="grid gap-1 text-tm-caption font-medium">
+          ชนิดของรูป
+          <select name="kind" required defaultValue="photo" className={inputClass}>
+            {mediaKind.options.map((option) => (
+              <option key={option} value={option}>
+                {valueLabel(option)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="grid gap-1 text-tm-caption font-medium">
+          คำอธิบายรูป ไทย
+          <input name="altTh" required maxLength={300} className={inputClass} />
+        </label>
+        <label className="grid gap-1 text-tm-caption font-medium">
+          คำอธิบายรูป English
+          <input name="altEn" required maxLength={300} className={inputClass} />
+        </label>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="submit" className={smallButton} disabled={busy}>
+          {busy ? "กำลังอัปโหลด…" : "อัปโหลดและเลือกรูปนี้"}
+        </button>
+        <p className="text-tm-caption text-tm-muted">ระบบย่อรูปให้กว้างไม่เกิน 2400 px และแปลงเป็น WebP; ใช้รูปที่มีสิทธิ์ใช้งานเท่านั้น</p>
+      </div>
+      {message ? (
+        <p role="alert" className="text-tm-caption text-tm-danger">
+          {message}
+        </p>
+      ) : null}
+    </form>
+  );
+}
+
+export function MediaPicker({ content, current, onPick, onClose, onUpload }: MediaPickerProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const assets = Object.entries(content.media) as [string, MediaAsset][];
   const kinds = Array.from(new Set(assets.map(([, asset]) => asset.kind)));
@@ -60,6 +122,15 @@ export function MediaPicker({ content, current, onPick, onClose }: MediaPickerPr
             ปิด
           </button>
         </div>
+        {onUpload ? (
+          <UploadForm
+            onUpload={onUpload}
+            onDone={(id) => {
+              onPick(id);
+              dialogRef.current?.close();
+            }}
+          />
+        ) : null}
         <div className="flex flex-wrap items-center gap-2 border-b border-tm-line px-5 py-3">
           <input
             type="search"

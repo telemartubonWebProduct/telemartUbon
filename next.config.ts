@@ -5,12 +5,32 @@ import type { NextConfig } from "next";
 // English is served from /en as is. The rewrite runs after static files and
 // non-dynamic routes (the back office, /auth, /api, metadata files) have had
 // their chance, so it only reaches public pages; unknown paths end at global-not-found.
+// Pictures uploaded from the editor live in the project's Storage bucket `media` (R4).
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL) : null;
+const localSupabase = supabaseUrl !== null && ["127.0.0.1", "localhost"].includes(supabaseUrl.hostname);
+
 const nextConfig: NextConfig = {
   experimental: {
     // Public pages sit under a dynamic root segment (src/app/[locale]) and the
     // back office has its own root layout, so unmatched URLs need the
     // routing-level 404 in src/app/global-not-found.tsx.
     globalNotFound: true,
+    // Picture uploads (8 MB at most, see media-actions.ts) plus the form's own bytes.
+    serverActions: { bodySizeLimit: "9mb" },
+  },
+  images: {
+    remotePatterns: supabaseUrl
+      ? [
+          {
+            protocol: supabaseUrl.protocol === "http:" ? "http" : "https",
+            hostname: supabaseUrl.hostname,
+            port: supabaseUrl.port,
+            pathname: "/storage/v1/object/public/media/**",
+          },
+        ]
+      : [],
+    // Only the local test stack serves Storage from 127.0.0.1; never true for a hosted project.
+    dangerouslyAllowLocalIP: localSupabase,
   },
   async headers() {
     return [

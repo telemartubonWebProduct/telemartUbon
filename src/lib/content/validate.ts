@@ -22,6 +22,7 @@ export function contentProblems(content: SiteContent): string[] {
     seen.add(item.id);
     for (const id of item.benefits) if (!(id in benefits)) problems.push(`แพ็กเกจ ${item.id}: ไม่มีสิทธิประโยชน์ "${id}"`);
     needMedia(item.image, `แพ็กเกจ ${item.id}`);
+    if (item.review.status !== "hidden" && item.price.amount <= 0) problems.push(`แพ็กเกจ ${item.id}: แพ็กเกจที่แสดงบนเว็บต้องมีราคา (ตอนนี้เป็น 0)`);
     if (item.price.regularAmount !== undefined && item.price.regularAmount <= item.price.amount) {
       problems.push(`แพ็กเกจ ${item.id}: ราคาปกติต้องสูงกว่าราคาเสนอ`);
     }
