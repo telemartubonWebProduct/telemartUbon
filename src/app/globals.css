@@ -950,3 +950,173 @@
     }
   }
 }
+
+/* Package pages: filters, comparison and package pages (docs/renovation/R3-PACKAGE-PAGES.md). */
+@layer components {
+  /* Cards the filters leave out: the card's own display would override [hidden]. */
+  .tm-compare-card[hidden] {
+    display: none;
+  }
+
+  .tm-explorer-label {
+    font-size: var(--tm-text-small);
+    font-weight: 600;
+    color: var(--tm-color-ink-muted);
+  }
+
+  .tm-chip {
+    min-height: var(--tm-control-height);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--tm-color-line);
+    border-radius: var(--tm-radius-pill);
+    font-size: var(--tm-text-small);
+    font-weight: 600;
+    transition: border-color var(--tm-duration-fast) var(--tm-ease-out), background-color var(--tm-duration-fast) var(--tm-ease-out);
+  }
+
+  .tm-chip:hover {
+    border-color: var(--tm-color-ink);
+  }
+
+  .tm-chip[aria-pressed="true"] {
+    border-color: var(--tm-color-ink);
+    background: var(--tm-color-ink);
+    color: var(--tm-color-canvas);
+  }
+
+  .tm-select {
+    min-height: var(--tm-control-height);
+    min-width: 11rem;
+    padding: 0.5rem 2.25rem 0.5rem 0.875rem;
+    border: 1px solid var(--tm-color-line);
+    border-radius: var(--tm-radius-control);
+    background: var(--tm-color-canvas)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%234a5570' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      no-repeat right 0.625rem center / 1.125rem;
+    font-size: var(--tm-text-small);
+    font-weight: 600;
+    appearance: none;
+  }
+
+  .tm-compare-pick {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: var(--tm-control-height);
+    font-size: var(--tm-text-small);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tm-compare-pick input {
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: var(--tm-color-ink);
+  }
+
+  .tm-compare-pick:has(input:disabled) {
+    color: var(--tm-color-ink-muted);
+    cursor: not-allowed;
+  }
+
+  /* The compare bar floats over the page's foot, in the navy ink. */
+  .tm-compare-bar {
+    position: fixed;
+    inset: auto var(--tm-gutter) 1rem;
+    z-index: 30;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    max-width: 52rem;
+    margin-inline: auto;
+    padding: 0.875rem 1rem 0.875rem 1.25rem;
+    border-radius: var(--tm-radius-panel);
+    background: var(--tm-tone-ink-canvas);
+    color: var(--tm-color-on-ink);
+    box-shadow: var(--tm-shadow-float);
+  }
+
+  .tm-compare-bar .tm-button-secondary {
+    border-color: var(--tm-color-on-ink);
+    color: var(--tm-color-on-ink);
+  }
+
+  .tm-compare-bar .tm-button-secondary:hover {
+    background: var(--tm-color-on-ink);
+    color: var(--tm-tone-ink-canvas);
+  }
+
+  .tm-compare-bar :focus-visible {
+    outline-color: var(--tm-color-focus-inverse);
+  }
+
+  .tm-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .tm-compare-dialog {
+    width: min(64rem, calc(100vw - 2 * var(--tm-gutter)));
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    border: 0;
+    border-radius: var(--tm-radius-panel);
+    background: var(--tm-color-canvas);
+    color: var(--tm-color-ink);
+    box-shadow: var(--tm-shadow-float);
+  }
+
+  .tm-compare-dialog::backdrop {
+    background: rgb(14 22 48 / 0.6);
+  }
+
+  .tm-compare-dialog[open] {
+    animation: tm-promo-in var(--tm-duration-base) var(--tm-ease-out);
+  }
+
+  .tm-compare-table {
+    --tm-label-col: 4.75rem;
+    width: 100%;
+    min-width: calc(var(--tm-label-col) + var(--cols, 2) * 8.25rem);
+    table-layout: fixed;
+    border-collapse: collapse;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .tm-compare-table :is(th, td) {
+    padding: 0.75rem 0.5rem;
+    border-top: 1px solid var(--tm-color-line);
+    vertical-align: top;
+  }
+
+  .tm-compare-table thead :is(th, td) {
+    border-top: 0;
+  }
+
+  .tm-compare-table thead td:first-child {
+    width: var(--tm-label-col);
+  }
+
+  @media (min-width: 640px) {
+    .tm-compare-table {
+      --tm-label-col: 9rem;
+      min-width: calc(var(--tm-label-col) + var(--cols, 2) * 11rem);
+    }
+
+    .tm-compare-table :is(th, td) {
+      padding: 0.875rem 0.75rem;
+    }
+  }
+
+  /* Without JavaScript nothing can filter or compare, so those controls go. */
+  @media (scripting: none) {
+    .tm-explorer,
+    .tm-compare-pick {
+      display: none;
+    }
+  }
+}
+

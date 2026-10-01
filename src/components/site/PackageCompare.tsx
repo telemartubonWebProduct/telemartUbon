@@ -1,12 +1,14 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 
+import { packageDetailPath } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
 import type { CatalogPackage, Cta, Price } from "@/lib/content/schema";
 import type { Locale } from "@/lib/i18n/locales";
 
 import type { RenderContext } from "./context";
-import { CtaLink } from "./links";
+import { ComparePick, ExplorableCard } from "./explorer/PackageExplorer";
+import { CtaLink, TargetLink } from "./links";
 
 type Speed = NonNullable<CatalogPackage["speed"]>["download"];
 type Binding = { "data-edit"?: string };
@@ -238,14 +240,26 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
   rows.push({
     key: "cta",
     field: fixed(""),
-    cell: (item) => <CtaLink ctx={ctx} cta={cta} context={ctx.t(item.name)} className="w-full" bind={ctaBind} />,
+    cell: (item) => (
+      <div className="grid gap-3">
+        <CtaLink ctx={ctx} cta={cta} context={ctx.t(item.name)} className="w-full" bind={ctaBind} />
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <ComparePick packageId={item.id} name={ctx.t(item.name)} />
+          <TargetLink ctx={ctx} target={{ kind: "page", path: packageDetailPath(item.id) }} className="tm-link ml-auto text-tm-small font-semibold">
+            {ctx.t(ui.packageDetails)}
+            <span className="sr-only">: {ctx.t(item.name)}</span>
+          </TargetLink>
+        </div>
+      </div>
+    ),
   });
 
   return (
     <ul role="list" className={`tm-compare ${compact ? "tm-compare-compact" : ""} ${className}`}>
       {items.map((item) => (
-        <li
+        <ExplorableCard
           key={item.id}
+          packageId={item.id}
           data-package={item.id}
           className="tm-compare-card rounded-tm-panel border border-tm-line bg-tm-canvas"
           style={{ "--tm-rows": rows.length } as CSSProperties}
@@ -259,7 +273,7 @@ export function PackageCompare({ ctx, items, cta, ctaBind, variant, headingLevel
               </div>
             );
           })}
-        </li>
+        </ExplorableCard>
       ))}
     </ul>
   );

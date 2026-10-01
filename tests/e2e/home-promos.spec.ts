@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { content, packageById } from "@/lib/content";
-import { packageSectionIn } from "@/lib/content/lookup";
+import { packageDetailPath } from "@/lib/content/package-facts";
 import { formatNumber } from "@/lib/content/render";
 
 import { blockThirdParty, settle } from "./support/network";
@@ -63,7 +63,7 @@ test("arrow keys, Home and End move between tabs", async ({ page }) => {
   );
 });
 
-test("cards show the catalog's name, price and terms, and link to the package's section", async ({ page }) => {
+test("cards show the catalog's name, price and terms, and link to the package's page", async ({ page }) => {
   await page.goto("/");
   for (const tab of tabs) {
     await section(page).getByRole("tab", { name: tab.title.th }).click();
@@ -74,8 +74,7 @@ test("cards show the catalog's name, price and terms, and link to the package's 
       await expect(element).toContainText(formatNumber(item.price.amount, "th"));
       const term = item.contract ?? item.validity;
       if (term) await expect(element).toContainText(term.th);
-      const target = packageSectionIn(content, item)!;
-      await expect(element.getByRole("link", { name: /ดูรายละเอียด/ })).toHaveAttribute("href", `${target.path}#${target.hash}`);
+      await expect(element.getByRole("link", { name: /ดูรายละเอียด/ })).toHaveAttribute("href", packageDetailPath(item.id));
     }
   }
 });
@@ -113,5 +112,5 @@ test("the English page has the same tabs and cards in English", async ({ page })
   await expect(section(page).getByRole("tab")).toHaveText(tabs.map((tab) => tab.title.en));
   const first = packageById(tabs[0].items[0].packageId);
   await expect(panel(page, tabs[0].id).locator(`[data-package="${first.id}"]`).getByRole("heading", { level: 3 })).toHaveText(first.name.en);
-  await expect(panel(page, tabs[0].id).getByRole("link", { name: /See details/ }).first()).toHaveAttribute("href", /^\/en\/broadband#/);
+  await expect(panel(page, tabs[0].id).getByRole("link", { name: /See details/ }).first()).toHaveAttribute("href", /^\/en\/packages\//);
 });

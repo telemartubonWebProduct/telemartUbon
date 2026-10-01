@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { packageSectionIn } from "@/lib/content/lookup";
+import { packageDetailPath } from "@/lib/content/package-facts";
 import type { CatalogPackage, HomePage } from "@/lib/content/schema";
 
 import type { RenderContext } from "../context";
@@ -93,7 +93,6 @@ function PromoCard({ ctx, tab, card }: { ctx: RenderContext; tab: Tab; card: Car
   const { ui } = ctx.site;
   const item = ctx.packageById(card.packageId);
   const image = ctx.media(card.image);
-  const details = packageSectionIn(ctx.content, item);
   const term = item.contract ?? item.validity;
   const bind = (...path: string[]) => ctx.bind(doc, "promos", "tabs", tab.id, "items", card.id, ...path);
   const own = (field: string) => ctx.bind(`package:${item.id}`, field);
@@ -149,12 +148,10 @@ function PromoCard({ ctx, tab, card }: { ctx: RenderContext; tab: Tab; card: Car
         ) : null}
         <div className="mt-auto grid gap-3 pt-6">
           <CtaLink ctx={ctx} cta={tab.packageCta} context={ctx.t(item.name)} className="w-full" bind={ctx.bind(doc, "promos", "tabs", tab.id, "packageCta")} />
-          {details ? (
-            <TargetLink ctx={ctx} target={details} className="tm-link justify-self-center text-tm-small font-semibold">
-              {ctx.t(ui.packageDetails)}
-              <span className="sr-only">: {ctx.t(item.name)}</span>
-            </TargetLink>
-          ) : null}
+          <TargetLink ctx={ctx} target={{ kind: "page", path: packageDetailPath(item.id) }} className="tm-link justify-self-center text-tm-small font-semibold">
+            {ctx.t(ui.packageDetails)}
+            <span className="sr-only">: {ctx.t(item.name)}</span>
+          </TargetLink>
         </div>
       </div>
     </li>

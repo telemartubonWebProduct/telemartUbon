@@ -2,6 +2,7 @@ import type { DocumentId } from "@/lib/content/documents";
 import type { PackagePage } from "@/lib/content/schema";
 
 import type { RenderContext } from "./context";
+import { ExplorableGroup, NoMatches } from "./explorer/PackageExplorer";
 import { ContactLink } from "./links";
 import { PackageCompare } from "./PackageCompare";
 
@@ -72,10 +73,11 @@ export function PackageSections({ ctx, page }: { ctx: RenderContext; page: Packa
               </p>
             ) : null}
             <div className="mt-8 grid gap-12">
+              <NoMatches packageIds={section.groups.flatMap((group) => ctx.packages(group.category, group.group).map((item) => item.id))} />
               {section.groups.map((group) => {
                 const items = ctx.packages(group.category, group.group);
                 return (
-                  <div key={group.id}>
+                  <ExplorableGroup key={group.id} packageIds={items.map((item) => item.id)}>
                     {group.heading ? (
                       <h3 className="text-tm-h4 font-semibold" {...ctx.bind(doc, "sections", section.id, "groups", group.id, "heading")}>
                         {ctx.t(group.heading)}
@@ -100,7 +102,7 @@ export function PackageSections({ ctx, page }: { ctx: RenderContext; page: Packa
                         <EmptyGroup ctx={ctx} />
                       )}
                     </div>
-                  </div>
+                  </ExplorableGroup>
                 );
               })}
             </div>
