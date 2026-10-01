@@ -1,4 +1,4 @@
-import type { BrowserContext, Request } from "@playwright/test";
+import type { BrowserContext, Page, Request } from "@playwright/test";
 
 /**
  * Blocks every request that leaves the site under test. The public pages load
@@ -35,4 +35,17 @@ function reportSlowRequests(context: BrowserContext) {
   }, 2_000);
   timer.unref();
   context.on("close", () => clearInterval(timer));
+}
+
+/**
+ * Lets the page's requests finish before a test closes it. The image
+ * optimizer of `next start` (Next 16.3.7) hands the visitor's socket to its
+ * internal fetch of the source file: when the first request for an image is
+ * cut off within milliseconds, that fetch never ends, and every later request
+ * for the same image waits on it until the server restarts. Tests that close
+ * pages with lazy images still starting would leave such images behind for
+ * the tests after them.
+ */
+export async function settle(page: Page): Promise<void> {
+  await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
 }

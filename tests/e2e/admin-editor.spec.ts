@@ -11,7 +11,7 @@ import {
   setMembership,
   type TestUser,
 } from "./support/local-supabase";
-import { blockThirdParty } from "./support/network";
+import { blockThirdParty, settle } from "./support/network";
 
 // M3 acceptance for the Mirror editor, against the local Supabase stack:
 // edits show in the preview at once and autosave as drafts, drafts survive a
@@ -50,6 +50,10 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
   await clearDrafts();
   await deleteUsers(createdUserIds);
+});
+
+test.afterEach(async ({ page }) => {
+  await settle(page);
 });
 
 async function signIn(page: Page, user: TestUser, next = "/admin/editor") {
@@ -161,6 +165,8 @@ test("a save from another session is caught as a conflict instead of being overw
   await expect(preview(second.page).locator("h1").first()).toHaveText(theirs);
   await expect(saveStatus(second.page)).not.toHaveAttribute("data-save-status", "conflict", saving);
 
+  await settle(first.page);
+  await settle(second.page);
   await first.context.close();
   await second.context.close();
 });
@@ -205,8 +211,8 @@ test("the preview renders the phone layout at phone width", async ({ page }) => 
 
 test("the preview is the public page, pixel for pixel", async ({ browser, baseURL }) => {
   // Six full-page shots of long pages (the home film's panels alone are three
-  // screens) and three comparisons outgrow the default timeout on a cold server.
-  test.setTimeout(120_000);
+  // screens) and three comparisons take about half the default timeout.
+  test.setTimeout(60_000);
   // Reduced motion keeps the home film as panels and the 3D router on its
   // poster in both, so the shots are stable.
   const context = await browser.newContext({ locale: "th-TH", viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
@@ -238,6 +244,7 @@ test("the preview is the public page, pixel for pixel", async ({ browser, baseUR
     const previewShot = await shot(previewPath);
     expect(await pixelDifference(page, publicShot, previewShot), `${previewPath} against ${publicPath}`).toBeLessThan(0.001);
   }
+  await settle(page);
   await context.close();
 });
 

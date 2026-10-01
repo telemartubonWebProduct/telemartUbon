@@ -14,6 +14,7 @@ import {
   waitForEmail,
   type TestUser,
 } from "./support/local-supabase";
+import { settle } from "./support/network";
 
 // M1 acceptance: sign-in, sign-out, password recovery, invitations and denied
 // access, exercised against a real Supabase Auth, Data API and Postgres (local
@@ -38,6 +39,10 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   await deleteUsers(createdUserIds);
+});
+
+test.afterEach(async ({ page }) => {
+  await settle(page);
 });
 
 // Next's route announcer is also role="alert"; page messages live in <main>.

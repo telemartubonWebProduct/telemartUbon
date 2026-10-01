@@ -1,16 +1,22 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { content } from "@/lib/content";
-import { blockThirdParty } from "./support/network";
+import { content, getMedia } from "@/lib/content";
+import { blockThirdParty, settle } from "./support/network";
 
 // The home film (docs/renovation/R1-HOME-FILM.md): it plays as visitors scroll,
 // one beat of words at a time, with the calls to action always on screen.
 // Reduced motion, no JavaScript and the editor get the same beats as panels.
 
 const beats = content.pages.home.hero.beats;
+/** Frames in the landscape cut of the film. */
+const filmFrames = getMedia(content.pages.home.hero.film).sequence!.landscape.frames;
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);
+});
+
+test.afterEach(async ({ page }) => {
+  await settle(page);
 });
 
 /** Scrolls to a point of the film (0 top, 1 last frame) and waits for the film to catch up. */
@@ -91,11 +97,11 @@ test("phones get the portrait frames", async ({ page, isMobile }) => {
   expect(frames.every((frame) => frame.includes("/portrait/"))).toBe(true);
 });
 
-test("reduced motion shows the beats as panels over stills and loads no frames", async ({ page }) => {
+test("reduced motion shows the beats as panels over stills and loads no other frames", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  const frames: string[] = [];
+  const frames = new Set<string>();
   page.on("request", (request) => {
-    if (rawFrame(request.url())) frames.push(request.url());
+    if (rawFrame(request.url())) frames.add(new URL(request.url()).pathname);
   });
   await page.goto("/");
   await page.waitForTimeout(3_000);
@@ -105,7 +111,11 @@ test("reduced motion shows the beats as panels over stills and loads no frames",
     await heading.scrollIntoViewIfNeeded();
     await expect(heading).toBeInViewport();
   }
-  expect(frames).toEqual([]);
+  const stills = await page.evaluate(() =>
+    Array.from(document.querySelectorAll<HTMLImageElement>(".tm-film-still"), (still) => new URL(still.currentSrc).pathname),
+  );
+  expect(new Set(stills).size).toBe(beats.length);
+  expect([...frames].sort()).toEqual([...new Set(stills)].sort());
 });
 
 test("the page before and after the film starts is the same height, so nothing jumps", async ({ page, browser, baseURL }) => {
@@ -120,9 +130,25 @@ test("the page before and after the film starts is the same height, so nothing j
   const beforePage = await before.newPage();
   await beforePage.goto(page.url());
   const stack = await height(beforePage);
+  await settle(beforePage);
   await before.close();
   expect(film.track).toBeCloseTo(beats.length * 1.5 * film.screen, 0);
   expect(stack.track).toBeCloseTo(film.track, 0);
+});
+
+test("frames the browser cannot open leave the beats over the poster, without downloading the whole film", async ({ page }) => {
+  await page.route((url) => rawFrame(url.href), (route) => route.fulfill({ contentType: "image/avif", body: "not an image" }));
+  const frames = new Set<string>();
+  page.on("request", (request) => {
+    if (rawFrame(request.url())) frames.add(new URL(request.url()).pathname);
+  });
+  await page.goto("/");
+  await expect(page.locator(".tm-film")).toHaveAttribute("data-film-live", "");
+  await page.waitForTimeout(3_000);
+  await expect(page.locator(".tm-film-canvas")).not.toHaveAttribute("data-ready", "");
+  expect(frames.size).toBeLessThan(filmFrames / 4);
+  await scrollFilm(page, 0.5);
+  expect(await beatOpacities(page)).toEqual([0, 1, 0]);
 });
 
 test("Save-Data loads only the stills", async ({ page }) => {

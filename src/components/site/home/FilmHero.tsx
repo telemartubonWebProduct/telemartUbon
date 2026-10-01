@@ -17,9 +17,12 @@ const portraitQuery = "(max-aspect-ratio: 4/5)";
 type Variables = CSSProperties & Record<`--${string}`, string | number>;
 
 /**
- * One frame of the film as a responsive picture: the poster under the canvas,
- * and the still behind each beat in the static layout. The first frame is the
- * page's largest image, so it loads first.
+ * One frame of the film as a picture: the poster under the canvas, and the
+ * still behind each beat in the static layout. The first frame is the page's
+ * largest image, so it loads first. Frames are already sized and compressed
+ * (scripts/media/film-frames.mjs), so browsers that can open them get the
+ * files themselves: the same ones the canvas plays, cached a week
+ * (next.config.ts). Others fall back to the image optimizer's copy.
  */
 function FilmPicture({
   film,
@@ -35,28 +38,26 @@ function FilmPicture({
   bind?: { "data-edit"?: string };
 }) {
   const sequence = film.sequence;
-  const common = { alt: "", sizes: "100vw" };
   const { props } = getImageProps({
-    ...common,
+    alt: "",
     src: sequence ? frameUrl(sequence.landscape, frame) : film.src,
     width: sequence?.landscape.width ?? film.width,
     height: sequence?.landscape.height ?? film.height,
+    sizes: "100vw",
     loading: eager ? "eager" : "lazy",
     fetchPriority: eager ? "high" : "auto",
   });
-  let portrait: string | undefined;
+  const sources = [];
   if (sequence?.portrait) {
-    const scale = (sequence.portrait.frames - 1) / (sequence.landscape.frames - 1);
-    portrait = getImageProps({
-      ...common,
-      src: frameUrl(sequence.portrait, Math.round(frame * scale)),
-      width: sequence.portrait.width,
-      height: sequence.portrait.height,
-    }).props.srcSet;
+    const index = Math.round((frame * (sequence.portrait.frames - 1)) / (sequence.landscape.frames - 1));
+    sources.push({ media: portraitQuery, srcSet: frameUrl(sequence.portrait, index), type: `image/${sequence.portrait.format}` });
   }
+  if (sequence) sources.push({ srcSet: frameUrl(sequence.landscape, frame), type: `image/${sequence.landscape.format}` });
   return (
     <picture>
-      {portrait ? <source media={portraitQuery} srcSet={portrait} sizes={common.sizes} /> : null}
+      {sources.map((source) => (
+        <source key={source.srcSet} {...source} />
+      ))}
       <img {...props} alt="" className={className} {...bind} />
     </picture>
   );

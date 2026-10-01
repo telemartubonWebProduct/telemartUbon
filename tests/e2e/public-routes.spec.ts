@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { localizePath, locales } from "@/lib/i18n/locales";
 
-import { blockThirdParty } from "./support/network";
+import { blockThirdParty, settle } from "./support/network";
 
 // Every public URL of the current site must keep working through the
 // renovation (docs/renovation/CURRENT-SITE-AUDIT.md, PLAN.md). Thai stays at
@@ -21,6 +21,10 @@ const publicPaths = [
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);
+});
+
+test.afterEach(async ({ page }) => {
+  await settle(page);
 });
 
 function trackFailures(page: Page, origin: string) {

@@ -106,7 +106,7 @@ class FrameBank {
   }
 
   private decode(index: number) {
-    if (index < 0 || index >= this.sequence.frames || this.decoded.has(index) || this.decoding.has(index)) return;
+    if (this.disposed || index < 0 || index >= this.sequence.frames || this.decoded.has(index) || this.decoding.has(index)) return;
     const blob = this.blobs[index];
     if (!blob) return;
     this.decoding.add(index);
@@ -121,7 +121,12 @@ class FrameBank {
         this.evict();
         this.onFrame();
       })
-      .catch(() => this.decoding.delete(index));
+      .catch(() => {
+        this.decoding.delete(index);
+        // A still this browser cannot open means none of the frames will: stop
+        // downloading them and leave the beats playing over the poster.
+        if (this.pinned.has(index)) this.dispose();
+      });
   }
 
   /** Frees the decoded frames farthest from the playhead; the stills stay. */
