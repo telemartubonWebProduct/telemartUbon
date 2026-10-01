@@ -3,7 +3,7 @@ import { z } from "zod";
 import { contrastRatio, parseHexColor } from "@/lib/design/contrast";
 
 // Theme settings an Admin may change (docs/renovation/FREE-DESIGN-BRIEF.md):
-// five brand colours, checked for WCAG AA before they can be saved, and a
+// six brand colours, checked for WCAG AA before they can be saved, and a
 // background tone for each section of the fixed layout. Everything else in
 // the palette is derived, so no combination can break text contrast.
 
@@ -25,15 +25,18 @@ export const themeColors = z.strictObject({
   surface: hexColor,
   /** Hairlines and card borders. */
   line: hexColor,
+  /** Second brand colour for gradients and highlights behind white text (dusk violet). */
+  glow: hexColor,
 });
 export type ThemeColors = z.infer<typeof themeColors>;
 
 export const defaultTheme: ThemeColors = {
   accent: "#e60012",
-  ink: "#000000",
-  muted: "#52525b",
-  surface: "#f5f5f5",
-  line: "#e4e4e7",
+  ink: "#0e1630",
+  muted: "#4a5570",
+  surface: "#f1f4f9",
+  line: "#dde3ee",
+  glow: "#5b3fd1",
 };
 
 const white = "#ffffff";
@@ -66,6 +69,7 @@ export function derivePalette(theme: ThemeColors) {
     onInkMuted: "#d4d4d8",
     inkSurface: mix(theme.ink, white, 0.1),
     inkLine: mix(theme.ink, white, 0.25),
+    glow: theme.glow,
   };
 }
 
@@ -83,6 +87,7 @@ export function themeContrastPairs(theme: ThemeColors) {
     { label: "ตัวอักษรบนพื้นดำ", foreground: p.onInk, background: p.ink },
     { label: "ตัวอักษรรองบนพื้นดำ", foreground: p.onInkMuted, background: p.ink },
     { label: "ตัวอักษรรองบนแผงในพื้นดำ", foreground: p.onInkMuted, background: p.inkSurface },
+    { label: "ตัวอักษรบนพื้นสีรอง", foreground: p.onInk, background: p.glow },
   ];
 }
 
@@ -120,6 +125,7 @@ export function themeVariables(value: ThemeColors): Record<string, string> {
     line: ["line", "--tm-color-line"],
     inkSurface: ["inkSurface", "--tm-tone-ink-surface"],
     inkLine: ["inkLine", "--tm-tone-ink-line"],
+    glow: ["glow", "--tm-color-glow"],
   };
   const style: Record<string, string> = {};
   for (const [key, ...names] of Object.values(variables)) {

@@ -4,59 +4,68 @@
  * primary action. Values are plain CSS custom properties so theme settings can
  * later override them per page or section, after a contrast check.
  *
- * Contrast on white: red #E60012 = 4.8:1 (white text on red is the same),
- * muted #52525B = 7.7:1, danger #B8000E = 6.8:1, success #166534 = 7.1:1.
+ * Contrast on white: navy ink #0E1630 = 17.9:1, red #E60012 = 4.8:1 (white text
+ * on red is the same), muted #4A5570 = 7.4:1, danger #B8000E = 6.8:1, success
+ * #166534 = 7.1:1; white on the violet glow #5B3FD1 = 6.8:1.
  */
 :root {
   /* Brand palette */
   --tm-color-canvas: #ffffff;
-  --tm-color-ink: #000000;
+  --tm-color-ink: #0e1630;
   --tm-color-red: #e60012;
-  --tm-color-surface: #f5f5f5;
-  --tm-color-ink-muted: #52525b;
-  --tm-color-line: #e4e4e7;
+  --tm-color-surface: #f1f4f9;
+  --tm-color-ink-muted: #4a5570;
+  --tm-color-line: #dde3ee;
+  /* Dusk violet: gradients and highlights behind white text (6.8:1). */
+  --tm-color-glow: #5b3fd1;
 
   /* Derived states */
   --tm-color-red-press: #b8000e;
   --tm-color-red-wash: #fdebec;
   --tm-color-on-red: #ffffff;
   --tm-color-on-ink: #ffffff;
-  --tm-color-on-ink-muted: #d4d4d8; /* secondary text on black, 14.2:1 */
+  --tm-color-on-ink-muted: #d4d4d8; /* secondary text on navy ink, 12.1:1 */
   --tm-color-danger: #b8000e;
   --tm-color-danger-wash: #fdebec;
   --tm-color-success: #166534;
   --tm-color-success-wash: #ecf8f0;
-  --tm-color-focus: #000000;
+  --tm-color-focus: #0e1630;
   --tm-color-focus-inverse: #ffffff;
 
   /* The black section tone swaps the palette inside a section (see globals.css).
      Derived from the theme's ink colour: ink, ink + 10% white, ink + 25% white. */
-  --tm-tone-ink-canvas: #000000;
+  --tm-tone-ink-canvas: #0e1630;
   --tm-tone-ink-text: #ffffff;
   --tm-tone-ink-muted: #d4d4d8;
-  --tm-tone-ink-surface: #1a1a1a;
-  --tm-tone-ink-line: #404040;
+  --tm-tone-ink-surface: #262d45;
+  --tm-tone-ink-line: #4a5064;
 
   /* Type: IBM Plex Sans Thai for headings and body. Thai stacks vowels and tone
      marks, so line heights stay generous. Containers that load the font through
      next/font redeclare this with var(--font-plex-thai) first. */
   --tm-font-sans: "IBM Plex Sans Thai", Tahoma, sans-serif;
+  /* Headlines, prices and speeds: Anuphan, a loopless Thai display face. */
+  --tm-font-display: "Anuphan", var(--tm-font-sans);
   --tm-text-caption: 0.8125rem; /* 13px */
   --tm-text-small: 0.875rem; /* 14px */
   --tm-text-body: 1rem; /* 16px */
   --tm-text-lead: 1.125rem; /* 18px */
   --tm-text-h4: 1.25rem; /* 20px */
   --tm-text-h3: 1.5rem; /* 24px */
-  --tm-text-h2: 1.875rem; /* 30px */
-  --tm-text-h1: 2.375rem; /* 38px */
-  --tm-text-display: 3rem; /* 48px */
+  --tm-text-h2: 2rem; /* 32px */
+  --tm-text-h1: 2.5rem; /* 40px */
+  --tm-text-display: 3.5rem; /* 56px */
   --tm-leading-body: 1.7;
-  --tm-leading-heading: 1.35;
+  --tm-leading-heading: 1.3;
 
   /* Shape: controls, panels and pills differ on purpose. */
-  --tm-radius-control: 6px;
-  --tm-radius-panel: 12px;
+  --tm-radius-control: 10px;
+  --tm-radius-panel: 20px;
   --tm-radius-pill: 999px;
+
+  /* Depth: raised cards and floating panels, tinted with the navy ink. */
+  --tm-shadow-raised: 0 1px 2px rgb(14 22 48 / 0.06), 0 18px 40px -20px rgb(14 22 48 / 0.3);
+  --tm-shadow-float: 0 2px 6px rgb(14 22 48 / 0.08), 0 28px 60px -24px rgb(14 22 48 / 0.45);
 
   /* Layout */
   --tm-content-max: 75rem; /* 1200px */

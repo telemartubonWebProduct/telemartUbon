@@ -37,6 +37,11 @@
 @layer components {
   .tm-site {
     --tm-font-sans: var(--font-plex-thai), "IBM Plex Sans Thai", Tahoma, sans-serif;
+    --tm-font-display: var(--font-anuphan), "Anuphan", var(--tm-font-sans);
+    /* The theme's own colours, kept for elements that sit on the film or a
+       dark tone but need the page's normal palette (menus, cards). */
+    --tm-solid-canvas: var(--tm-color-canvas);
+    --tm-solid-ink: var(--tm-color-ink);
     min-height: 100dvh;
     background: var(--tm-color-canvas);
     color: var(--tm-color-ink);
@@ -49,6 +54,13 @@
   .tm-site :focus-visible {
     outline: 3px solid var(--tm-color-focus);
     outline-offset: 2px;
+  }
+
+  /* Headlines, prices and speeds use the display face. */
+  .tm-site :is(h1, h2, h3),
+  .tm-site .tm-display {
+    font-family: var(--tm-font-display);
+    letter-spacing: -0.005em;
   }
 
   .tm-site .tm-on-ink :focus-visible {
@@ -164,6 +176,10 @@
   /* Prices and speeds line up digit by digit. */
   .tm-num {
     font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .tm-site .tm-num {
+    font-family: var(--tm-font-display);
   }
 
   /* Package comparison: every card in a row of cards shares the same row

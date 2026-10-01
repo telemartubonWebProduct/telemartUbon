@@ -34,12 +34,18 @@ export default {
             DEFAULT: "var(--tm-color-success)",
             wash: "var(--tm-color-success-wash)",
           },
+          glow: "var(--tm-color-glow)",
           focus: "var(--tm-color-focus)",
           "focus-inverse": "var(--tm-color-focus-inverse)",
         },
       },
       fontFamily: {
         "tm-sans": ["var(--tm-font-sans)"],
+        "tm-display": ["var(--tm-font-display)"],
+      },
+      boxShadow: {
+        "tm-raised": "var(--tm-shadow-raised)",
+        "tm-float": "var(--tm-shadow-float)",
       },
       fontSize: {
         "tm-caption": ["var(--tm-text-caption)", { lineHeight: "var(--tm-leading-body)" }],

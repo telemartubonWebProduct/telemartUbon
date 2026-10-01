@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans_Thai } from "next/font/google";
+import { Anuphan, IBM_Plex_Sans_Thai } from "next/font/google";
 import Script from "next/script";
 
 import { content } from "@/lib/content";
@@ -21,6 +21,13 @@ const plexThai = IBM_Plex_Sans_Thai({
   weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-plex-thai",
+});
+// Display face for headlines, prices and speeds (the preview must load it too).
+const anuphan = Anuphan({
+  subsets: ["thai", "latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+  variable: "--font-anuphan",
 });
 
 export const dynamicParams = false;
@@ -50,7 +57,7 @@ export default async function PublicRootLayout({ children, params }: LayoutProps
   const { googleAdsId, tawkSrc } = content.site.integrations;
 
   return (
-    <html lang={locale} className={plexThai.variable}>
+    <html lang={locale} className={`${plexThai.variable} ${anuphan.variable}`}>
       {/* Theme colours from site settings; the default theme adds nothing. */}
       <body className="tm-site" style={themeVariables(content.site.theme)}>
         {children}

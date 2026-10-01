@@ -103,6 +103,7 @@ const labels: Record<string, string> = {
   muted: "สีตัวอักษรรอง",
   surface: "สีพื้นเทา",
   line: "สีเส้นขอบ",
+  glow: "สีรอง (พื้นไล่เฉดและจุดเน้น)",
   siteName: "ชื่อเว็บไซต์",
   hero: "ส่วนเปิดหน้า",
   services: "เลือกบริการ",
