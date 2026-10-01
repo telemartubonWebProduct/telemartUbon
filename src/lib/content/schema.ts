@@ -210,6 +210,9 @@ export type UiKey = (typeof uiKeys)[number];
 
 const ui = z.strictObject(Object.fromEntries(uiKeys.map((key) => [key, localizedText])) as Record<UiKey, typeof localizedText>);
 
+/** Google Ads `send_to`: the account (AW-…) and the conversion's label. */
+const adsConversionPattern = /^(AW-[0-9]+)\/[A-Za-z0-9_-]+$/;
+
 const navItem = z.strictObject({
   id: stableId,
   label: localizedText,
@@ -245,10 +248,21 @@ export const siteSettings = z.strictObject({
   seo: z.strictObject({ siteName: localizedText, description: localizedText, image: mediaRef }),
   /** Brand colours; every text/background pair must keep 4.5:1. */
   theme,
-  integrations: z.strictObject({
-    googleAdsId: z.string().regex(/^AW-[0-9]+$/),
-    tawkSrc: httpsUrl,
-  }),
+  /** Third-party tags. The editor shows only the home conversion as editable (src/components/editor/schema-walk.ts). */
+  integrations: z
+    .strictObject({
+      googleAdsId: z.string().regex(/^AW-[0-9]+$/),
+      /** Google Ads `send_to` of the conversion counted each time the home page opens (as on the old site). */
+      googleAdsHomeConversion: z.string().regex(adsConversionPattern, "ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"),
+      tawkSrc: httpsUrl,
+    })
+    .superRefine((value, context) => {
+      // The tag only configures googleAdsId, so a conversion of another account would go nowhere.
+      // Zod runs this after field errors too; a malformed value already has its message.
+      const account = adsConversionPattern.exec(String(value.googleAdsHomeConversion))?.[1];
+      if (account === undefined || account === value.googleAdsId) return;
+      context.addIssue({ code: "custom", path: ["googleAdsHomeConversion"], message: `ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${value.googleAdsId}/…)` });
+    }),
 });
 export type SiteSettings = z.infer<typeof siteSettings>;
 

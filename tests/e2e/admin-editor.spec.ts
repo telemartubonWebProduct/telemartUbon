@@ -25,7 +25,7 @@ test.describe.configure({ mode: "serial" });
 let admin: TestUser;
 let member: TestUser;
 const createdUserIds: string[] = [];
-const documents = ["page:home", "page:contact"];
+const documents = ["page:home", "page:contact", "site"];
 const publishedHeading = content.pages.home.hero.beats[0].heading;
 
 async function clearDrafts() {
@@ -196,6 +196,68 @@ test("viewing follows links inside the site and never leaves it", async ({ page 
   await frame.getByRole("link", { name: /แชตทาง LINE/ }).first().click();
   await expect(page.getByRole("status").filter({ hasText: "หน้าตัวอย่างไม่เปิดลิงก์ออกนอกเว็บ" })).toBeVisible();
   expect(page.frames().some((entry) => entry.url().startsWith("https://lin.ee"))).toBe(false);
+});
+
+test("the editor and its preview load no Google Ads tag and report no conversion", async ({ page }) => {
+  const googleRequests: string[] = [];
+  page.context().on("request", (request) => {
+    if (/(^|\.)(googletagmanager|googleadservices|doubleclick)\.(com|net)$/.test(new URL(request.url()).hostname)) googleRequests.push(request.url());
+  });
+  const tagState = () =>
+    Promise.all(
+      page.frames().map((frame) =>
+        frame.evaluate(() => {
+          const scope = window as unknown as { gtag?: unknown; dataLayer?: unknown[] };
+          return { url: location.pathname, gtag: typeof scope.gtag, queued: scope.dataLayer?.length ?? 0 };
+        }),
+      ),
+    );
+
+  // The preview URL opened on its own, outside the editor.
+  await signIn(page, admin, "/admin/preview/th/home");
+  await expect(page.locator("h1").first()).toBeVisible();
+  await settle(page);
+  expect(await tagState()).toEqual([{ url: "/admin/preview/th/home", gtag: "undefined", queued: 0 }]);
+
+  // The editor, editing and then viewing the home page in its preview.
+  await openEditor(page);
+  await page.getByRole("button", { name: "ดูหน้าเว็บ" }).click();
+  await settle(page);
+  const frames = await tagState();
+  expect(frames.map((frame) => frame.url)).toEqual(["/admin/editor", "/admin/preview/th/home"]);
+  for (const frame of frames) expect(frame, frame.url).toMatchObject({ gtag: "undefined", queued: 0 });
+  expect(googleRequests).toEqual([]);
+});
+
+test("the home conversion is edited in the site settings, only for the site's own Google Ads account", async ({ page }) => {
+  const { googleAdsId, googleAdsHomeConversion } = content.site.integrations;
+  const storedConversion = async () => {
+    const { data, error } = await serviceClient().from("content_drafts").select("body").eq("document_id", "site").maybeSingle();
+    if (error) throw error;
+    return data && (data.body as { integrations: { googleAdsHomeConversion: string } }).integrations.googleAdsHomeConversion;
+  };
+  await signIn(page, admin);
+  await openEditor(page);
+  await page.getByRole("button", { name: "ตั้งค่าทั้งเว็บ" }).click();
+  await page.getByRole("button", { name: /การเชื่อมต่อ/ }).click();
+  const field = page.getByRole("textbox", { name: "Google Ads conversion เมื่อเปิดหน้าแรก (send_to)" });
+  await expect(field).toHaveValue(googleAdsHomeConversion);
+  // The tag and the chat script stay fixed.
+  await expect(page.getByRole("textbox", { name: /Google Ads ID|Tawk/ })).toHaveCount(0);
+
+  await field.fill("AW-1/OtherAccount");
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "invalid", saving);
+  await expect(page.getByText(`ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${googleAdsId}/…)`)).toBeVisible();
+  expect(await storedConversion()).toBeNull();
+
+  await field.fill(`${googleAdsId}/E2eLabel`);
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
+  expect(await storedConversion()).toBe(`${googleAdsId}/E2eLabel`);
+
+  await page.getByRole("button", { name: "ทิ้งร่างของเอกสารนี้" }).click();
+  await page.getByRole("button", { name: "ทิ้งร่าง", exact: true }).click();
+  await expect(field).toHaveValue(googleAdsHomeConversion);
+  await expect.poll(storedConversion, saving).toBeNull();
 });
 
 test("the preview renders the phone layout at phone width", async ({ page }) => {

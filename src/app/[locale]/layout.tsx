@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Anuphan, IBM_Plex_Sans_Thai } from "next/font/google";
 import Script from "next/script";
 
+import { gtagInitScript } from "@/lib/analytics/google-ads";
 import { content } from "@/lib/content";
 import { tx } from "@/lib/content/render";
 import { themeVariables } from "@/lib/content/theme";
@@ -61,10 +62,10 @@ export default async function PublicRootLayout({ children, params }: LayoutProps
       {/* Theme colours from site settings; the default theme adds nothing. */}
       <body className="tm-site" style={themeVariables(content.site.theme)}>
         {children}
-        {/* Google Ads base tag, as on the old site. Conversion events are defined in M5. */}
+        {/* Google Ads base tag, as on the old site; the home page reports its conversion (AdsConversion). */}
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} strategy="afterInteractive" />
         <Script id="gtag-init" strategy="afterInteractive">
-          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${googleAdsId}');`}
+          {gtagInitScript(googleAdsId)}
         </Script>
         {/* Tawk live chat, as on the old site; loaded once the page is idle. */}
         <Script src={tawkSrc} strategy="lazyOnload" />

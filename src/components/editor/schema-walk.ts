@@ -5,8 +5,9 @@ import { hexColor, theme, tone } from "@/lib/content/theme";
 
 // Reads the content schema to decide which editor a field gets. The Mirror
 // editor never hard-codes page fields: any field the schema has can be edited
-// with the control its type calls for, and structure (ids, paths, layout,
-// integrations) stays read-only so the fixed layout and links cannot break.
+// with the control its type calls for, and structure (ids, paths, layout, the
+// Google Ads tag and chat script) stays read-only so the fixed layout and links
+// cannot break and no script can be set from the back office.
 
 type Def = {
   type: string;
@@ -85,7 +86,7 @@ export type FieldKind =
   | "objectList";
 
 /** Structure the editor shows but never changes. */
-const readOnlyKeys = new Set(["id", "path", "source", "src", "width", "height", "kind", "category", "group", "layout", "integrations", "sequence"]);
+const readOnlyKeys = new Set(["id", "path", "source", "src", "width", "height", "kind", "category", "group", "layout", "googleAdsId", "tawkSrc", "sequence"]);
 
 export function isReadOnly(key: string | undefined): boolean {
   return key !== undefined && readOnlyKeys.has(key);

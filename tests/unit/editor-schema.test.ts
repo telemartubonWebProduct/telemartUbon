@@ -58,8 +58,16 @@ describe("every content value has an editor control", () => {
   });
 
   it("keeps structure out of the form", () => {
-    const structural = fields.filter((field) => ["id", "path", "layout", "integrations", "src", "category", "group"].includes(field.key));
+    const structural = fields.filter((field) => ["id", "path", "layout", "googleAdsId", "tawkSrc", "src", "category", "group"].includes(field.key));
     expect(structural).toEqual([]);
+  });
+
+  it("lets Admins change the home conversion of Google Ads, but not the tag or the chat script", () => {
+    const integrations = fields.filter((field) => field.path.slice(0, 2).join("/") === "site/integrations");
+    expect(integrations.map((field) => [field.path.join("/"), field.kind])).toEqual([
+      ["site/integrations", "object"],
+      ["site/integrations/googleAdsHomeConversion", "text"],
+    ]);
   });
 });
 
@@ -83,6 +91,23 @@ describe("field messages and bindings", () => {
     site.contact.lineSales = "javascript:alert(1)";
     const parsed = parseDocument("site", site);
     expect(!parsed.ok && parsed.messages).toEqual(["contact.lineSales: ใช้ลิงก์ที่ขึ้นต้นด้วย https://"]);
+  });
+
+  it("accepts a Google Ads conversion only for the site's own tag", () => {
+    const site = structuredClone(content.site);
+    const { googleAdsId } = site.integrations;
+    site.integrations.googleAdsHomeConversion = `${googleAdsId}/Label_2-x`;
+    expect(parseDocument("site", site).ok).toBe(true);
+
+    const messages = (value: string) => {
+      site.integrations.googleAdsHomeConversion = value;
+      const parsed = parseDocument("site", site);
+      return !parsed.ok && parsed.messages;
+    };
+    expect(messages("AW-1/abc")).toEqual([`integrations.googleAdsHomeConversion: ต้องเป็นบัญชี Google Ads เดียวกับแท็กของเว็บ (${googleAdsId}/…)`]);
+    for (const value of ["", googleAdsId, `${googleAdsId}/`, `${googleAdsId}/a'b`, `'};alert(1);//`]) {
+      expect(messages(value), value).toEqual(["integrations.googleAdsHomeConversion: ใช้รูปแบบ AW-ตัวเลข/รหัส conversion เช่น AW-123456789/AbC-12_x"]);
+    }
   });
 
   it("lists what changed between two versions of a document", () => {

@@ -145,6 +145,7 @@ export const site: SiteSettings = {
   theme: defaultTheme,
   integrations: {
     googleAdsId: "AW-18007307609",
+    googleAdsHomeConversion: "AW-18007307609/51JQCLqnuIYcENnqxopD",
     tawkSrc: "https://embed.tawk.to/67c0738b25eb41190eae9189/1il3s6mmf",
   },
 };
