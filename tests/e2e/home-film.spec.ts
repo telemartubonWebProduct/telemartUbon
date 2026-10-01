@@ -108,7 +108,7 @@ test("reduced motion shows the beats as panels over stills and loads no frames",
   expect(frames).toEqual([]);
 });
 
-test("the page before and after the film starts is the same height, so nothing jumps", async ({ page, browser }) => {
+test("the page before and after the film starts is the same height, so nothing jumps", async ({ page, browser, baseURL }) => {
   const height = (target: Page) =>
     target.evaluate(() => ({ track: document.querySelector<HTMLElement>(".tm-film-track")!.getBoundingClientRect().height, screen: window.innerHeight }));
   await page.goto("/");
@@ -116,6 +116,7 @@ test("the page before and after the film starts is the same height, so nothing j
   const film = await height(page);
   // Without JavaScript the server's stack of panels stays: what visitors see before the film starts.
   const before = await browser.newContext({ javaScriptEnabled: false, viewport: page.viewportSize()! });
+  await blockThirdParty(before, baseURL!);
   const beforePage = await before.newPage();
   await beforePage.goto(page.url());
   const stack = await height(beforePage);
