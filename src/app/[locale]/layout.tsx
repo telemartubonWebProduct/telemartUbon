@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Anuphan, IBM_Plex_Sans_Thai } from "next/font/google";
 import Script from "next/script";
 
+import { fontVariables } from "@/fonts";
 import { gtagInitScript } from "@/lib/analytics/google-ads";
 import { content } from "@/lib/content";
 import { tx } from "@/lib/content/render";
@@ -16,20 +16,8 @@ import "../globals.css";
 // Root layout of the public site. Thai pages are served at the unprefixed URLs
 // through a rewrite in next.config.ts; English pages live under /en. Each page
 // renders its own header and footer (PageShell) so the menu and the language
-// switch know the page they are on.
-const plexThai = IBM_Plex_Sans_Thai({
-  subsets: ["thai", "latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-plex-thai",
-});
-// Display face for headlines, prices and speeds (the preview must load it too).
-const anuphan = Anuphan({
-  subsets: ["thai", "latin"],
-  weight: ["500", "600", "700"],
-  display: "swap",
-  variable: "--font-anuphan",
-});
+// switch know the page they are on. Fonts come from src/fonts, shared with
+// the back office (whose preview must render the same faces).
 
 export const dynamicParams = false;
 
@@ -58,7 +46,7 @@ export default async function PublicRootLayout({ children, params }: LayoutProps
   const { googleAdsId, tawkSrc } = content.site.integrations;
 
   return (
-    <html lang={locale} className={`${plexThai.variable} ${anuphan.variable}`}>
+    <html lang={locale} className={fontVariables}>
       {/* Theme colours from site settings; the default theme adds nothing. */}
       <body className="tm-site" style={themeVariables(content.site.theme)}>
         {children}

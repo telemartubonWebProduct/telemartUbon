@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Thai } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 
+import { fontVariables } from "@/fonts";
 import { content, getMedia } from "@/lib/content";
 
 import "@/styles/tokens.css";
@@ -11,12 +11,6 @@ import "./globals.css";
 // Shown for any unknown URL, in either language: the request carries no
 // usable locale, so the page speaks both. Its links are full page loads (a
 // different root layout), so they are not prefetched.
-const plexThai = IBM_Plex_Sans_Thai({
-  subsets: ["thai", "latin"],
-  weight: ["400", "600"],
-  display: "swap",
-  variable: "--font-plex-thai",
-});
 
 export const metadata: Metadata = {
   title: "ไม่พบหน้านี้ | Page not found",
@@ -25,7 +19,7 @@ export const metadata: Metadata = {
 export default function GlobalNotFound() {
   const logo = getMedia(content.site.brand.logo);
   return (
-    <html lang="th" className={plexThai.variable}>
+    <html lang="th" className={fontVariables}>
       <body className="tm-site">
         <header className="border-b border-tm-line">
           <div className="tm-container flex h-16 items-center">

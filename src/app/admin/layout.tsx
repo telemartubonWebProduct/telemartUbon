@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Anuphan, IBM_Plex_Sans_Thai } from "next/font/google";
 
+import { fontVariables } from "@/fonts";
 import { readSupabasePublicEnv } from "@/lib/env";
 
 import "@/styles/tokens.css";
@@ -8,20 +8,8 @@ import "../globals.css";
 
 // Root layout of the back office. The public site has its own root layout in
 // src/app/[locale], so neither loads the other's fonts, tags or scripts;
-// moving between the two is a full page load.
-const plexThai = IBM_Plex_Sans_Thai({
-  subsets: ["thai", "latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-plex-thai",
-});
-// Display face for headlines, prices and speeds (the preview must load it too).
-const anuphan = Anuphan({
-  subsets: ["thai", "latin"],
-  weight: ["500", "600", "700"],
-  display: "swap",
-  variable: "--font-anuphan",
-});
+// moving between the two is a full page load. Both use the fonts in src/fonts;
+// the editor preview needs the display face too.
 
 export const metadata: Metadata = {
   title: {
@@ -35,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <html lang="th">
       <body>
-        <div className={`${plexThai.variable} ${anuphan.variable} tm-admin`}>
+        <div className={`${fontVariables} tm-admin`}>
           {readSupabasePublicEnv() ? children : <SupabaseNotConfigured />}
         </div>
       </body>
