@@ -99,8 +99,9 @@
 ## คำสั่งเจ้าของหลัง R1 (2026-10-01)
 
 - Google Ads conversion หน้าแรก: เจ้าของสั่งคืนพฤติกรรมเว็บเดิม (commit `9b768a6`) — ยิง `conversion` (`value` 1.0 THB) ครั้งเดียวต่อการเปิดหน้าแรก `/` และ `/en` ทั้งโหลดหน้าใหม่และกดกลับหน้าแรกจากหน้าอื่น หลังแท็กตั้งค่า (`config`) แล้วเสมอ ไม่ยิงในหน้าอื่น, `/admin/preview` และ editor
+- ยิงเฉพาะเมื่อเปิดบนโดเมน production (host ของ `siteUrl()` คือ `www.telemartubon.com`; โดเมนเปล่า redirect 308 ไป www) เครื่อง dev, Vercel Preview และ URL `*.vercel.app` ไม่ยิง เพื่อไม่ให้ตัวเลขใน Google Ads ปนการทดสอบ (เจ้าของเลือก 2026-10-01)
 - ค่า `send_to` อยู่ที่ `site.integrations.googleAdsHomeConversion` แก้ได้ใน Mirror editor (ปุ่ม “ตั้งค่าทั้งเว็บ” › การเชื่อมต่อ) แต่ต้องเป็นรูปแบบ `AW-ตัวเลข/รหัส` ของบัญชีเดียวกับ Google Ads ID ของแท็ก; Google Ads ID และสคริปต์ Tawk ยังแก้จากหลังบ้านไม่ได้ ค่านี้ส่งเข้า `gtag()` เป็นข้อมูล ไม่ได้ต่อเป็นสคริปต์
-- การนับการเปิดหน้าเป็น conversion ยังมีข้อจำกัดตาม CURRENT-SITE-AUDIT.md (นับการเข้าชมธรรมดา รวมเครื่อง dev และ Vercel Preview ที่โหลดแท็กจริง) M5 ยังต้องกำหนด conversion จากการส่งฟอร์ม/คลิกติดต่อ และ consent ตาม PDPA
+- การนับการเปิดหน้าเป็น conversion ยังมีข้อจำกัดตาม CURRENT-SITE-AUDIT.md (นับการเข้าชมธรรมดาเป็น conversion) M5 ยังต้องกำหนด conversion จากการส่งฟอร์ม/คลิกติดต่อ และ consent ตาม PDPA
 
 ## ต้นไม้ของรอบถัดไป (ยังไม่ถามจน prerequisite ชัด)
 

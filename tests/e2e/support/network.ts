@@ -18,6 +18,23 @@ export async function blockThirdParty(context: BrowserContext, baseURL: string):
   reportSlowRequests(context);
 }
 
+/**
+ * Serves the site under test at another origin, such as the production
+ * domain, so behaviour that depends on the hostname can be tested: the server
+ * under test answers every request to that origin, and nothing reaches the
+ * real site. Call it after blockThirdParty, whose route it then overrides.
+ */
+export async function serveAt(context: BrowserContext, baseURL: string, origin: string): Promise<void> {
+  const local = new URL(baseURL).origin;
+  await context.route(
+    (url) => url.origin === origin,
+    async (route) => {
+      const { pathname, search } = new URL(route.request().url());
+      await route.fulfill({ response: await route.fetch({ url: `${local}${pathname}${search}`, maxRedirects: 0 }) });
+    },
+  );
+}
+
 const SLOW_MS = 8_000;
 
 function reportSlowRequests(context: BrowserContext) {

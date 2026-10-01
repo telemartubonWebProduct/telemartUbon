@@ -1,18 +1,23 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { content } from "@/lib/content";
+import { siteUrl } from "@/lib/seo/metadata";
 
-import { blockThirdParty, settle } from "./support/network";
+import { blockThirdParty, serveAt, settle } from "./support/network";
 
-// The home page reports one Google Ads conversion each time it opens, as the
-// old site did (commit 9b768a6). Requests to Google are blocked here, so the
-// calls are read from the tag's queue (window.dataLayer) that gtag.js sends.
+// The home page reports one Google Ads conversion each time it opens on the
+// production domain, as the old site did (commit 9b768a6); previews and
+// development machines report none. The server under test is served at the
+// production origin here, and requests to Google are blocked, so the calls are
+// read from the tag's queue (window.dataLayer) that gtag.js sends.
 // The editor and its preview are covered in admin-editor.spec.ts.
 
 const { googleAdsId, googleAdsHomeConversion } = content.site.integrations;
+const production = siteUrl().origin;
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);
+  await serveAt(context, baseURL!, production);
 });
 
 test.afterEach(async ({ page }) => {
@@ -38,8 +43,8 @@ async function tagConfigured(page: Page) {
 }
 
 for (const path of ["/", "/en"]) {
-  test(`opening ${path} reports one conversion, after the tag is configured`, async ({ page }) => {
-    await page.goto(path);
+  test(`opening ${path} on the production domain reports one conversion, after the tag is configured`, async ({ page }) => {
+    await page.goto(`${production}${path}`);
     await tagConfigured(page);
     const calls = await gtagCalls(page);
     expect(await conversions(page)).toEqual([["event", "conversion", { send_to: googleAdsHomeConversion, value: 1, currency: "THB" }]]);
@@ -56,17 +61,28 @@ for (const path of ["/", "/en"]) {
 
 test("other pages report none, and going home from them counts once", async ({ page }) => {
   for (const path of ["/broadband", "/en/monthy", "/wEnergy"]) {
-    await page.goto(path);
+    await page.goto(`${production}${path}`);
     await tagConfigured(page);
     expect(await conversions(page), path).toEqual([]);
   }
 
   // The logo goes home without reloading the document (client-side navigation).
-  await page.goto("/broadband");
+  await page.goto(`${production}/broadband`);
   await tagConfigured(page);
+  await page.evaluate(() => Object.assign(window, { sameDocument: true }));
   await page.getByRole("banner").getByRole("link").first().click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(`${production}/`);
   await expect.poll(async () => (await conversions(page)).length).toBe(1);
   await settle(page);
   expect(await conversions(page)).toHaveLength(1);
+  expect(await page.evaluate(() => "sameDocument" in window)).toBe(true);
+});
+
+test("elsewhere, such as a preview deployment, the home page reports none", async ({ page }) => {
+  for (const path of ["/", "/en"]) {
+    await page.goto(path);
+    await tagConfigured(page);
+    expect(new URL(page.url()).origin).not.toBe(production);
+    expect(await conversions(page), path).toEqual([]);
+  }
 });
