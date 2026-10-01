@@ -205,6 +205,9 @@ export const uiKeys = [
   "footerContact",
   "filmScenes",
   "filmSkip",
+  "packageDetails",
+  "scrollPrevious",
+  "scrollNext",
 ] as const;
 export type UiKey = (typeof uiKeys)[number];
 
@@ -298,6 +301,24 @@ export const packagePage = z.strictObject({
 });
 export type PackagePage = z.infer<typeof packagePage>;
 
+/** A card of the home page's recommended packages: a catalog package with a picture. */
+const promoItem = z.strictObject({
+  id: stableId,
+  /** Price, speed and terms come from the catalog as they are; the card adds no offer of its own. */
+  packageId: packageRef,
+  image: mediaRef,
+});
+
+const promoTab = z.strictObject({
+  id: stableId,
+  title: localizedText,
+  items: z.array(promoItem).min(1).max(8),
+  /** Under the cards, such as who provides the service. */
+  remark: localizedText.optional(),
+  packageCta: cta,
+  viewAll: cta,
+});
+
 /** One set of words shown over the home film, in turn as visitors scroll. */
 const heroBeat = z.strictObject({
   id: stableId,
@@ -346,18 +367,19 @@ export const homePage = z.strictObject({
           title: localizedText,
           description: localizedText,
           provider: localizedText.optional(),
+          /** Picture behind the tile's words. */
+          image: mediaRef,
           target: linkTarget,
         }),
       )
       .length(4),
     tone,
   }),
-  featured: z.strictObject({
+  /** Recommended packages right after the film: one tab per category, a row of picture cards in each. */
+  promos: z.strictObject({
     heading: localizedText,
     description: localizedText,
-    packageIds: z.array(packageRef).min(1).max(4),
-    packageCta: cta,
-    viewAll: cta,
+    tabs: z.array(promoTab).min(1).max(4),
     tone,
   }),
   mobile: z.strictObject({

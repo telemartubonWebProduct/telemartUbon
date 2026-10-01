@@ -229,6 +229,37 @@ test("the editor and its preview load no Google Ads tag and report no conversion
   expect(googleRequests).toEqual([]);
 });
 
+test("the editor shows every tab of recommended packages, and a card's package can be swapped", async ({ page }) => {
+  const tab = content.pages.home.promos.tabs[1];
+  const card = tab.items[0];
+  const replacement = content.catalog.find(
+    (item) => item.category === "mobile-monthly" && item.review.status !== "hidden" && !tab.items.some((entry) => entry.packageId === item.id),
+  )!;
+  await signIn(page, admin);
+  await openEditor(page);
+  const frame = preview(page);
+  // Stacked, not tabbed, so every card can be clicked.
+  for (const entry of content.pages.home.promos.tabs) {
+    await expect(frame.locator(".tm-promos").getByRole("heading", { level: 3, name: entry.title.th, exact: true })).toBeVisible();
+  }
+  await expect(frame.getByRole("tablist")).toHaveCount(0);
+
+  await frame.locator(`[data-package="${card.packageId}"]`).getByRole("link", { name: /ดูรายละเอียด/ }).click();
+  const picker = page.getByRole("combobox", { name: "แพ็กเกจ", exact: true });
+  await expect(picker).toHaveValue(card.packageId);
+  await picker.selectOption(replacement.id);
+  await expect(frame.locator(`[data-package="${replacement.id}"]`).getByRole("heading", { level: 3 })).toHaveText(replacement.name.th);
+  await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
+  const { data } = await serviceClient().from("content_drafts").select("body").eq("document_id", "page:home").single();
+  const stored = (data!.body as typeof content.pages.home).promos.tabs[1].items[0];
+  expect(stored).toEqual({ ...card, packageId: replacement.id });
+
+  await page.getByRole("button", { name: "ทิ้งร่างของเอกสารนี้" }).click();
+  await page.getByRole("button", { name: "ทิ้งร่าง", exact: true }).click();
+  await expect(frame.locator(`[data-package="${card.packageId}"]`)).toBeVisible();
+  await expect.poll(() => storedDraft("page:home"), saving).toBeNull();
+});
+
 test("the home conversion is edited in the site settings, only for the site's own Google Ads account", async ({ page }) => {
   const { googleAdsId, googleAdsHomeConversion } = content.site.integrations;
   const storedConversion = async () => {
@@ -292,7 +323,13 @@ test("the preview is the public page, pixel for pixel", async ({ browser, baseUR
         await new Promise((resolve) => setTimeout(resolve, 50));
       }
       window.scrollTo(0, 0);
-      await Promise.all(Array.from(document.images, (image) => (image.complete ? null : new Promise((resolve) => (image.onload = image.onerror = resolve)))));
+      // Lazy pictures in closed tabs, or scrolled sideways off screen in a row
+      // of cards, load only when they come into view; neither page shows them.
+      const shown = Array.from(document.images).filter((image) => {
+        const box = image.getBoundingClientRect();
+        return image.checkVisibility() && box.right > 0 && box.left < window.innerWidth;
+      });
+      await Promise.all(shown.map((image) => (image.complete ? null : new Promise((resolve) => (image.onload = image.onerror = resolve)))));
     });
     return (await page.screenshot({ fullPage: true, animations: "disabled" })).toString("base64");
   };

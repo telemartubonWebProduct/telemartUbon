@@ -77,7 +77,7 @@ export type FieldKind =
   | "media"
   | "mediaList"
   | "benefitList"
-  | "packageList"
+  | "package"
   | "target"
   | "cta"
   | "link"
@@ -100,6 +100,7 @@ export function fieldKind(field: ZodType): FieldKind {
   if (schema === link) return "link";
   if (schema === price) return "price";
   if (schema === mediaRef) return "media";
+  if (schema === packageRef) return "package";
   if (schema === tone) return "tone";
   if (schema === hexColor) return "color";
   if (schema === theme) return "theme";
@@ -110,7 +111,6 @@ export function fieldKind(field: ZodType): FieldKind {
       if (element === localizedText) return "localizedList";
       if (element === mediaRef) return "mediaList";
       if (element === benefitRef) return "benefitList";
-      if (element === packageRef) return "packageList";
       if (defOf(element).type === "string") return "textList";
       return "objectList";
     }

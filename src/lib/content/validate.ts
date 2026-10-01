@@ -50,11 +50,22 @@ export function contentProblems(content: SiteContent): string[] {
   anchors.set(pages.solar.path, new Set([pages.solar.packages.id]));
   if (!groupExists("solar", pages.solar.packages.group)) problems.push(`หน้าโซลาร์: ไม่มีแพ็กเกจในกลุ่ม solar/${pages.solar.packages.group}`);
 
-  for (const id of pages.home.featured.packageIds) {
-    const item = catalog.find((entry) => entry.id === id);
-    if (!item) problems.push(`หน้าแรก แพ็กเกจเด่น: ไม่มีแพ็กเกจ "${id}"`);
-    else if (item.review.status === "hidden") problems.push(`หน้าแรก แพ็กเกจเด่น: แพ็กเกจ "${id}" ถูกซ่อนจากหน้าเว็บ`);
+  const tabIds = new Set<string>();
+  for (const tab of pages.home.promos.tabs) {
+    if (tabIds.has(tab.id)) problems.push(`หน้าแรก โปรแนะนำ: แท็บ "${tab.id}" ซ้ำกัน`);
+    tabIds.add(tab.id);
+    const cardIds = new Set<string>();
+    for (const card of tab.items) {
+      const where = `หน้าแรก โปรแนะนำ ${tab.id}`;
+      if (cardIds.has(card.id)) problems.push(`${where}: การ์ด "${card.id}" ซ้ำกัน`);
+      cardIds.add(card.id);
+      const item = catalog.find((entry) => entry.id === card.packageId);
+      if (!item) problems.push(`${where}: ไม่มีแพ็กเกจ "${card.packageId}"`);
+      else if (item.review.status === "hidden") problems.push(`${where}: แพ็กเกจ "${card.packageId}" ถูกซ่อนจากหน้าเว็บ`);
+      needMedia(card.image, `${where} การ์ด ${card.id}`);
+    }
   }
+  for (const item of pages.home.services.items) needMedia(item.image, `หน้าแรก บริการ ${item.id}`);
 
   needMedia(site.brand.logo, "โลโก้");
   needMedia(site.contact.lineQr, "QR ของ LINE");
@@ -89,7 +100,7 @@ export function contentProblems(content: SiteContent): string[] {
   checkLink(site.headerCta.target, "ปุ่มใน header");
   for (const group of site.footer.groups) for (const entry of group.links) checkLink(entry.target, `ส่วนท้าย ${entry.id}`);
   const home = pages.home;
-  for (const cta of [home.hero.primaryCta, home.hero.secondaryCta, home.featured.packageCta, home.featured.viewAll, home.solar.cta]) {
+  for (const cta of [home.hero.primaryCta, home.hero.secondaryCta, home.solar.cta, ...home.promos.tabs.flatMap((tab) => [tab.packageCta, tab.viewAll])]) {
     checkLink(cta.target, `หน้าแรก ปุ่ม ${cta.id}`);
   }
   for (const item of home.services.items) checkLink(item.target, `หน้าแรก บริการ ${item.id}`);

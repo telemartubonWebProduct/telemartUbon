@@ -515,36 +515,28 @@ export function BenefitListField({ value, onChange, ctx, label }: { value: strin
   );
 }
 
-export function PackageListField({ value, onChange, ctx, label }: { value: string[]; onChange: (value: string[]) => void; ctx: FieldContext; label: string }) {
+/** One package from the catalog (hidden ones cannot be chosen), and a way to edit it. */
+export function PackageField({ value, onChange, ctx, label }: { value: string; onChange: (value: string) => void; ctx: FieldContext; label: string }) {
   const visible = ctx.content.catalog.filter((item) => item.review.status !== "hidden");
   const categories = Array.from(new Set(visible.map((item) => item.category)));
   return (
-    <div className="grid gap-2">
-      {value.map((id, index) => (
-        <div key={`${index}-${id}`} className="flex items-center gap-2">
-          <select
-            aria-label={`${label} ${index + 1}`}
-            value={id}
-            onChange={(event) => onChange(value.map((entry, position) => (position === index ? event.target.value : entry)))}
-            className={inputClass}
-          >
-            {categories.map((category) => (
-              <optgroup key={category} label={valueLabel(category)}>
-                {visible
-                  .filter((item) => item.category === category)
-                  .map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name.th}
-                    </option>
-                  ))}
-              </optgroup>
-            ))}
-          </select>
-          <button type="button" className={`${smallButton} shrink-0`} onClick={() => ctx.select(`package:${id}`)}>
-            แก้แพ็กเกจ
-          </button>
-        </div>
-      ))}
+    <div className="flex items-center gap-2">
+      <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)} className={inputClass}>
+        {categories.map((category) => (
+          <optgroup key={category} label={valueLabel(category)}>
+            {visible
+              .filter((item) => item.category === category)
+              .map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name.th}
+                </option>
+              ))}
+          </optgroup>
+        ))}
+      </select>
+      <button type="button" className={`${smallButton} shrink-0`} onClick={() => ctx.select(`package:${value}`)}>
+        แก้แพ็กเกจ
+      </button>
     </div>
   );
 }

@@ -19,7 +19,7 @@ export function EquipmentSection({ ctx }: { ctx: RenderContext }) {
           binds={{ visual: ctx.bind(doc, "equipment", "visual"), note: ctx.bind(doc, "equipment", "visualNote") }}
         />
         <div className="max-w-[34rem] lg:order-first">
-          <h2 id="equipment-heading" className="text-balance text-tm-h1 font-semibold" {...ctx.bind(doc, "equipment", "heading")}>
+          <h2 id="equipment-heading" className="tm-section-title" {...ctx.bind(doc, "equipment", "heading")}>
             {ctx.t(equipment.heading)}
           </h2>
           <p className="mt-4 text-tm-lead text-tm-muted" {...ctx.bind(doc, "equipment", "description")}>

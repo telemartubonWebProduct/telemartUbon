@@ -22,7 +22,7 @@ import {
   MediaField,
   MediaListField,
   NumberField,
-  PackageListField,
+  PackageField,
   PriceField,
   smallButton,
   TargetField,
@@ -245,8 +245,8 @@ function FieldRow({ name, parent, field, path, node }: { name: string; parent?: 
       return frame(<MediaListField value={value as string[]} ctx={ctx} label={label} onChange={set} />);
     case "benefitList":
       return frame(<BenefitListField value={value as string[]} ctx={ctx} label={label} onChange={set} />);
-    case "packageList":
-      return frame(<PackageListField value={value as string[]} ctx={ctx} label={label} onChange={set} />);
+    case "package":
+      return frame(<PackageField value={value as string} ctx={ctx} label={label} onChange={set} />);
     case "target":
       return frame(<TargetField value={value as never} ctx={ctx} label={label} issues={own} onChange={set} />, remove);
     case "cta":

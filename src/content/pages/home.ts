@@ -1,8 +1,18 @@
-import type { HomePage, LinkTarget } from "@/lib/content/schema";
+import type { Cta, HomePage, LinkTarget } from "@/lib/content/schema";
 
 import { t } from "../catalog/helpers";
+import type { MediaId } from "../media";
 
 const page = (path: string, hash?: string): LinkTarget => (hash ? { kind: "page", path, hash } : { kind: "page", path });
+
+const promo = (packageId: string, image: MediaId) => ({ id: packageId, packageId, image });
+
+const interested = (id: string): Cta => ({
+  id,
+  label: t("สนใจแพ็กเกจนี้", "I'm interested"),
+  target: { kind: "contact", channel: "line-sales" },
+  style: "primary",
+});
 
 // Copy follows docs/renovation/FREE-DESIGN-BRIEF.md (hero heading and CTAs)
 // and the old site's section texts; it is draft copy for the owner to edit.
@@ -103,6 +113,7 @@ export const home: HomePage = {
         icon: "router",
         title: t("เน็ตบ้าน ลูกค้าใหม่", "Home internet, new customers"),
         description: t("แพ็กเกจทรูไฟเบอร์พร้อมอุปกรณ์และสิทธิประโยชน์", "True fibre packages with equipment and benefits"),
+        image: "scene-city-fibre",
         target: page("/broadband"),
       },
       {
@@ -110,6 +121,7 @@ export const home: HomePage = {
         icon: "router-upgrade",
         title: t("เน็ตบ้าน ลูกค้าปัจจุบัน", "Home internet, current customers"),
         description: t("เพิ่มสปีด กล้องวงจรปิด และบริการเสริม", "Speed boosts, security cameras and add-ons"),
+        image: "scene-smart-home",
         target: page("/broadband-old"),
       },
       {
@@ -117,6 +129,7 @@ export const home: HomePage = {
         icon: "phone",
         title: t("เน็ตมือถือ", "Mobile packages"),
         description: t("แพ็กเสริมรายเดือนและเติมเงิน ทั้งเน็ต โทร และความบันเทิง", "Postpaid and prepaid add-ons for data, calls and entertainment"),
+        image: "people-phone-city",
         target: page("/monthy"),
       },
       {
@@ -125,31 +138,102 @@ export const home: HomePage = {
         title: t("โซลาร์เซลล์", "Rooftop solar"),
         description: t("สำรวจ ออกแบบ และติดตั้งโซลาร์เซลล์บนหลังคา", "Survey, design and rooftop installation"),
         provider: t("บริการของ W&W Energy", "A W&W Energy service"),
+        image: "solar-aerial",
         target: page("/wEnergy"),
       },
     ],
     tone: "canvas",
   },
-  featured: {
-    heading: t("แพ็กเกจเน็ตบ้านลูกค้าใหม่", "Home internet for new customers"),
+  promos: {
+    heading: t("โปรแนะนำ", "Recommended packages"),
     description: t(
-      "ทุกแพ็กเกจเรียงข้อมูลแบบเดียวกัน เทียบความเร็ว ราคา และสิทธิประโยชน์ได้ในแถวเดียว",
-      "Every package lists the same details in the same order, so speed, price and benefits line up.",
+      "เลือกหมวด แล้วเลื่อนดูแพ็กเกจที่เราแนะนำ ทักเจ้าหน้าที่เพื่อยืนยันราคาและเงื่อนไขล่าสุดก่อนสมัคร",
+      "Pick a category and scroll through the packages we recommend. Message our team to confirm the latest price and terms before you sign up.",
     ),
-    packageIds: ["fiber-500-499", "fiber-700-599", "fiber-1g-799"],
-    packageCta: {
-      id: "home-package-interest",
-      label: t("สนใจแพ็กเกจนี้", "I'm interested"),
-      target: { kind: "contact", channel: "line-sales" },
-      style: "primary",
-    },
-    viewAll: {
-      id: "home-all-broadband",
-      label: t("ดูแพ็กเกจเน็ตบ้านทั้งหมด", "See all home internet packages"),
-      target: page("/broadband"),
-      style: "secondary",
-    },
-    tone: "surface",
+    // Packages straight from the catalog; the cards show their price and terms as the catalog has them.
+    tabs: [
+      {
+        id: "broadband",
+        title: t("เน็ตบ้าน", "Home internet"),
+        items: [
+          promo("fiber-500-499", "scene-living-room-wifi"),
+          promo("fiber-700-599", "scene-city-fibre"),
+          promo("fiber-1g-799", "scene-gamers-neon"),
+          promo("fiber-500-650-cctv", "scene-smart-home"),
+          promo("fiber-500-999-netflix", "people-tablet-home"),
+          promo("fiber-1500-1199", "scene-data-glow"),
+        ],
+        packageCta: interested("home-package-interest"),
+        viewAll: {
+          id: "home-all-broadband",
+          label: t("ดูแพ็กเกจเน็ตบ้านทั้งหมด", "See all home internet packages"),
+          target: page("/broadband"),
+          style: "secondary",
+        },
+      },
+      {
+        id: "monthly",
+        title: t("มือถือรายเดือน", "Postpaid mobile"),
+        items: [
+          promo("m-boost-60gb", "people-phone-city"),
+          promo("m-unlimited-7d", "people-street-backpack"),
+          promo("m-social-4-apps", "people-phone-violet"),
+          promo("m-asian-combo-179", "people-laptop-lights"),
+          promo("m-up2u-true-coffee", "people-night-market"),
+          promo("m-call-200", "people-smile-home"),
+        ],
+        remark: t("แพ็กเสริมสำหรับลูกค้ามือถือรายเดือน", "Add-ons for postpaid mobile customers"),
+        packageCta: interested("home-monthly-interest"),
+        viewAll: {
+          id: "home-all-monthly",
+          label: t("ดูแพ็กเสริมรายเดือนทั้งหมด", "See all postpaid add-ons"),
+          target: page("/monthy"),
+          style: "secondary",
+        },
+      },
+      {
+        id: "prepaid",
+        title: t("เติมเงิน", "Prepaid"),
+        items: [
+          promo("p-net-20mbps", "people-phone-neon"),
+          promo("p-net-10mbps", "people-toy-shop"),
+          promo("p-net-call-6mbps", "people-laptop-orange"),
+          promo("p-call-200", "people-smile-home"),
+          promo("p-game-prohub", "scene-gamers-neon"),
+        ],
+        remark: t("แพ็กเสริมสำหรับลูกค้ามือถือเติมเงิน", "Add-ons for prepaid mobile customers"),
+        packageCta: interested("home-prepaid-interest"),
+        viewAll: {
+          id: "home-all-prepaid",
+          label: t("ดูแพ็กเสริมเติมเงินทั้งหมด", "See all prepaid add-ons"),
+          target: page("/topup"),
+          style: "secondary",
+        },
+      },
+      {
+        id: "solar",
+        title: t("โซลาร์เซลล์", "Solar"),
+        items: [
+          promo("solar-3kwp", "solar-rooftop"),
+          promo("solar-5kwp", "solar-aerial"),
+          promo("solar-10kwp", "solar-rooftop"),
+        ],
+        remark: t("บริการของ W&W Energy แยกจากแพ็กเกจของทรู", "A W&W Energy service, separate from True's packages"),
+        packageCta: {
+          id: "home-solar-interest",
+          label: t("สอบถามแพ็กเกจนี้", "Ask about this package"),
+          target: { kind: "contact", channel: "line-sales" },
+          style: "primary",
+        },
+        viewAll: {
+          id: "home-all-solar",
+          label: t("ดูรายละเอียดโซลาร์เซลล์", "See solar details"),
+          target: page("/wEnergy", "solar"),
+          style: "secondary",
+        },
+      },
+    ],
+    tone: "ink",
   },
   mobile: {
     heading: t("แพ็กเสริมเน็ตมือถือ", "Mobile add-ons"),

@@ -17,6 +17,14 @@ function asset(
   return { src, width, height, kind, alt: { th, en }, source: `${legacy}${src.slice(1)}` };
 }
 
+/** An old-site picture that looks AI-generated; nobody recorded where it came from. */
+function generated(src: string, width: number, height: number, th: string, en: string): MediaAsset {
+  return {
+    ...asset(src, width, height, "generated", th, en),
+    source: `${legacy}${src.slice(1)} (ลักษณะเป็นภาพสร้างด้วย AI ไม่มีบันทึกที่มา เจ้าของต้องยืนยันสิทธิ์ใช้งาน)`,
+  };
+}
+
 export const media = {
   // Brand
   "telemart-logo": asset("/logo.webp", 258, 92, "brand", "เทเลมาร์ท คอมมิวนิเคชั่น", "Telemart Communication"),
@@ -179,6 +187,116 @@ export const media = {
     },
     source: "สร้างจาก logo.webp และ router-concept.svg (scripts/media/og-image.mjs)",
   },
+
+  // Supporting pictures for the home page's offer cards and service tiles (R2),
+  // until the S1–S8 illustrations briefed for Google Flow arrive. Scenes and
+  // people only, never a product: the old site used them as decoration, they
+  // look AI-generated and carry no text, prices or logos.
+  "scene-living-room-wifi": generated(
+    "/assets/HomeInternet/home-tol-newcustomer.webp",
+    721,
+    405,
+    "ห้องนั่งเล่นยามค่ำที่มีสัญลักษณ์ Wi-Fi เรืองแสงรอบห้อง",
+    "Living room at night with glowing Wi-Fi symbols around it",
+  ),
+  "scene-smart-home": generated(
+    "/assets/HomeInternet/home-tol-customer.webp",
+    721,
+    405,
+    "ไอคอนบ้านอัจฉริยะและอุปกรณ์ในบ้านลอยเหนือโทรศัพท์บนโต๊ะ",
+    "Smart-home icons floating above a phone on a table",
+  ),
+  "scene-gamers-neon": generated(
+    "/assets/backgrounds/bgWifiHome.jpg",
+    1344,
+    768,
+    "กลุ่มวัยรุ่นในแสงนีออนสีชมพู",
+    "Young people in pink neon light",
+  ),
+  "scene-city-fibre": generated(
+    "/assets/backgrounds/bgWifiHome2.jpg",
+    1344,
+    768,
+    "เมืองยามค่ำคืนที่มีเส้นแสงพาดผ่านเหมือนสายไฟเบอร์",
+    "City at night crossed by a line of light like a fibre cable",
+  ),
+  "scene-data-glow": generated(
+    "/assets/backgrounds/bgWiifiHome3.jpg",
+    1344,
+    768,
+    "ใบหน้าผู้หญิงในแสงสีแดงจากหน้าจอข้อมูล",
+    "A woman's face lit red by screens of data",
+  ),
+  "people-phone-violet": generated(
+    "/assets/PackagePlan/Monthly/thumb-01.webp",
+    528,
+    297,
+    "หญิงสาวใส่แจ็กเก็ตสีส้มกำลังใช้โทรศัพท์",
+    "Young woman in an orange jacket using her phone",
+  ),
+  "people-laptop-orange": generated(
+    "/assets/PackagePlan/Monthly/thumb-02.webp",
+    528,
+    297,
+    "หญิงสาวยิ้มหน้าแล็ปท็อป",
+    "Young woman smiling at her laptop",
+  ),
+  "people-laptop-lights": generated(
+    "/assets/PackagePlan/Monthly/thumb-03.webp",
+    528,
+    297,
+    "หญิงสาวดูแล็ปท็อปในห้องที่มีไฟประดับ",
+    "Young woman watching her laptop in a room with string lights",
+  ),
+  "people-phone-city": generated(
+    "/assets/PackagePlan/Monthly/thumb-04.webp",
+    528,
+    297,
+    "หญิงสาวถือโทรศัพท์ในเมืองยามค่ำ",
+    "Young woman holding her phone in the city at night",
+  ),
+  "people-street-backpack": generated(
+    "/assets/imgAiPromote/ai-cardSection.webp",
+    1024,
+    1024,
+    "ชายหนุ่มสะพายเป้ยิ้มบนถนน",
+    "Young man with a backpack smiling on a street",
+  ),
+  "people-night-market": generated(
+    "/assets/imgAiPromote/ai-cardSection2.webp",
+    1024,
+    1024,
+    "หญิงสาวใช้โทรศัพท์ในตลาดกลางคืน",
+    "Young woman using her phone at a night market",
+  ),
+  "people-tablet-home": generated(
+    "/assets/imgAiPromote/ai-cardSection3.webp",
+    1024,
+    1024,
+    "ชายหนุ่มดูแท็บเล็ตในห้องนั่งเล่นยามค่ำ",
+    "Young man watching a tablet in a living room at night",
+  ),
+  "people-toy-shop": generated(
+    "/assets/imgAiPromote/ai-cardSection4.webp",
+    1024,
+    1024,
+    "หญิงสาวยิ้มถือโทรศัพท์ในร้านของเล่น",
+    "Young woman smiling with her phone in a toy shop",
+  ),
+  "people-smile-home": generated(
+    "/assets/imgAiPromote/ai-cardSection5.webp",
+    1024,
+    1024,
+    "ชายหนุ่มใส่แว่นยิ้มในบ้าน",
+    "Young man in glasses smiling at home",
+  ),
+  "people-phone-neon": generated(
+    "/assets/imgAiPromote/ai-cardSection6.webp",
+    1024,
+    1024,
+    "หญิงสาวถือโทรศัพท์ท่ามกลางแสงไฟเมือง",
+    "Young woman with her phone among city lights",
+  ),
 
   // Apply with an agent
   "agent-support": asset(

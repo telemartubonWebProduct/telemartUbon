@@ -9,9 +9,11 @@ import { contentProblems } from "./validate";
 
 /**
  * Version of the content schema that drafts are written for. 2: the home
- * opening became a scroll film with beats, and the router moved to its own section.
+ * opening became a scroll film with beats, and the router moved to its own
+ * section. 3: the home page's featured packages became tabs of picture cards
+ * (promos), and service tiles have pictures.
  */
-export const CONTENT_SCHEMA_VERSION = 2;
+export const CONTENT_SCHEMA_VERSION = 3;
 
 export type DraftRecord = {
   documentId: DocumentId;

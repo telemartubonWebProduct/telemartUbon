@@ -47,7 +47,7 @@ describe("every content value has an editor control", () => {
 
   it("covers every kind of value the pages use", () => {
     const kinds = new Set(fields.map((field) => field.kind));
-    for (const kind of ["localized", "localizedList", "textList", "text", "number", "boolean", "enum", "tone", "theme", "media", "mediaList", "benefitList", "packageList", "target", "cta", "link", "price", "object", "objectList"] as const) {
+    for (const kind of ["localized", "localizedList", "textList", "text", "number", "boolean", "enum", "tone", "theme", "media", "mediaList", "benefitList", "package", "target", "cta", "link", "price", "object", "objectList"] as const) {
       expect(kinds, kind).toContain(kind);
     }
   });
@@ -133,7 +133,7 @@ describe("field messages and bindings", () => {
 
   it("finds where shared pictures and packages appear", () => {
     expect(mediaUsage(content, content.site.brand.logo)).toContain("site/brand/logo");
-    const featured = content.pages.home.featured.packageIds[0];
+    const featured = content.pages.home.promos.tabs[0].items[0].packageId;
     expect(packagePages(content, featured)).toContain("home");
   });
 });

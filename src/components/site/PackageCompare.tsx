@@ -11,14 +11,14 @@ import { CtaLink } from "./links";
 type Speed = NonNullable<CatalogPackage["speed"]>["download"];
 type Binding = { "data-edit"?: string };
 
-function speedText({ download, upload }: NonNullable<CatalogPackage["speed"]>, locale: Locale) {
+export function speedText({ download, upload }: NonNullable<CatalogPackage["speed"]>, locale: Locale) {
   const value = (speed: Speed) => formatNumber(speed.value, locale);
   return download.unit === upload.unit
     ? { figure: `${value(download)}/${value(upload)}`, unit: upload.unit }
     : { figure: `${value(download)} ${download.unit}/${value(upload)}`, unit: upload.unit };
 }
 
-function PriceBlock({ ctx, price, size }: { ctx: RenderContext; price: Price; size: "large" | "medium" }) {
+export function PriceBlock({ ctx, price, size }: { ctx: RenderContext; price: Price; size: "large" | "medium" }) {
   const { ui } = ctx.site;
   const unit = price.per === "month" ? ui.perMonth : ui.baht;
   const vat = price.vat === "excluded" ? ui.vatExcluded : price.vat === "included" ? ui.vatIncluded : null;

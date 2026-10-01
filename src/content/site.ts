@@ -132,6 +132,9 @@ export const site: SiteSettings = {
     footerContact: t("ติดต่อ", "Contact"),
     filmScenes: t("ฉากในหนังเปิดหน้า", "Scenes of the opening film"),
     filmSkip: t("ข้ามไปเนื้อหาถัดไป", "Skip to the next section"),
+    packageDetails: t("ดูรายละเอียด", "See details"),
+    scrollPrevious: t("เลื่อนไปการ์ดก่อนหน้า", "Scroll to the previous cards"),
+    scrollNext: t("เลื่อนไปการ์ดถัดไป", "Scroll to the next cards"),
   },
   seo: {
     siteName: t("เทเลมาร์ท อุบล", "Telemart Ubon"),

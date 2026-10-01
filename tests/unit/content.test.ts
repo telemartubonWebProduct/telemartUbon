@@ -29,12 +29,14 @@ describe("site content", () => {
   it("reports broken references instead of rendering around them", () => {
     const broken: SiteContent = structuredClone(content);
     broken.catalog[0].benefits.push("no-such-benefit");
-    broken.pages.home.featured.packageIds = ["no-such-package"];
+    broken.pages.home.promos.tabs[0].items[0].packageId = "no-such-package";
+    broken.pages.home.promos.tabs[0].items[1].image = "no-such-picture";
     broken.pages.home.mobile.columns[0].links[0].target = { kind: "page", path: "/monthy", hash: "no-such-section" };
     expect(contentProblems(broken)).toEqual(
       expect.arrayContaining([
         expect.stringContaining('ไม่มีสิทธิประโยชน์ "no-such-benefit"'),
         expect.stringContaining('ไม่มีแพ็กเกจ "no-such-package"'),
+        expect.stringContaining('ไม่มีรูป "no-such-picture"'),
         expect.stringContaining('หน้า "/monthy" ไม่มีหมวด #no-such-section'),
       ]),
     );

@@ -124,15 +124,18 @@ describe("autosave", () => {
   it("saves a document again once the document that blocked it is fixed", async () => {
     const save = serverSaves();
     const store = makeStore(save);
-    const featured = content.pages.home.featured.packageIds[0];
-    // Hiding a featured package is refused while the home page still features it.
+    const [tab] = content.pages.home.promos.tabs;
+    const card = tab.items[0];
+    const featured = card.packageId;
+    // Hiding a package is refused while a card of the home page still shows it.
     store.edit(`package:${featured}`, ["review", "status"], "hidden");
     await vi.advanceTimersByTimeAsync(800);
     expect(store.metaOf(`package:${featured}`).status).toBe("invalid");
     expect(save).not.toHaveBeenCalled();
 
-    const others = content.catalog.filter((item) => item.review.status !== "hidden" && item.id !== featured && item.category === "broadband-new");
-    store.edit("page:home", ["featured", "packageIds"], content.pages.home.featured.packageIds.map((id) => (id === featured ? others.find((item) => !content.pages.home.featured.packageIds.includes(item.id))!.id : id)));
+    const shown = new Set(tab.items.map((entry) => entry.packageId));
+    const other = content.catalog.find((item) => item.review.status !== "hidden" && item.category === "broadband-new" && !shown.has(item.id))!;
+    store.edit("page:home", ["promos", "tabs", tab.id, "items", card.id, "packageId"], other.id);
     // Fake timers run a zero-delay timer set during a tick one millisecond later.
     await vi.advanceTimersByTimeAsync(810);
     expect(save.mock.calls.map((call) => call[0].documentId)).toEqual(["page:home", `package:${featured}`]);

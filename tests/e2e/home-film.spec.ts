@@ -82,7 +82,7 @@ test("scene links and the skip link move through the film", async ({ page }) => 
   await page.locator(`[data-film-scene='${beats.length - 1}']`).click();
   await expect.poll(() => beatOpacities(page).then((opacities) => opacities.at(-1)), { timeout: 5_000 }).toBe(1);
   await page.locator(".tm-film-skip").click();
-  await expect(page.locator("#featured-heading")).toBeInViewport();
+  await expect(page.locator("#promos-heading")).toBeInViewport();
 });
 
 test("phones get the portrait frames", async ({ page, isMobile }) => {
