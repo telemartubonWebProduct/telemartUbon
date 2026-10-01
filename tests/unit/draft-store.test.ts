@@ -5,7 +5,7 @@ import { content } from "@/lib/content";
 import { CONTENT_SCHEMA_VERSION, type DraftRecord } from "@/lib/content/draft-model";
 import type { SaveOutcome } from "@/lib/content/drafts";
 
-const heading = ["hero", "heading"];
+const heading = ["equipment", "heading"];
 
 /** A server that keeps one revision per document, like content_drafts. */
 function serverSaves() {
@@ -29,7 +29,7 @@ function makeStore(save: SaveAction, options: { discard?: DiscardAction } = {}) 
   });
 }
 
-const homeHeading = (store: DraftStore) => store.getSnapshot().content.pages.home.hero.heading;
+const homeHeading = (store: DraftStore) => store.getSnapshot().content.pages.home.equipment.heading;
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -74,7 +74,7 @@ describe("autosave", () => {
     }
     await vi.advanceTimersByTimeAsync(800);
     expect(save).toHaveBeenCalledTimes(1);
-    expect((save.mock.calls[0][0].body as typeof content.pages.home).hero.heading.en).toBe("New");
+    expect((save.mock.calls[0][0].body as typeof content.pages.home).equipment.heading.en).toBe("New");
   });
 
   it("saves changes made during a save once that save is confirmed", async () => {
@@ -112,7 +112,7 @@ describe("autosave", () => {
     expect(save).not.toHaveBeenCalled();
     const meta = store.metaOf("page:home");
     expect(meta.status).toBe("invalid");
-    expect(meta.issues).toEqual([{ path: ["hero", "heading", "en"], message: "ต้องกรอกข้อความ" }]);
+    expect(meta.issues).toEqual([{ path: ["equipment", "heading", "en"], message: "ต้องกรอกข้อความ" }]);
     expect(store.hasUnsaved()).toBe(true);
 
     store.edit("page:home", [...heading, "en"], "Fixed");
@@ -164,7 +164,7 @@ describe("conflicts", () => {
   });
 
   it("stops saving the document until the Admin keeps their version", async () => {
-    const other = { ...content.pages.home, hero: { ...content.pages.home.hero, heading: { th: "ของอีกคน", en: "Theirs" } } };
+    const other = { ...content.pages.home, equipment: { ...content.pages.home.equipment, heading: { th: "ของอีกคน", en: "Theirs" } } };
     const save = vi
       .fn<SaveAction>()
       .mockResolvedValueOnce({ ok: false, reason: "conflict", current: theirs(other) })
@@ -188,7 +188,7 @@ describe("conflicts", () => {
   });
 
   it("can continue from the other Admin's version instead", async () => {
-    const other = { ...content.pages.home, hero: { ...content.pages.home.hero, heading: { th: "ของอีกคน", en: "Theirs" } } };
+    const other = { ...content.pages.home, equipment: { ...content.pages.home.equipment, heading: { th: "ของอีกคน", en: "Theirs" } } };
     const save = vi.fn<SaveAction>().mockResolvedValue({ ok: false, reason: "conflict", current: theirs(other) });
     const store = makeStore(save);
     const previews: unknown[] = [];
@@ -199,14 +199,14 @@ describe("conflicts", () => {
     store.takeTheirs("page:home");
     expect(homeHeading(store)).toEqual({ th: "ของอีกคน", en: "Theirs" });
     expect(store.metaOf("page:home")).toMatchObject({ status: "saved", revision: 4 });
-    expect(previews.at(-1)).toMatchObject({ hero: { heading: { en: "Theirs" } } });
+    expect(previews.at(-1)).toMatchObject({ equipment: { heading: { en: "Theirs" } } });
     expect(store.hasUnsaved()).toBe(false);
   });
 });
 
 describe("discarding", () => {
   it("throws the draft away on the server and shows the published document", async () => {
-    const edited = { ...content.pages.home, hero: { ...content.pages.home.hero, heading: { th: "ร่าง", en: "Draft" } } };
+    const edited = { ...content.pages.home, equipment: { ...content.pages.home.equipment, heading: { th: "ร่าง", en: "Draft" } } };
     const discard = vi.fn<DiscardAction>(async () => ({ ok: true }));
     const store = new DraftStore({
       published: content,
@@ -219,7 +219,7 @@ describe("discarding", () => {
 
     await expect(store.discard("page:home")).resolves.toEqual({ ok: true });
     expect(discard).toHaveBeenCalledWith({ documentId: "page:home", expectedRevision: 3 });
-    expect(homeHeading(store)).toEqual(content.pages.home.hero.heading);
+    expect(homeHeading(store)).toEqual(content.pages.home.equipment.heading);
     expect(store.metaOf("page:home").revision).toBe(0);
   });
 
@@ -229,7 +229,7 @@ describe("discarding", () => {
     store.edit("page:home", [...heading, "en"], "Unsaved");
     await store.discard("page:home");
     expect(discard).not.toHaveBeenCalled();
-    expect(homeHeading(store)).toEqual(content.pages.home.hero.heading);
+    expect(homeHeading(store)).toEqual(content.pages.home.equipment.heading);
     await vi.advanceTimersByTimeAsync(2000);
     expect(store.hasUnsaved()).toBe(false);
   });

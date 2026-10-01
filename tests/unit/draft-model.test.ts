@@ -18,15 +18,15 @@ const home = content.pages.home;
 
 describe("applying drafts", () => {
   it("renders valid drafts over the published content", () => {
-    const edited = { ...home, hero: { ...home.hero, heading: { th: "หัวเรื่องใหม่", en: "A new heading" } } };
+    const edited = { ...home, equipment: { ...home.equipment, heading: { th: "หัวเรื่องใหม่", en: "A new heading" } } };
     const { content: result, problems } = applyDrafts(content, [draft("page:home", edited)]);
     expect(problems).toEqual([]);
-    expect(result.pages.home.hero.heading.en).toBe("A new heading");
+    expect(result.pages.home.equipment.heading.en).toBe("A new heading");
     expect(result.pages.solar).toBe(content.pages.solar);
   });
 
   it("leaves out drafts that no longer fit, and says why", () => {
-    const missingEnglish = { ...home, hero: { ...home.hero, heading: { th: "มีแต่ไทย", en: "" } } };
+    const missingEnglish = { ...home, equipment: { ...home.equipment, heading: { th: "มีแต่ไทย", en: "" } } };
     const brokenLink = { ...home, solar: { ...home.solar, image: "no-such-image" } };
     const { content: result, problems } = applyDrafts(content, [
       draft("page:home", missingEnglish),
@@ -36,7 +36,7 @@ describe("applying drafts", () => {
     ]);
     expect(result).toBe(content);
     expect(problems.map((problem) => problem.documentId)).toEqual(["page:home", "page:solar", "package:no-such-package", "page:home"]);
-    expect(problems[0].messages[0]).toContain("hero.heading.en");
+    expect(problems[0].messages[0]).toContain("equipment.heading.en");
     expect(problems[0].messages[0]).toContain("ต้องกรอกข้อความ");
     expect(problems[3].messages[0]).toContain('ไม่มีรูป "no-such-image"');
   });

@@ -59,7 +59,8 @@ export function contentProblems(content: SiteContent): string[] {
   needMedia(site.brand.logo, "โลโก้");
   needMedia(site.contact.lineQr, "QR ของ LINE");
   needMedia(site.seo.image, "รูปสำหรับแชร์ของเว็บ");
-  needMedia(pages.home.hero.visual, "หน้าแรก ส่วนเปิดหน้า");
+  needMedia(pages.home.hero.film, "หน้าแรก หนังเปิดหน้า");
+  needMedia(pages.home.equipment.visual, "หน้าแรก อุปกรณ์");
   needMedia(pages.home.solar.image, "หน้าแรก โซลาร์เซลล์");
   needMedia(pages.solar.hero.image, "หน้าโซลาร์ ส่วนเปิดหน้า");
   needMedia(pages.solar.about.image, "หน้าโซลาร์ เกี่ยวกับ");

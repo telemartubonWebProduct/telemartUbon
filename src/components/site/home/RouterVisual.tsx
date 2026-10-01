@@ -16,13 +16,13 @@ type RouterVisualProps = {
 };
 
 /**
- * The hero's one bold element. The poster is the image visitors see first and
- * whenever the 3D model cannot run; the frame keeps its size either way, so the
- * text and calls to action beside it never move.
+ * The router, large. The poster is the image visitors see first and whenever
+ * the 3D model cannot run; the frame keeps its size either way, so the text
+ * beside it never moves.
  */
 export function RouterVisual({ poster, alt, note, interactive = true, binds = {} }: RouterVisualProps) {
   const image = (
-    <Image src={poster.src} alt={alt} fill preload sizes="(min-width: 1024px) 50vw, 100vw" className="tm-reveal object-contain" />
+    <Image src={poster.src} alt={alt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-contain" />
   );
   return (
     <figure className="w-full">

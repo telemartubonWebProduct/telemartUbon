@@ -26,7 +26,7 @@ let admin: TestUser;
 let member: TestUser;
 const createdUserIds: string[] = [];
 const documents = ["page:home", "page:contact"];
-const publishedHeading = content.pages.home.hero.heading;
+const publishedHeading = content.pages.home.hero.beats[0].heading;
 
 async function clearDrafts() {
   const { error } = await serviceClient().from("content_drafts").delete().in("document_id", documents);
@@ -36,7 +36,7 @@ async function clearDrafts() {
 async function storedDraft(documentId: string) {
   const { data, error } = await serviceClient().from("content_drafts").select("body, revision").eq("document_id", documentId).maybeSingle();
   if (error) throw error;
-  return data as { body: { hero?: { heading?: { th: string; en: string } } }; revision: number } | null;
+  return data as { body: { hero?: { beats?: { heading: { th: string; en: string } }[] } }; revision: number } | null;
 }
 
 test.beforeAll(async () => {
@@ -110,7 +110,7 @@ test("an edit shows in the preview at once, autosaves, survives a reload and sta
   await thai.fill(marker);
   await expect(frame.locator("h1").first()).toHaveText(marker);
   await expect(saveStatus(page)).toHaveAttribute("data-save-status", "saved", saving);
-  expect((await storedDraft("page:home"))?.body.hero?.heading?.th).toBe(marker);
+  expect((await storedDraft("page:home"))?.body.hero?.beats?.[0]?.heading.th).toBe(marker);
 
   await page.reload();
   await expect(preview(page).locator("h1").first()).toHaveText(marker);
@@ -154,7 +154,7 @@ test("a save from another session is caught as a conflict instead of being overw
   await second.page.getByRole("textbox", { name: "หัวเรื่อง ไทย" }).fill("ฉบับที่สอง ซึ่งเปิดไว้ก่อนหน้า");
   await expect(saveStatus(second.page)).toHaveAttribute("data-save-status", "conflict", saving);
   await expect(second.page.getByRole("alert").filter({ hasText: "ผู้ดูแลอีกคนบันทึกเอกสารนี้" })).toBeVisible();
-  expect((await storedDraft("page:home"))?.body.hero?.heading?.th).toBe(theirs);
+  expect((await storedDraft("page:home"))?.body.hero?.beats?.[0]?.heading.th).toBe(theirs);
 
   await second.page.getByRole("button", { name: "ใช้ฉบับล่าสุดในระบบ (ทิ้งที่ฉันแก้)" }).click();
   await expect(second.page.getByRole("textbox", { name: "หัวเรื่อง ไทย" })).toHaveValue(theirs);
@@ -204,7 +204,11 @@ test("the preview renders the phone layout at phone width", async ({ page }) => 
 });
 
 test("the preview is the public page, pixel for pixel", async ({ browser, baseURL }) => {
-  // Reduced motion keeps the 3D hero on its poster in both, so the shots are stable.
+  // Six full-page shots of long pages (the home film's panels alone are three
+  // screens) and three comparisons outgrow the default timeout on a cold server.
+  test.setTimeout(120_000);
+  // Reduced motion keeps the home film as panels and the 3D router on its
+  // poster in both, so the shots are stable.
   const context = await browser.newContext({ locale: "th-TH", viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
   await blockThirdParty(context, baseURL!);
   const page = await context.newPage();

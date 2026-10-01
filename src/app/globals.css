@@ -36,6 +36,7 @@
 /* Public site (src/app/[locale]), built on the same tokens. */
 @layer components {
   .tm-site {
+    --tm-header-height: 4rem;
     --tm-font-sans: var(--font-plex-thai), "IBM Plex Sans Thai", Tahoma, sans-serif;
     --tm-font-display: var(--font-anuphan), "Anuphan", var(--tm-font-sans);
     /* The theme's own colours, kept for elements that sit on the film or a
@@ -49,6 +50,12 @@
     font-size: var(--tm-text-body);
     line-height: var(--tm-leading-body);
     -webkit-font-smoothing: antialiased;
+  }
+
+  @media (min-width: 1024px) {
+    .tm-site {
+      --tm-header-height: 4.5rem;
+    }
   }
 
   .tm-site :focus-visible {
@@ -237,25 +244,441 @@
     transform: rotate(45deg);
   }
 
-  @keyframes tm-reveal {
-    from {
-      opacity: 0;
-      transform: translateY(0.75rem) scale(0.98);
+  /* Header: frosted glass, so the home film runs under it. */
+  .tm-header {
+    background: color-mix(in srgb, var(--tm-color-canvas) 84%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--tm-color-line) 75%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    backdrop-filter: blur(18px) saturate(1.5);
+  }
+
+  /* Home film (src/components/site/home/FilmHero.tsx, docs/renovation/R1-HOME-FILM.md).
+     The markup is a stack of panels, one per beat, each over a still of the
+     film: the layout without JavaScript, with reduced motion and in the
+     editor. FilmPlayer sets data-film-live to play the film instead. Both
+     layouts are --beats × 150svh tall, so nothing below moves when it does. */
+  .tm-film {
+    --tm-film-bar-space: 14rem;
+    position: relative;
+    isolation: isolate;
+    margin-top: calc(-1 * var(--tm-header-height));
+    background: var(--tm-color-surface);
+  }
+
+  .tm-film-media {
+    display: none;
+  }
+
+  .tm-film-beats {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tm-film-beat {
+    position: relative;
+    height: 150svh;
+  }
+
+  .tm-film-frame {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100svh;
+    overflow: hidden;
+    padding-top: var(--tm-header-height);
+    padding-bottom: var(--tm-film-bar-space);
+  }
+
+  .tm-film-still,
+  .tm-film-poster,
+  .tm-film-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .tm-film-canvas {
+    opacity: 0;
+    transition: opacity 400ms var(--tm-ease-out);
+  }
+
+  .tm-film-canvas[data-ready] {
+    opacity: 1;
+  }
+
+  /* Scrims keep the words readable on any frame: light behind dark words,
+     navy behind white ones, strongest where the words sit. */
+  .tm-film-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to bottom, color-mix(in srgb, var(--tm-film-scrim) 45%, transparent), transparent 24%),
+      linear-gradient(to top, color-mix(in srgb, var(--tm-film-scrim) 55%, transparent), transparent 42%),
+      var(--tm-film-side, none);
+  }
+
+  .tm-film-beat[data-text="dark"] {
+    --tm-film-scrim: var(--tm-solid-canvas);
+    color: var(--tm-solid-ink);
+  }
+
+  .tm-film-beat[data-text="light"] {
+    --tm-film-scrim: var(--tm-solid-ink);
+    color: #ffffff;
+  }
+
+  .tm-film-beat[data-align="start"] {
+    --tm-film-side: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--tm-film-scrim) 72%, transparent),
+      color-mix(in srgb, var(--tm-film-scrim) 30%, transparent) 50%,
+      transparent 75%
+    );
+  }
+
+  .tm-film-beat[data-align="end"] {
+    --tm-film-side: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--tm-film-scrim) 72%, transparent),
+      color-mix(in srgb, var(--tm-film-scrim) 30%, transparent) 50%,
+      transparent 75%
+    );
+  }
+
+  .tm-film-beat[data-align="center"] {
+    --tm-film-side: radial-gradient(
+      ellipse 90% 45% at 50% 30%,
+      color-mix(in srgb, var(--tm-film-scrim) 60%, transparent),
+      transparent 75%
+    );
+  }
+
+  .tm-film-copy {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: flex-start;
+    padding-block: 1.75rem;
+  }
+
+  .tm-film-words {
+    max-width: 40rem;
+  }
+
+  .tm-film-beat[data-align="center"] .tm-film-words {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .tm-film-beat[data-align="end"] .tm-film-words {
+    margin-inline-start: auto;
+  }
+
+  .tm-film-beat[data-text="light"] .tm-film-words {
+    text-shadow:
+      0 1px 2px rgb(0 0 0 / 0.2),
+      0 8px 32px rgb(0 0 0 / 0.25);
+  }
+
+  .tm-film-heading {
+    font-size: clamp(2rem, 1.2rem + 3.4vw, 4rem);
+    font-weight: 600;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  h1.tm-film-heading {
+    font-size: clamp(2.25rem, 1.25rem + 4vw, 4.5rem);
+    font-weight: 700;
+  }
+
+  .tm-film-body {
+    max-width: 34rem;
+    margin-top: 1.25rem;
+    font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+    line-height: 1.7;
+  }
+
+  .tm-film-beat[data-align="center"] .tm-film-body {
+    margin-inline: auto;
+  }
+
+  .tm-film-beat[data-text="dark"] .tm-film-body {
+    color: var(--tm-color-ink-muted);
+  }
+
+  .tm-film-beat[data-text="light"] .tm-film-body {
+    color: rgb(255 255 255 / 0.88);
+  }
+
+  /* The bar of calls to action: light glass over bright frames, navy glass over dark ones. */
+  .tm-film-actions {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 2;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .tm-film-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.875rem 2rem;
+    padding: 0.875rem;
+    border: 1px solid color-mix(in srgb, var(--tm-solid-canvas) 55%, transparent);
+    border-radius: var(--tm-radius-panel);
+    background: color-mix(in srgb, var(--tm-solid-canvas) 80%, transparent);
+    box-shadow: var(--tm-shadow-float);
+    color: var(--tm-solid-ink);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+    transition-property: background-color, border-color, color;
+    transition-duration: 300ms;
+    transition-timing-function: var(--tm-ease-out);
+  }
+
+  .tm-film:not([data-film-live]) .tm-film-beat[data-text="light"] .tm-film-bar,
+  .tm-film[data-film-live] .tm-film-stage[data-text="light"] .tm-film-bar {
+    --tm-color-ink: #ffffff;
+    --tm-color-canvas: var(--tm-solid-ink);
+    --tm-color-ink-muted: rgb(255 255 255 / 0.82);
+    --tm-color-focus: #ffffff;
+    border-color: rgb(255 255 255 / 0.16);
+    background: color-mix(in srgb, var(--tm-solid-ink) 64%, transparent);
+    color: #ffffff;
+  }
+
+  .tm-film-bar-main {
+    display: grid;
+    flex: 1 1 22rem;
+    gap: 0.625rem;
+  }
+
+  .tm-film-bar .tm-button {
+    flex: 1 1 auto;
+    padding-inline: 0.875rem;
+  }
+
+  .tm-film-note,
+  .tm-film-credit {
+    color: var(--tm-color-ink-muted);
+    font-size: var(--tm-text-caption);
+    line-height: 1.55;
+  }
+
+  .tm-film-bar-side {
+    display: flex;
+    flex: 1 1 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+
+  .tm-film-credit {
+    order: -1;
+  }
+
+  .tm-film-scenes {
+    display: none;
+    margin-inline-start: auto;
+  }
+
+  .tm-film[data-film-live] .tm-film-scenes {
+    display: flex;
+  }
+
+  .tm-film-scenes a {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 2.75rem;
+    border-radius: var(--tm-radius-pill);
+  }
+
+  .tm-film-scenes a::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--tm-radius-pill);
+    background: currentColor;
+    opacity: 0.4;
+    transition:
+      width 200ms var(--tm-ease-out),
+      opacity 200ms var(--tm-ease-out);
+  }
+
+  .tm-film-scenes a[aria-current="step"]::before {
+    width: 1.375rem;
+    opacity: 1;
+  }
+
+  .tm-film-skip {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid currentColor;
+    border-radius: var(--tm-radius-pill);
+    font-size: 1.125rem;
+  }
+
+  .tm-film-skip:hover {
+    background: var(--tm-color-ink);
+    color: var(--tm-color-canvas);
+  }
+
+  .tm-film-end {
+    display: block;
+    height: 0;
+  }
+
+  @media (min-width: 768px) {
+    .tm-film-beat[data-align="start"] {
+      --tm-film-side: linear-gradient(
+        to right,
+        color-mix(in srgb, var(--tm-film-scrim) 75%, transparent),
+        color-mix(in srgb, var(--tm-film-scrim) 32%, transparent) 42%,
+        transparent 68%
+      );
     }
-    to {
-      opacity: 1;
-      transform: none;
+
+    .tm-film-beat[data-align="end"] {
+      --tm-film-side: linear-gradient(
+        to left,
+        color-mix(in srgb, var(--tm-film-scrim) 75%, transparent),
+        color-mix(in srgb, var(--tm-film-scrim) 32%, transparent) 42%,
+        transparent 68%
+      );
+    }
+
+    .tm-film-beat[data-align="center"] {
+      --tm-film-side: radial-gradient(
+        ellipse 55% 45% at 50% 45%,
+        color-mix(in srgb, var(--tm-film-scrim) 58%, transparent),
+        transparent 75%
+      );
+    }
+
+    .tm-film-copy {
+      align-items: center;
     }
   }
 
-  /* The one orchestrated moment on the page: the hero visual arrives once. */
-  .tm-reveal {
-    animation: tm-reveal 700ms var(--tm-ease-out) both;
+  @media (min-width: 1024px) {
+    .tm-film {
+      --tm-film-bar-space: 8rem;
+    }
+
+    .tm-film-bar {
+      flex-wrap: nowrap;
+      align-items: center;
+      padding: 1rem 1.25rem;
+    }
+
+    .tm-film-bar-main {
+      display: flex;
+      flex: 1 1 auto;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .tm-film-bar .tm-button {
+      flex: none;
+      padding-inline: 1.25rem;
+    }
+
+    .tm-film-note {
+      max-width: 22rem;
+    }
+
+    .tm-film-bar-side {
+      display: grid;
+      flex: none;
+      grid-template-columns: auto auto;
+      justify-items: end;
+    }
+
+    .tm-film-credit {
+      order: 0;
+      grid-column: 1 / -1;
+    }
   }
 
+  /* With reduced motion nothing switches to the film, so the panels need not
+     hold the screen: one screen each. */
   @media (prefers-reduced-motion: reduce) {
-    .tm-reveal {
-      animation: none;
+    .tm-film:not([data-film-live]) .tm-film-beat {
+      height: auto;
     }
+
+    .tm-film:not([data-film-live]) .tm-film-frame {
+      position: relative;
+      height: auto;
+      min-height: 100svh;
+    }
+  }
+
+  /* Film layout, set by FilmPlayer: one screen held while the track scrolls,
+     beats fading in turn as --p goes from 0 to 1. */
+  .tm-film[data-film-live] .tm-film-track {
+    height: calc(var(--beats) * 150svh);
+  }
+
+  .tm-film[data-film-live] .tm-film-stage {
+    --p: 0;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .tm-film[data-film-live] .tm-film-media {
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+
+  .tm-film[data-film-live] .tm-film-beats {
+    position: absolute;
+    inset: 0;
+  }
+
+  .tm-film[data-film-live] .tm-film-beat {
+    --o: clamp(0, min((var(--p) - var(--in)) / var(--fade), (var(--out) - var(--p)) / var(--fade)), 1);
+    position: absolute;
+    inset: 0;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .tm-film[data-film-live] .tm-film-frame {
+    position: absolute;
+    inset: 0;
+    height: auto;
+  }
+
+  .tm-film[data-film-live] .tm-film-still {
+    display: none;
+  }
+
+  .tm-film[data-film-live] .tm-film-copy,
+  .tm-film[data-film-live] .tm-film-scrim {
+    opacity: var(--o);
+  }
+
+  .tm-film[data-film-live] .tm-film-words {
+    transform: translateY(calc((1 - var(--o)) * 1.25rem));
+  }
+
+  .tm-film[data-film-live] .tm-film-actions {
+    pointer-events: auto;
   }
 }

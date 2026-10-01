@@ -7,8 +7,11 @@ import { contentProblems } from "./validate";
 // editor, validating a save) and the unit tests. Database access lives in
 // drafts.ts.
 
-/** Version of the content schema that drafts are written for. */
-export const CONTENT_SCHEMA_VERSION = 1;
+/**
+ * Version of the content schema that drafts are written for. 2: the home
+ * opening became a scroll film with beats, and the router moved to its own section.
+ */
+export const CONTENT_SCHEMA_VERSION = 2;
 
 export type DraftRecord = {
   documentId: DocumentId;

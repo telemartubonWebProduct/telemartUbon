@@ -42,6 +42,17 @@ export const mediaKind = z.enum([
   "illustration", // drawn for this site
 ]);
 
+/** Numbered frames of a film that plays as visitors scroll (written by scripts/media/film-frames.mjs). */
+export const frameSequence = z.strictObject({
+  /** Folder of the frames, named 0001.avif, 0002.avif, … */
+  path: z.string().regex(/^\/[A-Za-z0-9/_-]+$/, "ที่อยู่โฟลเดอร์เฟรมต้องขึ้นต้นด้วย / และใช้ a-z ตัวเลข - _"),
+  format: z.enum(["avif", "webp"]),
+  frames: z.number().int().min(2).max(480),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+});
+export type FrameSequence = z.infer<typeof frameSequence>;
+
 export const mediaAsset = z.strictObject({
   src: z.string().startsWith("/"),
   width: z.number().int().positive(),
@@ -50,6 +61,8 @@ export const mediaAsset = z.strictObject({
   kind: mediaKind,
   /** Where the file came from, for rights and provenance review. */
   source: z.string().min(1),
+  /** A film: `src` is its first frame. Portrait frames serve phones when the film has them. */
+  sequence: z.strictObject({ landscape: frameSequence, portrait: frameSequence.optional() }).optional(),
 });
 export type MediaAsset = z.infer<typeof mediaAsset>;
 
@@ -190,6 +203,8 @@ export const uiKeys = [
   "facebook",
   "opensInNewTab",
   "footerContact",
+  "filmScenes",
+  "filmSkip",
 ] as const;
 export type UiKey = (typeof uiKeys)[number];
 
@@ -269,16 +284,38 @@ export const packagePage = z.strictObject({
 });
 export type PackagePage = z.infer<typeof packagePage>;
 
+/** One set of words shown over the home film, in turn as visitors scroll. */
+const heroBeat = z.strictObject({
+  id: stableId,
+  heading: localizedText,
+  body: localizedText.optional(),
+  /** Where the words sit on the film. */
+  align: z.enum(["start", "center", "end"]),
+  /** Dark words for bright frames, white words for dark ones. */
+  textColor: z.enum(["dark", "light"]),
+});
+export type HeroBeat = z.infer<typeof heroBeat>;
+
 export const homePage = z.strictObject({
   id: z.literal("home"),
   path: z.literal("/"),
   seo,
   hero: z.strictObject({
-    heading: localizedText,
-    description: localizedText,
-    note: localizedText,
+    /** Film the opening plays as visitors scroll; a still picture works too. */
+    film: mediaRef,
+    /** Visible line on the film, such as "illustration". */
+    filmNote: localizedText,
+    /** The first heading is the page's main heading. */
+    beats: z.array(heroBeat).min(1).max(4),
+    /** Stay on screen for the whole film. */
     primaryCta: cta,
     secondaryCta: cta,
+    note: localizedText,
+  }),
+  equipment: z.strictObject({
+    heading: localizedText,
+    description: localizedText,
+    points: z.array(z.strictObject({ id: stableId, title: localizedText, description: localizedText })).max(4),
     /** Router picture: the poster, and the fallback of the 3D model. */
     visual: mediaRef,
     /** Visible line under the picture, such as "illustration, not the installed model". */

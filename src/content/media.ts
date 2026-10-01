@@ -150,6 +150,24 @@ export const media = {
     source: "วาดสำหรับเว็บนี้ (scripts/media/router-concept.py)",
   },
 
+  // The opening film of the home page, drawn by scripts/media/film-placeholder.mjs
+  // until the footage briefed for Google Flow is approved (docs/renovation/R1-HOME-FILM.md).
+  "film-home-placeholder": {
+    src: "/media/film/home-placeholder/landscape/0001.avif",
+    width: 1600,
+    height: 900,
+    kind: "illustration",
+    alt: {
+      th: "ภาพประกอบเส้นสัญญาณไฟเบอร์เดินทางจากท้องฟ้า ผ่านเมือง ไปถึงบ้าน",
+      en: "Illustration of a fibre signal travelling from the sky, across a city, to a home",
+    },
+    source: "วาดด้วยสคริปต์สำหรับเว็บนี้ (scripts/media/film-placeholder.mjs) เป็นภาพชั่วคราว",
+    sequence: {
+      landscape: { path: "/media/film/home-placeholder/landscape", format: "avif", frames: 120, width: 1600, height: 900 },
+      portrait: { path: "/media/film/home-placeholder/portrait", format: "avif", frames: 120, width: 720, height: 1280 },
+    },
+  },
+
   "og-image": {
     src: "/media/og-image.png",
     width: 1200,

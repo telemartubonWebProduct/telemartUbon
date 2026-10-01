@@ -130,6 +130,8 @@ export const site: SiteSettings = {
     facebook: t("เฟซบุ๊ก", "Facebook"),
     opensInNewTab: t("เปิดในแท็บใหม่", "opens in a new tab"),
     footerContact: t("ติดต่อ", "Contact"),
+    filmScenes: t("ฉากในหนังเปิดหน้า", "Scenes of the opening film"),
+    filmSkip: t("ข้ามไปเนื้อหาถัดไป", "Skip to the next section"),
   },
   seo: {
     siteName: t("เทเลมาร์ท อุบล", "Telemart Ubon"),

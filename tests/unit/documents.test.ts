@@ -21,9 +21,9 @@ describe("content documents", () => {
 
   it("replace one document without touching the others", () => {
     const home = readDocument(content, "page:home") as typeof content.pages.home;
-    const edited = writeDocument(content, "page:home", { ...home, hero: { ...home.hero, tone: "ink" } });
-    expect(edited.pages.home.hero.tone).toBe("ink");
-    expect(content.pages.home.hero.tone).toBe("canvas");
+    const edited = writeDocument(content, "page:home", { ...home, equipment: { ...home.equipment, tone: "ink" } });
+    expect(edited.pages.home.equipment.tone).toBe("ink");
+    expect(content.pages.home.equipment.tone).toBe("canvas");
     expect(edited.pages.solar).toBe(content.pages.solar);
     expect(edited.catalog).toBe(content.catalog);
 

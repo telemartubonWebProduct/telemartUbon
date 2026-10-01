@@ -85,7 +85,7 @@ export type FieldKind =
   | "objectList";
 
 /** Structure the editor shows but never changes. */
-const readOnlyKeys = new Set(["id", "path", "source", "src", "width", "height", "kind", "category", "group", "layout", "integrations"]);
+const readOnlyKeys = new Set(["id", "path", "source", "src", "width", "height", "kind", "category", "group", "layout", "integrations", "sequence"]);
 
 export function isReadOnly(key: string | undefined): boolean {
   return key !== undefined && readOnlyKeys.has(key);

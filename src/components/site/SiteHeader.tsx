@@ -49,8 +49,8 @@ export function SiteHeader({ ctx, path }: { ctx: RenderContext; path: string }) 
   const cta = site.headerCta;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-tm-line bg-tm-canvas">
-      <div className="tm-container flex h-16 items-center gap-6 lg:h-[4.5rem]">
+    <header className="tm-header sticky top-0 z-40">
+      <div className="tm-container flex h-[var(--tm-header-height)] items-center gap-6">
         <Link href={localizePath("/", ctx.locale)} className="shrink-0 rounded-tm-control" {...ctx.bind("site", "brand", "logo")}>
           <Image
             src={logo.src}

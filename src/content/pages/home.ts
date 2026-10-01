@@ -17,15 +17,40 @@ export const home: HomePage = {
     ),
   },
   hero: {
-    heading: t("เลือกเน็ตบ้านที่เหมาะกับทุกวันของคุณ", "Home internet that fits your every day"),
-    description: t(
-      "เทียบแพ็กเกจเน็ตบ้านทรูไฟเบอร์ทั้งความเร็ว ราคา และสิทธิประโยชน์ในที่เดียว แล้วให้เจ้าหน้าที่ช่วยตรวจพื้นที่และนัดติดตั้ง",
-      "Compare True fibre packages by speed, price and benefits in one place, then let our team check your area and book the installation.",
-    ),
-    note: t(
-      "รับเรื่องจากทุกจังหวัด การติดตั้งขึ้นกับผลตรวจพื้นที่ตามที่อยู่",
-      "We take requests from every province. Installation depends on a check of your address.",
-    ),
+    film: "film-home-placeholder",
+    filmNote: t("ภาพประกอบ ไม่ใช่ภาพเครือข่ายจริง", "Illustration, not the actual network"),
+    beats: [
+      {
+        id: "choose",
+        heading: t("เลือกเน็ตบ้านที่เหมาะกับทุกวันของคุณ", "Home internet that fits your every day"),
+        body: t(
+          "เทียบแพ็กเกจเน็ตบ้านทรูไฟเบอร์ทั้งความเร็ว ราคา และสิทธิประโยชน์ในที่เดียว แล้วให้เจ้าหน้าที่ช่วยตรวจพื้นที่และนัดติดตั้ง",
+          "Compare True fibre packages by speed, price and benefits in one place, then let our team check your area and book the installation.",
+        ),
+        align: "start",
+        textColor: "dark",
+      },
+      {
+        id: "network",
+        heading: t("ไฟเบอร์จากเครือข่ายทรู ตรงถึงบ้านคุณ", "Fibre from the True network, all the way to your home"),
+        body: t(
+          "เลือกความเร็วตามการใช้งานของบ้าน ทั้งดูซีรีส์ ทำงาน และเล่นเกม",
+          "Pick the speed your home needs for streaming, working and gaming.",
+        ),
+        align: "center",
+        textColor: "light",
+      },
+      {
+        id: "at-home",
+        heading: t("ให้เราช่วยเลือก แล้วนัดติดตั้งถึงบ้าน", "We help you choose, then book the installation"),
+        body: t(
+          "ทักทาง LINE หรือโทรหาเรา เจ้าหน้าที่ตรวจพื้นที่ตามที่อยู่ของคุณ แล้วติดต่อกลับเพื่อยืนยัน",
+          "Message us on LINE or call. We check installation at your address, then contact you to confirm.",
+        ),
+        align: "start",
+        textColor: "light",
+      },
+    ],
     primaryCta: {
       id: "hero-broadband",
       label: t("ดูแพ็กเกจเน็ตบ้าน", "See home internet packages"),
@@ -38,6 +63,34 @@ export const home: HomePage = {
       target: page("/service"),
       style: "secondary",
     },
+    note: t(
+      "รับเรื่องจากทุกจังหวัด การติดตั้งขึ้นกับผลตรวจพื้นที่ตามที่อยู่",
+      "We take requests from every province. Installation depends on a check of your address.",
+    ),
+  },
+  equipment: {
+    heading: t("อุปกรณ์ Wi-Fi ตามแพ็กเกจ", "Wi-Fi equipment with your package"),
+    description: t(
+      "การ์ดของแต่ละแพ็กเกจระบุอุปกรณ์ที่ได้รับ เช่น Router Wi-Fi, Mesh หรือกล่องทีวี เทียบได้ก่อนตัดสินใจ",
+      "Each package card lists the equipment it includes, such as a Wi-Fi router, mesh units or a TV box, so you can compare before you decide.",
+    ),
+    points: [
+      {
+        id: "listed",
+        title: t("รู้ก่อนว่าได้อุปกรณ์อะไร", "Know what equipment you get"),
+        description: t("อุปกรณ์และสิทธิประโยชน์ของทุกแพ็กเกจเรียงไว้ในรูปแบบเดียวกัน", "Every package lists its equipment and benefits in the same order."),
+      },
+      {
+        id: "installation",
+        title: t("นัดติดตั้งถึงบ้าน", "Installation booked at your home"),
+        description: t("เจ้าหน้าที่ตรวจพื้นที่ตามที่อยู่ แล้วนัดวันติดตั้งกับคุณ", "We check your address, then book an installation date with you."),
+      },
+      {
+        id: "questions",
+        title: t("ถามเรื่องอุปกรณ์ได้", "Ask us about the equipment"),
+        description: t("ทักเจ้าหน้าที่ทาง LINE หรือโทรหาฝ่ายขาย", "Message our team on LINE or call our sales line."),
+      },
+    ],
     visual: "router-concept",
     visualNote: t("ภาพประกอบ ไม่ใช่รุ่นที่ติดตั้งจริง", "Illustration, not the exact model you receive"),
     tone: "canvas",

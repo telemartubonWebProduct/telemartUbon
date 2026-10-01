@@ -88,10 +88,10 @@ describe("field messages and bindings", () => {
   it("lists what changed between two versions of a document", () => {
     const home = content.pages.home;
     const edited = structuredClone(home);
-    edited.hero.heading.th = "ใหม่";
+    edited.hero.beats[0].heading.th = "ใหม่";
     edited.faq.items[0].answer.en = "New";
     expect(diffPaths(home, edited)).toEqual([
-      ["hero", "heading", "th"],
+      ["hero", "beats", home.hero.beats[0].id, "heading", "th"],
       ["faq", "items", home.faq.items[0].id, "answer", "en"],
     ]);
     expect(pathLabel(home, ["faq", "items", home.faq.items[0].id, "answer", "en"])).toBe(
@@ -100,7 +100,8 @@ describe("field messages and bindings", () => {
   });
 
   it("names what a preview highlight points at", () => {
-    expect(bindingLabel(content, "page:home/hero/heading")).toBe("หัวเรื่อง");
+    expect(bindingLabel(content, `page:home/hero/beats/${content.pages.home.hero.beats[0].id}/heading`)).toBe("หัวเรื่อง");
+    expect(bindingLabel(content, `page:home/hero/beats/${content.pages.home.hero.beats[1].id}`)).toBe(content.pages.home.hero.beats[1].heading.th);
     expect(bindingLabel(content, `page:home/faq/items/${content.pages.home.faq.items[0].id}`)).toBe(content.pages.home.faq.items[0].question.th);
     expect(bindingLabel(content, "site/ui/chatOnLine")).toBe("ปุ่ม แชต LINE");
   });

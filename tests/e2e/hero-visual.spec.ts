@@ -2,8 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockThirdParty } from "./support/network";
 
-// The home hero shows the router poster first and swaps in the 3D model only
-// where it can run (docs/renovation/3D-MEDIA-PLAN.md).
+// The router of the home page's equipment section shows its poster first and
+// swaps in the 3D model only where it can run (docs/renovation/3D-MEDIA-PLAN.md).
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);
@@ -63,7 +63,7 @@ test("without WebGL the poster stays", async ({ page }) => {
   await expect(stage(page).locator("canvas")).toHaveCount(0);
 });
 
-test("the model stops rendering when the hero leaves the screen", async ({ page }) => {
+test("the model stops rendering when its section leaves the screen", async ({ page }) => {
   await page.goto("/");
   await stage(page).scrollIntoViewIfNeeded();
   test.skip(!(await supportsWebGL2(page)), "no WebGL2 in this browser");

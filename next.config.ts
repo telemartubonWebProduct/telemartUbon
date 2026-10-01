@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
     // routing-level 404 in src/app/global-not-found.tsx.
     globalNotFound: true,
   },
+  async headers() {
+    return [
+      // Frames of the home film (docs/renovation/R1-HOME-FILM.md). A new cut
+      // goes in a new folder (home-v1, home-v2…), so visitors keep frames a week.
+      { source: "/media/film/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }] },
+    ];
+  },
   async redirects() {
     return [
       // /th/... would duplicate the unprefixed Thai URLs.
