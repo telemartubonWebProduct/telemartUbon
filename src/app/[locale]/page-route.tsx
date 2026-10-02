@@ -4,6 +4,7 @@ import { renderContext } from "@/components/site/context";
 import { PageView } from "@/components/site/pages/PageView";
 import { readDocument, type PageDocumentId } from "@/lib/content/documents";
 import { getPublishedContent } from "@/lib/content/published";
+import { leadIntakeEnabled } from "@/lib/leads/intake";
 import type { Seo } from "@/lib/content/schema";
 import { pageLocale } from "@/lib/i18n/page";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -22,7 +23,8 @@ export function pageRoute(pageId: PageDocumentId) {
 
   async function Page({ params }: RouteProps) {
     const content = await getPublishedContent();
-    return <PageView ctx={renderContext(content, await pageLocale(params))} pageId={pageId} />;
+    const leads = leadIntakeEnabled() ? "live" : "off";
+    return <PageView ctx={renderContext(content, await pageLocale(params), { leads })} pageId={pageId} />;
   }
 
   return { generateMetadata, Page };

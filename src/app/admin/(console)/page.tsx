@@ -3,13 +3,13 @@ import Link from "next/link";
 
 import { pageTitle, textLink } from "@/components/admin/styles";
 import { requireActiveAdmin } from "@/lib/auth/access";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "ภาพรวม" };
 
-const upcoming = [{ label: "คำขอให้ติดต่อกลับและรายงาน", milestone: "M5" }];
-
 export default async function AdminOverviewPage() {
   const access = await requireActiveAdmin();
+  const { count: newLeads } = await (await createClient()).from("leads").select("id", { count: "exact", head: true }).eq("status", "new");
 
   return (
     <>
@@ -60,20 +60,20 @@ export default async function AdminOverviewPage() {
             </Link>
             <span className="text-tm-small text-tm-muted">ใครเผยแพร่เมื่อไร และย้อนกลับไปฉบับก่อนได้</span>
           </li>
-        </ul>
-      </section>
-
-      <section aria-labelledby="next-heading" className="mt-12">
-        <h2 id="next-heading" className="text-tm-h4 font-semibold">
-          เครื่องมือที่จะเปิดในขั้นถัดไป
-        </h2>
-        <ul className="mt-4 divide-y divide-tm-line border-y border-tm-line">
-          {upcoming.map((item) => (
-            <li key={item.label} className="flex items-baseline justify-between gap-6 py-3">
-              <span>{item.label}</span>
-              <span className="shrink-0 text-tm-small text-tm-muted">{item.milestone}</span>
-            </li>
-          ))}
+          <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+            <Link href="/admin/leads" className={textLink}>
+              คำขอติดต่อกลับ
+            </Link>
+            <span className="text-tm-small text-tm-muted">
+              {newLeads ? `มีคำขอใหม่ ${newLeads} รายการ · ` : ""}คำขอจากแบบฟอร์มในหน้าติดต่อเรา เปลี่ยนสถานะ บันทึกการติดตาม ดาวน์โหลด CSV
+            </span>
+          </li>
+          <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+            <Link href="/admin/reports" className={textLink}>
+              รายงาน
+            </Link>
+            <span className="text-tm-small text-tm-muted">คำขอ ผลการติดต่อ แหล่งที่มา และ event ที่ส่งไป Google Analytics</span>
+          </li>
         </ul>
       </section>
     </>

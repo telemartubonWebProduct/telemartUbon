@@ -16,6 +16,12 @@ export type RenderContext = {
   locale: Locale;
   /** True only inside the Mirror editor preview. */
   edit: boolean;
+  /**
+   * The call-back form (M5): "live" on public pages of a deployment that can
+   * store requests, "preview" in the Mirror editor (shown, never sends), "off"
+   * otherwise (visitors get LINE and the phone instead).
+   */
+  leads: "live" | "preview" | "off";
   t: (text: LocalizedText) => string;
   /**
    * Attributes that mark an element as the view of one field. Empty outside
@@ -29,13 +35,14 @@ export type RenderContext = {
   packages: (category: CategoryId, group: string) => CatalogPackage[];
 };
 
-export function renderContext(content: SiteContent, locale: Locale, options: { edit?: boolean } = {}): RenderContext {
+export function renderContext(content: SiteContent, locale: Locale, options: { edit?: boolean; leads?: RenderContext["leads"] } = {}): RenderContext {
   const edit = options.edit ?? false;
   return {
     content,
     site: content.site,
     locale,
     edit,
+    leads: options.leads ?? "off",
     t: (text) => text[locale],
     bind: edit ? (documentId, ...path) => ({ "data-edit": encodeBinding(documentId, path) }) : () => ({}),
     media: (id) => mediaIn(content, id),

@@ -76,13 +76,61 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"lead_events": {
+                  Row: {
+                    "actor_email": string | null,"actor_user_id": string | null,"changes": NonNullable<Json>,"details": Json | null,"id": number,"idempotency_key": string | null,"kind": string,"lead_id": string,"note": string | null,"occurred_at": string
+                  }
+                  Insert: {
+                    "actor_email"?: string | null,"actor_user_id"?: string | null,"changes"?: NonNullable<Json>,"details"?: Json | null,"id"?: never,"idempotency_key"?: string | null,"kind": string,"lead_id": string,"note"?: string | null,"occurred_at"?: string
+                  }
+                  Update: {
+                    "actor_email"?: string | null,"actor_user_id"?: string | null,"changes"?: NonNullable<Json>,"details"?: Json | null,"id"?: never,"idempotency_key"?: string | null,"kind"?: string,"lead_id"?: string,"note"?: string | null,"occurred_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "lead_events_lead_id_fkey"
+      columns: ["lead_id"]
+isOneToOne: false
+      referencedRelation: "leads"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"lead_intake_log": {
+                  Row: {
+                    "at": string,"client_hash": string,"id": number
+                  }
+                  Insert: {
+                    "at"?: string,"client_hash": string,"id"?: never
+                  }
+                  Update: {
+                    "at"?: string,"client_hash"?: string,"id"?: never
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"leads": {
+                  Row: {
+                    "anonymised_at": string | null,"area": string | null,"area_check": string,"closed_at": string | null,"consent_version": string,"created_at": string,"follow_up_on": string | null,"id": string,"idempotency_key": string,"locale": string,"name": string | null,"note": string | null,"outcome": string | null,"package_id": string | null,"phone": string | null,"preferred_time": string,"province": string,"resubmitted_at": string | null,"service": string,"source_path": string | null,"status": string,"updated_at": string,"utm": NonNullable<Json>
+                  }
+                  Insert: {
+                    "anonymised_at"?: string | null,"area"?: string | null,"area_check"?: string,"closed_at"?: string | null,"consent_version": string,"created_at"?: string,"follow_up_on"?: string | null,"id"?: string,"idempotency_key": string,"locale": string,"name"?: string | null,"note"?: string | null,"outcome"?: string | null,"package_id"?: string | null,"phone"?: string | null,"preferred_time": string,"province": string,"resubmitted_at"?: string | null,"service": string,"source_path"?: string | null,"status"?: string,"updated_at"?: string,"utm"?: NonNullable<Json>
+                  }
+                  Update: {
+                    "anonymised_at"?: string | null,"area"?: string | null,"area_check"?: string,"closed_at"?: string | null,"consent_version"?: string,"created_at"?: string,"follow_up_on"?: string | null,"id"?: string,"idempotency_key"?: string,"locale"?: string,"name"?: string | null,"note"?: string | null,"outcome"?: string | null,"package_id"?: string | null,"phone"?: string | null,"preferred_time"?: string,"province"?: string,"resubmitted_at"?: string | null,"service"?: string,"source_path"?: string | null,"status"?: string,"updated_at"?: string,"utm"?: NonNullable<Json>
+                  }
+                  Relationships: [
+                    
+                  ]
                 }
           }
           Views: {
             [_ in never]: never
           }
           Functions: {
-            "discard_content_draft":
+            "anonymise_lead":
+{ Args: { "p_lead": string,"p_reason": string }; Returns: undefined
+                           },
+"discard_content_draft":
 { Args: { "p_document_id": string,"p_expected_revision": number }; Returns: undefined
                            },
 "publish_content":
@@ -100,6 +148,14 @@ isOneToOne: false
 { Args: { "p_body": Json,"p_document_id": string,"p_expected_revision": number,"p_schema_version": number }; Returns: {
               "revision": number,"updated_at": string
             }[]
+                           },
+"submit_lead":
+{ Args: { "p_area"?: string,"p_client_hash": string,"p_consent_version": string,"p_idempotency_key": string,"p_locale": string,"p_name": string,"p_note"?: string,"p_package_id"?: string,"p_phone": string,"p_preferred_time": string,"p_province": string,"p_service": string,"p_source_path"?: string,"p_utm"?: Json }; Returns: {
+              "lead_id": string,"outcome": string
+            }[]
+                           },
+"update_lead":
+{ Args: { "p_area_check": string,"p_follow_up_on"?: string,"p_lead": string,"p_note"?: string,"p_outcome"?: string,"p_seen_updated_at": string,"p_status": string }; Returns: string
                            }
           }
           Enums: {

@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { formatPhone, isCurrent, telHref } from "@/lib/content/render";
 
+import { ConsentSettingsButton } from "./consent/ConsentBanner";
 import type { RenderContext } from "./context";
 import { CallIcon, MailIcon } from "./icons";
 import { LanguageSwitch } from "./LanguageSwitch";
@@ -131,7 +132,14 @@ export function SiteFooter({ ctx, path }: { ctx: RenderContext; path: string }) 
           <p {...ctx.bind("site", "footer", "copyright")}>
             © {year} {ctx.t(site.footer.copyright)}
           </p>
-          <LanguageSwitch locale={ctx.locale} path={path} label={ctx.t(ui.languageSwitch)} tone="ink" />
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <ConsentSettingsButton
+              label={ctx.t(site.consent.settingsLink)}
+              className="min-h-tm-control font-medium text-tm-on-ink underline decoration-tm-red decoration-2 underline-offset-4"
+              bind={ctx.bind("site", "consent", "settingsLink")}
+            />
+            <LanguageSwitch locale={ctx.locale} path={path} label={ctx.t(ui.languageSwitch)} tone="ink" />
+          </div>
         </div>
       </div>
     </footer>

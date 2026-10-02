@@ -23,4 +23,6 @@ esac
 printf 'export NEXT_PUBLIC_SUPABASE_URL=%q\n' "$api_url"
 printf 'export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%q\n' "$(value PUBLISHABLE_KEY)"
 printf 'export E2E_SUPABASE_SECRET_KEY=%q\n' "$(value SECRET_KEY)"
+# The app's own server key (M5 stores call-back requests with it): the local stack's demo key.
+printf 'export SUPABASE_SECRET_KEY=%q\n' "$(value SECRET_KEY)"
 printf 'export E2E_MAILPIT_URL=%q\n' "$(value MAILPIT_URL)"

@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import { consentState, necessaryOnly } from "./tests/e2e/support/consent";
+
 // E2E runs against a production build (`npm run build` first). Set
 // E2E_BASE_URL to test an already running server instead of starting one.
 // Port 3000 matches the local Auth site_url, so links in test emails reach this server.
@@ -20,6 +22,8 @@ export default defineConfig({
   use: {
     baseURL,
     locale: "th-TH",
+    // A cookie choice is already made, so the banner (M5) stays out of the way; consent.spec.ts starts without one.
+    storageState: consentState(necessaryOnly),
     trace: "retain-on-failure",
     launchOptions: { executablePath },
   },

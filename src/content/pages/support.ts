@@ -57,9 +57,10 @@ export const contactPage: ContactPage = {
     tone: "canvas",
   },
   callback: {
-    note: t(
-      "ต้องการให้เจ้าหน้าที่โทรกลับ ส่งชื่อ เบอร์โทร และพื้นที่ที่ต้องการติดตั้งมาทาง LINE ได้เลย",
-      "Want us to call you back? Send your name, phone number and the area you need service in on LINE.",
+    heading: t("ขอให้เจ้าหน้าที่ติดต่อกลับ", "Ask us to call you back"),
+    description: t(
+      "กรอกชื่อ เบอร์โทร และพื้นที่ที่ต้องการใช้บริการ เจ้าหน้าที่จะโทรกลับเพื่อตรวจพื้นที่และแนะนำแพ็กเกจ รับเรื่องจากทุกจังหวัด",
+      "Leave your name, number and the area you need service in. We will call you back to check your area and suggest a package. We take requests from every province.",
     ),
     tone: "surface",
   },
@@ -221,6 +222,10 @@ export const termsPage: LegalPage = {
           "เราอาจเก็บข้อมูลส่วนบุคคลของท่าน เช่น ชื่อ อีเมล หมายเลขโทรศัพท์ หรือข้อมูลอื่น ๆ ที่ท่านให้ไว้โดยสมัครใจผ่านแบบฟอร์มลงทะเบียนหรือการติดต่อสอบถาม เพื่อใช้ติดต่อกลับหรือให้บริการตามที่ท่านร้องขอ",
           "We may collect personal data you choose to give us, such as your name, email address, phone number or other details, through registration forms or enquiries, to contact you back or provide the service you asked for.",
         ),
+        t(
+          "เมื่อท่านส่งแบบฟอร์มขอให้ติดต่อกลับ เราเก็บชื่อ เบอร์โทร จังหวัดและพื้นที่ บริการหรือแพ็กเกจที่สนใจ ช่วงเวลาที่สะดวก และรายละเอียดที่ท่านกรอก เพื่อโทรกลับ ตรวจพื้นที่ให้บริการ และแนะนำบริการตามที่ท่านขอ เราเก็บข้อมูลเหล่านี้ไว้จนครบ 1 ปีหลังปิดคำขอ แล้วลบข้อมูลที่ระบุตัวท่านได้ คงไว้เฉพาะสถิติที่ไม่ระบุตัวบุคคล",
+          "When you send the call-back form, we keep your name, phone number, province and area, the service or package you are interested in, the time that suits you and any details you add, to call you back, check service in your area and advise you as you asked. We keep these details until one year after your request is closed, then delete what identifies you and keep only statistics that do not.",
+        ),
       ],
       list: [],
     },
@@ -232,6 +237,10 @@ export const termsPage: LegalPage = {
         t(
           "หากคุกกี้เหล่านี้เก็บข้อมูลที่อาจระบุตัวตน หรือใช้ในเชิงการตลาด/โฆษณา เราจะแจ้งให้ท่านทราบและขอความยินยอมตามที่กฎหมายกำหนด ท่านสามารถปฏิเสธหรือลบคุกกี้ได้จากการตั้งค่าเบราว์เซอร์ของท่าน",
           "If these cookies collect data that could identify you, or are used for marketing or advertising, we will tell you and ask for your consent as the law requires. You can refuse or delete cookies in your browser settings.",
+        ),
+        t(
+          "เว็บไซต์ใช้คุกกี้วิเคราะห์การใช้งาน (Google Analytics) คุกกี้โฆษณา (Google Ads) และแชตสด (Tawk) ก็ต่อเมื่อท่านยินยอมผ่านแถบคุกกี้ ท่านเปลี่ยนหรือถอนความยินยอมได้ทุกเมื่อที่ “ตั้งค่าคุกกี้” ท้ายหน้าเว็บ",
+          "The website uses analytics cookies (Google Analytics), advertising cookies (Google Ads) and live chat (Tawk) only after you agree in the cookie banner. You can change or withdraw your consent at any time under “Cookie settings” at the bottom of each page.",
         ),
       ],
       list: [

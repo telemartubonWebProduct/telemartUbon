@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 
+import { ConsentBanner, type ConsentText } from "@/components/site/consent/ConsentBanner";
+import { SiteTags } from "@/components/site/consent/SiteTags";
 import { fontVariables } from "@/fonts";
-import { gtagInitScript } from "@/lib/analytics/google-ads";
 import { getPublishedContent } from "@/lib/content/published";
-import { tx } from "@/lib/content/render";
+import { resolveLink, tx } from "@/lib/content/render";
 import { themeVariables } from "@/lib/content/theme";
 import { locales } from "@/lib/i18n/locales";
 import { pageLocale } from "@/lib/i18n/page";
@@ -48,19 +48,25 @@ export default async function PublicRootLayout({ children, params }: LayoutProps
   const locale = await pageLocale(params);
   const { site } = await getPublishedContent();
   const { googleAdsId, ga4MeasurementId, tawkSrc } = site.integrations;
+  const { policyVersion, ...consentCopy } = site.consent;
+  const consentText = Object.fromEntries(Object.entries(consentCopy).map(([key, text]) => [key, tx(text, locale)])) as ConsentText;
+  const policyHref = resolveLink({ kind: "page", path: "/termsAndPrivacy", hash: "cookies" }, locale, site).href;
 
   return (
     <html lang={locale} className={fontVariables}>
       {/* Theme colours from site settings; the default theme adds nothing. */}
       <body className="tm-site" style={themeVariables(site.theme)}>
+        {/* First, so keyboard and screen-reader users meet the choice before the page. */}
+        <ConsentBanner text={consentText} policyHref={policyHref} policyVersion={policyVersion} />
         {children}
-        {/* Google Ads base tag (as on the old site) and Google Analytics 4 on the production domain; the home page reports its Ads conversion (AdsConversion). */}
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} strategy="afterInteractive" />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {gtagInitScript({ googleAdsId, ga4MeasurementId, productionHost: siteUrl().hostname })}
-        </Script>
-        {/* Tawk live chat, as on the old site; loaded once the page is idle. */}
-        <Script src={tawkSrc} strategy="lazyOnload" />
+        {/* Google Ads (as on the old site), Google Analytics 4 on the production domain and Tawk chat, each only after consent; the home page reports its Ads conversion (AdsConversion). */}
+        <SiteTags
+          googleAdsId={googleAdsId}
+          ga4MeasurementId={ga4MeasurementId}
+          productionHost={siteUrl().hostname}
+          tawkSrc={tawkSrc}
+          policyVersion={policyVersion}
+        />
       </body>
     </html>
   );

@@ -289,10 +289,10 @@ export function PreviewCanvas({ initialContent, initialPage, initialLocale, chan
     window.scrollTo(0, 0);
   }, [view.pageId, view.locale]);
 
-  const ctx = useMemo(() => renderContext(shown, view.locale, { edit: view.edit }), [shown, view]);
+  const ctx = useMemo(() => renderContext(shown, view.locale, { edit: view.edit, leads: "preview" }), [shown, view]);
   // The same element while only `stable` changes, so the page renders once per edit.
   const page = useMemo(() => <PageView ctx={ctx} pageId={view.pageId} />, [ctx, view.pageId]);
-  const stableCtx = useMemo(() => renderContext(stable, view.locale, { edit: view.edit }), [stable, view]);
+  const stableCtx = useMemo(() => renderContext(stable, view.locale, { edit: view.edit, leads: "preview" }), [stable, view]);
   const theme = useMemo(() => {
     try {
       return themeVariables(shown.site.theme);

@@ -20,6 +20,13 @@ import type { SiteContent } from "./schema";
 
 export const CONTENT_TAG = "content";
 
+/**
+ * Even without a publish, the cached release is read again after a day. The
+ * data cache outlives deployments (on Vercel too), so a database changed
+ * outside the back office, such as a restored backup, still reaches visitors.
+ */
+const CONTENT_MAX_AGE_SECONDS = 86_400;
+
 export type Published = {
   content: SiteContent;
   /** Release number visitors see; null while the repository content is shown. */
@@ -34,7 +41,7 @@ async function readRelease(cached: boolean): Promise<ReleaseRow | null> {
     auth: { persistSession: false, autoRefreshToken: false },
     global: {
       fetch: (input, init) =>
-        fetch(input, cached ? { ...init, cache: "force-cache", next: { tags: [CONTENT_TAG] } } : { ...init, cache: "no-store" }),
+        fetch(input, cached ? { ...init, cache: "force-cache", next: { tags: [CONTENT_TAG], revalidate: CONTENT_MAX_AGE_SECONDS } } : { ...init, cache: "no-store" }),
     },
   });
   // GET, so the response can be cached (PostgREST serves stable functions over GET).

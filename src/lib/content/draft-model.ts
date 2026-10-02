@@ -11,9 +11,11 @@ import { contentProblems } from "./validate";
  * Version of the content schema that drafts are written for. 2: the home
  * opening became a scroll film with beats, and the router moved to its own
  * section. 3: the home page's featured packages became tabs of picture cards
- * (promos), and service tiles have pictures.
+ * (promos), and service tiles have pictures. 4: site settings gained the
+ * call-back form's copy and the cookie banner (M5), and the contact page's
+ * call-back band became a form section.
  */
-export const CONTENT_SCHEMA_VERSION = 3;
+export const CONTENT_SCHEMA_VERSION = 4;
 // R4 added documents (catalog order, new packages/media/benefits, tombstones)
 // without changing any document's shape, so drafts of version 3 still read.
 

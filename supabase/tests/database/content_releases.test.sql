@@ -71,7 +71,7 @@ select is(
 );
 select is((select created_by_email from public.content_releases where number = 1), 'publish.admin@test.local', 'a release names who published it');
 select is(
-  (select array_agg(action order by id) from public.audit_log where target_type = 'content_release'),
+  (select array_agg(action order by id) from public.audit_log where target_type = 'content_release' and occurred_at >= now()),
   array['content.publish', 'content.publish', 'content.rollback'],
   'every publish and rollback is in the audit log'
 );

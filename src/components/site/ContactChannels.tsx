@@ -94,42 +94,29 @@ function ChannelAction({ ctx, channel }: { ctx: RenderContext; channel: Channel 
 }
 
 export function ContactChannels({ ctx, page }: { ctx: RenderContext; page: ContactPage }) {
-  const { channels, callback } = page;
-  const lineChannel = channels.items.find((item) => item.channel === "line-sales" || item.channel === "line-service")?.channel ?? "line-sales";
+  const { channels } = page;
   return (
-    <>
-      <section aria-labelledby="channels-heading" className="py-12 lg:py-16" data-tone={channels.tone} {...ctx.bind("page:contact", "channels")}>
-        <div className="tm-container">
-          <h2 id="channels-heading" className="text-tm-h2 font-semibold" {...ctx.bind("page:contact", "channels", "heading")}>
-            {ctx.t(channels.heading)}
-          </h2>
-          <ul role="list" className="mt-8 grid gap-px overflow-hidden rounded-tm-panel border border-tm-line bg-tm-line md:grid-cols-2">
-            {channels.items.map((channel) => (
-              <li key={channel.id} className="flex flex-col items-start gap-5 bg-tm-canvas p-6 lg:p-8" {...ctx.bind("page:contact", "channels", "items", channel.id)}>
-                <div>
-                  <h3 className="text-tm-h3 font-semibold" {...ctx.bind("page:contact", "channels", "items", channel.id, "title")}>
-                    {ctx.t(channel.title)}
-                  </h3>
-                  <p className="mt-1 text-tm-muted" {...ctx.bind("page:contact", "channels", "items", channel.id, "description")}>
-                    {ctx.t(channel.description)}
-                  </p>
-                </div>
-                <ChannelAction ctx={ctx} channel={channel} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-      <section aria-label={ctx.t(ctx.site.contactBand.heading)} data-tone={callback.tone} {...ctx.bind("page:contact", "callback")}>
-        <div className="tm-container flex flex-col gap-5 py-10 md:flex-row md:items-center md:justify-between">
-          <p className="max-w-[40rem] text-tm-lead" {...ctx.bind("page:contact", "callback", "note")}>
-            {ctx.t(callback.note)}
-          </p>
-          <ContactLink ctx={ctx} channel={lineChannel} ctaId="contact-callback-line" className="tm-button tm-button-primary shrink-0">
-            {ctx.t(ctx.site.ui.chatOnLine)}
-          </ContactLink>
-        </div>
-      </section>
-    </>
+    <section aria-labelledby="channels-heading" className="py-12 lg:py-16" data-tone={channels.tone} {...ctx.bind("page:contact", "channels")}>
+      <div className="tm-container">
+        <h2 id="channels-heading" className="text-tm-h2 font-semibold" {...ctx.bind("page:contact", "channels", "heading")}>
+          {ctx.t(channels.heading)}
+        </h2>
+        <ul role="list" className="mt-8 grid gap-px overflow-hidden rounded-tm-panel border border-tm-line bg-tm-line md:grid-cols-2">
+          {channels.items.map((channel) => (
+            <li key={channel.id} className="flex flex-col items-start gap-5 bg-tm-canvas p-6 lg:p-8" {...ctx.bind("page:contact", "channels", "items", channel.id)}>
+              <div>
+                <h3 className="text-tm-h3 font-semibold" {...ctx.bind("page:contact", "channels", "items", channel.id, "title")}>
+                  {ctx.t(channel.title)}
+                </h3>
+                <p className="mt-1 text-tm-muted" {...ctx.bind("page:contact", "channels", "items", channel.id, "description")}>
+                  {ctx.t(channel.description)}
+                </p>
+              </div>
+              <ChannelAction ctx={ctx} channel={channel} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }

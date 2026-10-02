@@ -3,17 +3,22 @@ import { expect, test, type Page } from "@playwright/test";
 import { content } from "@/lib/content";
 import { siteUrl } from "@/lib/seo/metadata";
 
+import { consentState, everything } from "./support/consent";
 import { blockThirdParty, serveAt, settle } from "./support/network";
 
 // The home page reports one Google Ads conversion each time it opens on the
 // production domain, as the old site did (commit 9b768a6); previews and
-// development machines report none. The server under test is served at the
-// production origin here, and requests to Google are blocked, so the calls are
-// read from the tag's queue (window.dataLayer) that gtag.js sends.
+// development machines report none. Since M5 the tags load only after the
+// visitor agrees to them (consent.spec.ts covers refusing); here the visitor
+// agreed to everything. The server under test is served at the production
+// origin, and requests to Google are blocked, so the calls are read from the
+// tag's queue (window.dataLayer) that gtag.js sends.
 // The editor and its preview are covered in admin-editor.spec.ts.
 
 const { googleAdsId, googleAdsHomeConversion } = content.site.integrations;
 const production = siteUrl().origin;
+
+test.use({ storageState: consentState(everything) });
 
 test.beforeEach(async ({ context, baseURL }) => {
   await blockThirdParty(context, baseURL!);

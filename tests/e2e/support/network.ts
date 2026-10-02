@@ -26,11 +26,14 @@ export async function blockThirdParty(context: BrowserContext, baseURL: string):
  */
 export async function serveAt(context: BrowserContext, baseURL: string, origin: string): Promise<void> {
   const local = new URL(baseURL).origin;
+  const { host } = new URL(origin);
   await context.route(
     (url) => url.origin === origin,
     async (route) => {
       const { pathname, search } = new URL(route.request().url());
-      await route.fulfill({ response: await route.fetch({ url: `${local}${pathname}${search}`, maxRedirects: 0 }) });
+      // The host the browser asked for, as a proxy reports it: Server Actions check it against the Origin header.
+      const headers = { ...(await route.request().allHeaders()), "x-forwarded-host": host };
+      await route.fulfill({ response: await route.fetch({ url: `${local}${pathname}${search}`, headers, maxRedirects: 0 }) });
     },
   );
 }

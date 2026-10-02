@@ -245,6 +245,7 @@ export const uiKeys = [
   "unverifiedNote",
   "packageContactNote",
   "callSales",
+  "requestCallback",
 ] as const;
 export type UiKey = (typeof uiKeys)[number];
 
@@ -252,6 +253,66 @@ const ui = z.strictObject(Object.fromEntries(uiKeys.map((key) => [key, localized
 
 /** Google Ads `send_to`: the account (AW-…) and the conversion's label. */
 const adsConversionPattern = /^(AW-[0-9]+)\/[A-Za-z0-9_-]+$/;
+
+/** Copy of the call-back form (M5); the fields themselves are fixed. */
+export const leadFormCopy = z.strictObject({
+  name: localizedText,
+  phone: localizedText,
+  phoneHint: localizedText,
+  province: localizedText,
+  provincePlaceholder: localizedText,
+  area: localizedText,
+  areaHint: localizedText,
+  service: localizedText,
+  services: z.strictObject({ broadband: localizedText, mobile: localizedText, solar: localizedText, other: localizedText }),
+  package: localizedText,
+  packageRemove: localizedText,
+  time: localizedText,
+  times: z.strictObject({ anytime: localizedText, morning: localizedText, afternoon: localizedText, evening: localizedText }),
+  message: localizedText,
+  optional: localizedText,
+  consent: localizedText,
+  policyLink: localizedText,
+  submit: localizedText,
+  sending: localizedText,
+  successHeading: localizedText,
+  successBody: localizedText,
+  another: localizedText,
+  errors: z.strictObject({
+    required: localizedText,
+    phone: localizedText,
+    consent: localizedText,
+    tooLong: localizedText,
+    rateLimited: localizedText,
+    failed: localizedText,
+    unavailable: localizedText,
+    preview: localizedText,
+  }),
+});
+export type LeadFormCopy = z.infer<typeof leadFormCopy>;
+
+/** The cookie banner (PDPA). Changing policyVersion asks every visitor again. */
+export const consentCopy = z.strictObject({
+  policyVersion: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "ใช้วันที่ เช่น 2026-10-02"),
+  heading: localizedText,
+  body: localizedText,
+  policyLink: localizedText,
+  acceptAll: localizedText,
+  rejectAll: localizedText,
+  customize: localizedText,
+  save: localizedText,
+  necessaryTitle: localizedText,
+  necessaryBody: localizedText,
+  alwaysOn: localizedText,
+  analyticsTitle: localizedText,
+  analyticsBody: localizedText,
+  adsTitle: localizedText,
+  adsBody: localizedText,
+  chatTitle: localizedText,
+  chatBody: localizedText,
+  settingsLink: localizedText,
+});
+export type ConsentCopy = z.infer<typeof consentCopy>;
 
 const navItem = z.strictObject({
   id: stableId,
@@ -284,6 +345,8 @@ export const siteSettings = z.strictObject({
     copyright: localizedText,
   }),
   contactBand: z.strictObject({ heading: localizedText, description: localizedText, tone }),
+  leadForm: leadFormCopy,
+  consent: consentCopy,
   ui,
   seo: z.strictObject({ siteName: localizedText, description: localizedText, image: mediaRef }),
   /** Brand colours; every text/background pair must keep 4.5:1. */
@@ -525,8 +588,8 @@ export const contactPage = z.strictObject({
       .min(1),
     tone,
   }),
-  /** Band under the channels asking visitors to request a call back. */
-  callback: z.strictObject({ note: localizedText, tone }),
+  /** The call-back request form under the channels (M5); its copy is site.leadForm. */
+  callback: z.strictObject({ heading: localizedText, description: localizedText, tone }),
 });
 export type ContactPage = z.infer<typeof contactPage>;
 

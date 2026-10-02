@@ -2,11 +2,14 @@ import { AdminNav } from "@/components/admin/AdminNav";
 import { BrandMark } from "@/components/admin/BrandMark";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 import { requireActiveAdmin } from "@/lib/auth/access";
+import { createClient } from "@/lib/supabase/server";
 
 // Every console page is behind an active Admin membership. Pages and Server
 // Actions repeat the check themselves; this layout only guards rendering.
 export default async function ConsoleLayout({ children }: { children: React.ReactNode }) {
   const access = await requireActiveAdmin();
+  // New call-back requests (M5); before the M5 migration the count is just absent.
+  const { count: newLeads } = await (await createClient()).from("leads").select("id", { count: "exact", head: true }).eq("status", "new");
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[var(--tm-admin-nav-width)_minmax(0,1fr)]">
@@ -19,7 +22,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
         <div className="hidden px-5 py-6 lg:block">
           <BrandMark onInk />
         </div>
-        <AdminNav />
+        <AdminNav newLeads={newLeads ?? 0} />
         <div className="mt-auto hidden border-t border-white/15 px-5 py-5 lg:block">
           <p className="text-tm-caption text-white/70">เข้าสู่ระบบในชื่อ</p>
           <p className="truncate text-tm-small font-semibold" title={access.email ?? undefined}>

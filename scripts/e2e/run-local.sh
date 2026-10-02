@@ -8,5 +8,8 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 eval "$(bash scripts/supabase/local-env.sh)"
 
+# The suites change the database directly (and the publish suite clears its
+# releases); a data cache kept from an earlier build would still hold them.
+rm -rf .next/cache/fetch-cache
 npm run build
 npx playwright test "$@"
