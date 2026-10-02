@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { content, getMedia } from "@/lib/content";
+import { mediaIn } from "@/lib/content/lookup";
 import { tx } from "@/lib/content/render";
-import type { Seo } from "@/lib/content/schema";
+import type { Seo, SiteContent } from "@/lib/content/schema";
 import { defaultLocale, localizePath, locales, type Locale } from "@/lib/i18n/locales";
 
 /** Public origin for canonical URLs, sitemaps and social cards. */
@@ -20,9 +20,9 @@ export function languageAlternates(path: string): Record<string, string> {
   };
 }
 
-export function pageMetadata({ locale, path, seo }: { locale: Locale; path: string; seo: Seo }): Metadata {
+export function pageMetadata({ locale, path, seo, content }: { locale: Locale; path: string; seo: Seo; content: SiteContent }): Metadata {
   const { site } = content;
-  const image = getMedia(seo.image ?? site.seo.image);
+  const image = mediaIn(content, seo.image ?? site.seo.image);
   const title = tx(seo.title, locale);
   const description = tx(seo.description, locale);
   const url = localizePath(path, locale);

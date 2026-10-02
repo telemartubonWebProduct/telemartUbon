@@ -271,6 +271,14 @@ export function MirrorEditor({ published, working, drafts, problems, draftsAvail
         <button type="button" className="min-h-8 rounded-tm-control border border-white/25 px-2.5 text-tm-caption font-semibold hover:border-white" onClick={() => select("catalog")}>
           แพ็กเกจและสิทธิประโยชน์
         </button>
+        {/* Review and publish the saved drafts (M4); waiting edits save first. */}
+        <Link
+          href="/admin/publish"
+          onClick={() => store.flushAll()}
+          className="min-h-8 rounded-tm-control bg-tm-red px-2.5 py-1.5 text-tm-caption font-semibold text-tm-on-red hover:bg-tm-red-press"
+        >
+          เผยแพร่…
+        </Link>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <p role="status" aria-live="polite" data-save-status={summary.status} className={`rounded-tm-pill px-3 py-1 text-tm-caption font-semibold ${statusTone}`}>
             {summary.status === "clean" ? (drafted.length > 0 ? "ร่างบันทึกไว้แล้ว" : "ตรงกับฉบับที่เผยแพร่") : summaryText[summary.status]}

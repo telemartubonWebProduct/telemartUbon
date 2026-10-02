@@ -6,11 +6,7 @@ import { requireActiveAdmin } from "@/lib/auth/access";
 
 export const metadata: Metadata = { title: "ภาพรวม" };
 
-const upcoming = [
-  { label: "เผยแพร่ร่าง ประวัติการแก้ไข และย้อนกลับ", milestone: "M4" },
-  { label: "อัปโหลดรูปใหม่เข้าคลังสื่อ", milestone: "M4" },
-  { label: "คำขอให้ติดต่อกลับและรายงาน", milestone: "M5" },
-];
+const upcoming = [{ label: "คำขอให้ติดต่อกลับและรายงาน", milestone: "M5" }];
 
 export default async function AdminOverviewPage() {
   const access = await requireActiveAdmin();
@@ -49,8 +45,20 @@ export default async function AdminOverviewPage() {
               แก้ไขหน้าเว็บ (Mirror Editor)
             </Link>
             <span className="text-tm-small text-tm-muted">
-              แก้ข้อความ รูป ปุ่ม และสีบนหน้าจริง บันทึกเป็นร่างอัตโนมัติ หน้าเว็บจริงยังไม่เปลี่ยนจนกว่าจะเผยแพร่ (M4)
+              แก้ข้อความ รูป ปุ่ม สี แพ็กเกจ และอัปโหลดรูป บันทึกเป็นร่างอัตโนมัติ หน้าเว็บจริงยังไม่เปลี่ยนจนกว่าจะเผยแพร่
             </span>
+          </li>
+          <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+            <Link href="/admin/publish" className={textLink}>
+              เผยแพร่
+            </Link>
+            <span className="text-tm-small text-tm-muted">ดูความต่างของร่างทั้งหมดกับหน้าเว็บ แล้วเผยแพร่ในครั้งเดียว</span>
+          </li>
+          <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+            <Link href="/admin/releases" className={textLink}>
+              ประวัติการเผยแพร่
+            </Link>
+            <span className="text-tm-small text-tm-muted">ใครเผยแพร่เมื่อไร และย้อนกลับไปฉบับก่อนได้</span>
           </li>
         </ul>
       </section>

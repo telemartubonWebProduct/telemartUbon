@@ -1,24 +1,20 @@
-import type { Metadata } from "next";
-
 import { AdsConversion } from "@/components/site/AdsConversion";
-import { renderContext } from "@/components/site/context";
-import { PageView } from "@/components/site/pages/PageView";
-import { content } from "@/lib/content";
-import { pageLocale } from "@/lib/i18n/page";
-import { pageMetadata, siteUrl } from "@/lib/seo/metadata";
+import { getPublishedContent } from "@/lib/content/published";
+import { siteUrl } from "@/lib/seo/metadata";
 
-const page = content.pages.home;
+import { pageRoute } from "./page-route";
 
-export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
-  return pageMetadata({ locale: await pageLocale(params), path: page.path, seo: page.seo });
-}
+const route = pageRoute("home");
 
-export default async function Page({ params }: PageProps<"/[locale]">) {
+export const generateMetadata = route.generateMetadata;
+
+export default async function Page(props: { params: Promise<{ locale: string }> }) {
+  const { site } = await getPublishedContent();
   return (
     <>
-      <PageView ctx={renderContext(content, await pageLocale(params))} pageId="home" />
+      <route.Page {...props} />
       {/* Every opening of the home page on the production domain counts as a Google Ads conversion, as on the old site. */}
-      <AdsConversion sendTo={content.site.integrations.googleAdsHomeConversion} productionHost={siteUrl().hostname} />
+      <AdsConversion sendTo={site.integrations.googleAdsHomeConversion} productionHost={siteUrl().hostname} />
     </>
   );
 }

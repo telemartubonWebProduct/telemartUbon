@@ -44,6 +44,38 @@ export type Database = {
                   Relationships: [
                     
                   ]
+                },"content_publication": {
+                  Row: {
+                    "published_at": string,"published_by": string | null,"release_number": number,"singleton": boolean
+                  }
+                  Insert: {
+                    "published_at"?: string,"published_by"?: string | null,"release_number": number,"singleton"?: boolean
+                  }
+                  Update: {
+                    "published_at"?: string,"published_by"?: string | null,"release_number"?: number,"singleton"?: boolean
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "content_publication_release_number_fkey"
+      columns: ["release_number"]
+isOneToOne: false
+      referencedRelation: "content_releases"
+      referencedColumns: ["number"]
+    }
+                  ]
+                },"content_releases": {
+                  Row: {
+                    "content": NonNullable<Json>,"created_at": string,"created_by": string | null,"created_by_email": string | null,"id": number,"kind": string,"note": string | null,"number": number,"restored_from": number | null,"schema_version": number
+                  }
+                  Insert: {
+                    "content": NonNullable<Json>,"created_at"?: string,"created_by"?: string | null,"created_by_email"?: string | null,"id"?: never,"kind": string,"note"?: string | null,"number": number,"restored_from"?: number | null,"schema_version": number
+                  }
+                  Update: {
+                    "content"?: NonNullable<Json>,"created_at"?: string,"created_by"?: string | null,"created_by_email"?: string | null,"id"?: never,"kind"?: string,"note"?: string | null,"number"?: number,"restored_from"?: number | null,"schema_version"?: number
+                  }
+                  Relationships: [
+                    
+                  ]
                 }
           }
           Views: {
@@ -52,6 +84,17 @@ export type Database = {
           Functions: {
             "discard_content_draft":
 { Args: { "p_document_id": string,"p_expected_revision": number }; Returns: undefined
+                           },
+"publish_content":
+{ Args: { "p_based_on": number,"p_content": Json,"p_documents": Json,"p_note"?: string,"p_schema_version": number }; Returns: number
+                           },
+"published_content":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "content": Json,"number": number,"published_at": string,"schema_version": number
+            }[]
+                           },
+"rollback_content":
+{ Args: { "p_based_on": number,"p_note"?: string,"p_release": number }; Returns: number
                            },
 "save_content_draft":
 { Args: { "p_body": Json,"p_document_id": string,"p_expected_revision": number,"p_schema_version": number }; Returns: {

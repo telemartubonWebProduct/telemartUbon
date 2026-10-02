@@ -50,7 +50,7 @@ select lives_ok(
   $$ insert into storage.objects (bucket_id, name, owner) values ('media', 'uploads/admin.webp', 'b1111111-1111-4111-8111-111111111111') $$,
   'an Admin uploads to the media bucket'
 );
-select is((select count(*)::integer from storage.objects where bucket_id = 'media'), 1, 'an Admin lists the media bucket');
+select is((select count(*)::integer from storage.objects where bucket_id = 'media' and name = 'uploads/admin.webp'), 1, 'an Admin lists the media bucket');
 select throws_ok(
   $$ insert into storage.objects (bucket_id, name) values ('other', 'uploads/elsewhere.webp') $$,
   '42501', null,

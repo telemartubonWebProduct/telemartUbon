@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 const sections = [
   { href: "/admin", label: "ภาพรวม" },
   { href: "/admin/editor", label: "แก้ไขหน้าเว็บ" },
+  { href: "/admin/publish", label: "เผยแพร่" },
+  { href: "/admin/releases", label: "ประวัติการเผยแพร่" },
 ] as const;
 
 export function AdminNav() {

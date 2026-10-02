@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 
 import { MirrorEditor } from "@/components/editor/MirrorEditor";
 import { requireActiveAdmin } from "@/lib/auth/access";
-import { content } from "@/lib/content";
 import { isPageDocumentId } from "@/lib/content/documents";
 import { loadDraftContent } from "@/lib/content/drafts";
+import { getPublishedContent } from "@/lib/content/published";
 import { isLocale } from "@/lib/i18n/locales";
 import { createClient } from "@/lib/supabase/server";
 
@@ -20,6 +20,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/admin/edi
   const pageId = typeof page === "string" && isPageDocumentId(page) ? page : "home";
   const lang = typeof locale === "string" && isLocale(locale) ? locale : "th";
 
+  const content = await getPublishedContent();
   const { content: working, drafts, problems, available } = await loadDraftContent(await createClient(), content);
   return (
     <MirrorEditor

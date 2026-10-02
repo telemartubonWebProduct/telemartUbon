@@ -3,9 +3,9 @@
 import { z } from "zod";
 
 import { getAdminAccess } from "@/lib/auth/access";
-import { content } from "@/lib/content";
 import { isDocumentId, type DocumentId } from "@/lib/content/documents";
 import { discardDraft, saveDraft, type DiscardOutcome, type SaveOutcome } from "@/lib/content/drafts";
+import { getPublishedContent } from "@/lib/content/published";
 import { createClient } from "@/lib/supabase/server";
 
 // Autosave and discard for the Mirror editor. Server Actions are public
@@ -32,7 +32,7 @@ export async function saveDraftAction(input: { documentId: string; expectedRevis
   if (access.status !== "active") return denied;
   try {
     const supabase = await createClient();
-    return await saveDraft(supabase, content, parsed.data.documentId as DocumentId, parsed.data.expectedRevision, parsed.data.body);
+    return await saveDraft(supabase, await getPublishedContent(), parsed.data.documentId as DocumentId, parsed.data.expectedRevision, parsed.data.body);
   } catch (error) {
     console.error("Saving a draft failed", { documentId: parsed.data.documentId, error: error instanceof Error ? error.message : "unknown" });
     return failed;

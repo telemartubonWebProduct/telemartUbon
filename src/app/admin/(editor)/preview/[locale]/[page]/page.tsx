@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import { PreviewCanvas } from "@/components/editor/PreviewCanvas";
 import { isChannel } from "@/components/editor/protocol";
 import { requireActiveAdmin } from "@/lib/auth/access";
-import { content } from "@/lib/content";
 import { isPageDocumentId } from "@/lib/content/documents";
 import { loadDraftContent } from "@/lib/content/drafts";
+import { getPublishedContent } from "@/lib/content/published";
 import { isLocale } from "@/lib/i18n/locales";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,6 +21,6 @@ export default async function PreviewPage({ params, searchParams }: PageProps<"/
   await requireActiveAdmin(`/admin/preview/${locale}/${page}`);
 
   const { channel } = await searchParams;
-  const { content: working } = await loadDraftContent(await createClient(), content);
+  const { content: working } = await loadDraftContent(await createClient(), await getPublishedContent());
   return <PreviewCanvas initialContent={working} initialPage={page} initialLocale={locale} channel={isChannel(channel) ? channel : null} />;
 }
