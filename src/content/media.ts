@@ -158,8 +158,29 @@ export const media = {
     source: "วาดสำหรับเว็บนี้ (scripts/media/router-concept.py)",
   },
 
-  // The opening film of the home page, drawn by scripts/media/film-placeholder.mjs
-  // until the footage briefed for Google Flow is approved (docs/renovation/R1-HOME-FILM.md).
+  // The opening film of the home page: the owner's Google Flow video (sent
+  // 2 Oct 2026 as true_fiber_simplified_15s.mp4), cleaned and turned into frames
+  // by scripts/media/film-frames.mjs (docs/renovation/R1-HOME-FILM.md). The top
+  // 112 px are cropped away to remove the "CapCut AI" watermark, and the video
+  // ends at 11.2 s, before an AI-drawn router with a "true" logo.
+  "film-home-v1": {
+    src: "/media/film/home-v1/landscape/0001.avif",
+    width: 1600,
+    height: 900,
+    kind: "generated",
+    alt: {
+      th: "ภาพประกอบบินจากเหนือเมฆยามเย็น ผ่านเมืองที่มีเส้นแสงวิ่ง ลงสู่ถนนในหมู่บ้าน และเข้าไปในห้องนั่งเล่นของบ้าน",
+      en: "Illustration flying from above the clouds at dusk, over a city traced with light, down a quiet street and into a living room",
+    },
+    source: "Google Flow ของเจ้าของ (true_fiber_simplified_15s.mp4, 2 ต.ค. 2026) ครอปขอบบนเพื่อตัดลายน้ำ CapCut และใช้ช่วง 0–11.2 วินาที",
+    sequence: {
+      landscape: { path: "/media/film/home-v1/landscape", format: "avif", frames: 120, width: 1600, height: 900 },
+      portrait: { path: "/media/film/home-v1/portrait", format: "avif", frames: 120, width: 720, height: 1280 },
+    },
+  },
+
+  // The stand-in film drawn by scripts/media/film-placeholder.mjs before the
+  // Google Flow footage arrived; kept so Admins can switch back in the editor.
   "film-home-placeholder": {
     src: "/media/film/home-placeholder/landscape/0001.avif",
     width: 1600,

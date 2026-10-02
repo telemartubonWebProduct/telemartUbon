@@ -27,7 +27,7 @@ export const home: HomePage = {
     ),
   },
   hero: {
-    film: "film-home-placeholder",
+    film: "film-home-v1",
     filmNote: t("ภาพประกอบ ไม่ใช่ภาพเครือข่ายจริง", "Illustration, not the actual network"),
     beats: [
       {
@@ -38,7 +38,8 @@ export const home: HomePage = {
           "Compare True fibre packages by speed, price and benefits in one place, then let our team check your area and book the installation.",
         ),
         align: "start",
-        textColor: "dark",
+        // The film opens at dusk above the clouds: white words over the dark side gradient.
+        textColor: "light",
       },
       {
         id: "network",
