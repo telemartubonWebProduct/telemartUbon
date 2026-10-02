@@ -14,6 +14,8 @@
 
 อัปเดต 2026-10-02: **งานค้างจาก `telemart-prompts.md` ทำบน branch `renovation/backlog-2026-10-01`** (เจ้าของสั่งทำให้เสร็จแล้ว push เข้า `main` ครั้งเดียว): คืน conversion ของ Google Ads เฉพาะโดเมนจริง, ฟอนต์ local, ไฟล์ตรวจราคา `price-review-2026-10-01.xlsx`, R2 โปรหน้าแรก, R3 หน้าแพ็กเกจ (กรอง/เรียง/เทียบ/หน้ารายละเอียด), R4 เพิ่ม/ลบ/เรียง + อัปโหลดรูป + รูป Google Flow, M4 เผยแพร่/ประวัติ/ย้อนกลับ และ M5 ฟอร์มขอให้ติดต่อกลับ + consent คุกกี้ + GA4 (`G-DQGCC5J4YM`) + กล่องคำขอและรายงานในหลังบ้าน ดู [R2](R2-HOME-PROMOS.md), [R3](R3-PACKAGE-PAGES.md), [R4](R4-CATALOG-AND-MEDIA.md), [M4](M4-PUBLISH.md), [M5](M5-LEADS.md) **migration ที่เจ้าของต้อง apply ที่ dev project ตามลำดับ**: `20260930160641_content_drafts.sql` (M3), `20261001160000_catalog_and_media.sql` (R4), `20261002090000_content_releases.sql` (M4), `20261002120000_leads.sql` (M5) ด้วย `npm run db:push:dev` แล้ว `npm run db:push:dev:apply` และตั้ง `SUPABASE_SECRET_KEY` (Sensitive) ใน Vercel ก่อนเปิดใช้ฟอร์ม
 
+อัปเดต 2026-10-03: หนังหน้าแรกใช้วิดีโอ Google Flow ของเจ้าของแล้ว ([R1-HOME-FILM.md](R1-HOME-FILM.md)) และ **M6 ส่วนที่ทำใน repo เสร็จ** — smoke test, backup/restore, accessibility, performance, rollback และ checklist ของเจ้าของใน [M6-LAUNCH.md](M6-LAUNCH.md) เจ้าของยังต้องตัดสินใจว่า production ใช้ Supabase project ไหน (Claude ไม่สร้าง project ใหม่โดยไม่ถาม)
+
 ## ข้อสรุปที่ต้องรักษา
 
 | เรื่อง | ข้อสรุป |

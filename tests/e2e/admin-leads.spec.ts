@@ -1,5 +1,6 @@
 import { randomBytes, randomInt, randomUUID } from "node:crypto";
 
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { content } from "@/lib/content";
@@ -177,4 +178,15 @@ test("the report counts requests from the database and points to GA4 for visits 
   expect(total).toBeGreaterThanOrEqual(phones.length);
   await expect(page.getByText(content.site.integrations.ga4MeasurementId!)).toBeVisible();
   await expect(page.getByRole("cell", { name: "generate_lead" })).toBeVisible();
+});
+
+test("the inbox, a request and the report pass the automated WCAG checks", async ({ page }) => {
+  const lead = await request("ตรวจ การเข้าถึง", { note: "ทดสอบ" });
+  await signIn(page, admin, "/admin/leads");
+  await page.waitForURL((url) => url.pathname === "/admin/leads");
+  for (const path of ["/admin/leads", `/admin/leads/${lead.id}`, "/admin/reports"]) {
+    await page.goto(path);
+    const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+    expect(violations.map((violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(" ")).join(", ")}`), path).toEqual([]);
+  }
 });

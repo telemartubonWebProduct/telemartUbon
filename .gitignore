@@ -33,6 +33,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# database backups (personal data): scripts/supabase/backup.mjs
+/backups/
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example

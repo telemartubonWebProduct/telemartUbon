@@ -149,6 +149,16 @@
 - schema เนื้อหารุ่น 4: `site.leadForm`, `site.consent`, `ui.requestCallback`, `pages.contact.callback` เป็น heading/description — release รุ่น 3 (ถ้ามี) จะไม่ถูกแสดงและเว็บใช้ `src/content` จนกว่าจะเผยแพร่ใหม่
 - เนื้อหาที่เผยแพร่ถูก cache สูงสุด 1 วัน (นอกเหนือจากล้างทันทีเมื่อเผยแพร่)
 
+## ค่าเริ่มต้นที่เลือกระหว่าง M6 (2026-10-03, แก้ได้)
+
+รายละเอียดใน [M6-LAUNCH.md](M6-LAUNCH.md)
+
+- ไม่สร้าง Supabase project ใหม่ (รอเจ้าของ) เสนอให้ production ใช้ project ใหม่และ dev project เป็น preview/dev
+- backup ด้วย Supabase CLI (`db dump` + storage cp) เพราะ Free ไม่มี backup อัตโนมัติ: เก็บ data ของ auth/public/private/storage ไม่รวมแถวที่ migration สร้างเอง กู้คืนแบบ apply migration ก่อนแล้วโหลดข้อมูล
+- smoke test แยก config อ่านอย่างเดียว บล็อก third party ใช้กับ production หลัง deploy ทุกครั้ง
+- ตรวจ accessibility ด้วย axe ใน Playwright ทุกหน้าและสถานะสำคัญ; วัด performance ด้วยสคริปต์ lab (Lighthouse CLI เปิด Chromium บนเครื่องนี้ไม่ได้)
+- หนังหน้าแรกจริง `film-home-v1`: ครอปลายน้ำ CapCut และตัดก่อนเราเตอร์โลโก้ true ที่ AI วาด (R1-HOME-FILM.md)
+
 ## คำสั่งเจ้าของหลัง R1 (2026-10-01)
 
 - Google Ads conversion หน้าแรก: เจ้าของสั่งคืนพฤติกรรมเว็บเดิม (commit `9b768a6`) — ยิง `conversion` (`value` 1.0 THB) ครั้งเดียวต่อการเปิดหน้าแรก `/` และ `/en` ทั้งโหลดหน้าใหม่และกดกลับหน้าแรกจากหน้าอื่น หลังแท็กตั้งค่า (`config`) แล้วเสมอ ไม่ยิงในหน้าอื่น, `/admin/preview` และ editor

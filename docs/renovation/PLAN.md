@@ -85,6 +85,8 @@ URL เดิมต้องคงไว้หรือมี redirect map ท�
 
 ผล M5 (2026-10-02): ฟอร์มขอให้ติดต่อกลับในหน้าติดต่อเรา (ตรวจข้อมูล 3 ชั้น, กันส่งซ้ำ, honeypot + จำกัดอัตรา, สำเร็จเมื่อบันทึกจริง), คำขอเก็บใน Supabase ด้วย RLS ผ่าน `submit_lead()` ของ server, หลังบ้านมีกล่องคำขอ ประวัติ CSV และรายงาน, แจ้งเตือนในหลังบ้าน (ตามที่เลือก), ลบข้อมูลส่วนบุคคล 1 ปีหลังปิดอัตโนมัติ, แถบ consent คุกกี้ (GA4/Ads/Tawk โหลดหลังยินยอม) และ GA4 events แยก LINE/โทร/ส่งฟอร์มสำเร็จ; GA4 Data API ยังรอ Property ID + สิทธิ์ รายละเอียดใน [M5-LEADS.md](M5-LEADS.md)
 
+ผล M6 (2026-10-03, ส่วนที่ทำใน repo): smoke test หลัง deploy (`npm run test:smoke`, อ่านอย่างเดียว ใช้กับ production ได้), backup/restore (`db:backup:dev`, `db:backup:local`, `db:restore:local` ซ้อมกู้คืนบน local ผ่าน), ตรวจ accessibility อัตโนมัติ (axe WCAG 2.2 A/AA ทุกหน้า 0 ข้อผิด), วัด performance แบบ lab, วิธี rollback และ checklist ของเจ้าของสำหรับ Vercel/DNS/Supabase Auth/GA4/มือถือจริง; ยังรอเจ้าของตัดสินใจเรื่อง Supabase project ของ production รายละเอียดใน [M6-LAUNCH.md](M6-LAUNCH.md)
+
 ## ขอบเขตการจัดการทุกค่า
 
 - คอนเทนต์: หัวเรื่อง คำอธิบาย ราคา หน่วยความเร็ว เงื่อนไข FAQ labels เมนู footer และข้อความฟอร์ม

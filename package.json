@@ -18,7 +18,11 @@
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "db:push:dev": "node scripts/supabase/push-dev.mjs",
-    "db:push:dev:apply": "node scripts/supabase/push-dev.mjs --apply"
+    "db:push:dev:apply": "node scripts/supabase/push-dev.mjs --apply",
+    "db:backup:dev": "node scripts/supabase/backup.mjs --dev",
+    "db:backup:local": "node scripts/supabase/backup.mjs --local",
+    "db:restore:local": "node scripts/supabase/restore-local.mjs",
+    "test:smoke": "playwright test --config playwright.smoke.config.ts"
   },
   "dependencies": {
     "@google-analytics/data": "7.2.1",
@@ -35,6 +39,7 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.63.0",
     "@types/node": "24.19.0",
     "@types/react": "19.3.0",
