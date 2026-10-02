@@ -58,7 +58,7 @@ describe("every content value has an editor control", () => {
   });
 
   it("keeps structure out of the form", () => {
-    const structural = fields.filter((field) => ["id", "path", "layout", "googleAdsId", "tawkSrc", "src", "category", "group"].includes(field.key));
+    const structural = fields.filter((field) => ["id", "path", "layout", "googleAdsId", "ga4MeasurementId", "tawkSrc", "src", "category", "group"].includes(field.key));
     expect(structural).toEqual([]);
   });
 

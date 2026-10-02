@@ -298,6 +298,73 @@ export const media = {
     "Young woman with her phone among city lights",
   ),
 
+  // Illustrations S1–S8 made in Google Flow from the brief in the owner's Drive (R2/R5).
+  // Generated scenes, no text or logos; checked before use (docs/renovation/R2-HOME-PROMOS.md).
+  "flow-s1-family-streaming": {
+    src: "/media/flow/s1-family-streaming.webp",
+    width: 1920,
+    height: 1072,
+    kind: "generated",
+    alt: { th: "ครอบครัวนั่งดูทีวีด้วยกันในห้องนั่งเล่น", en: "A family watching TV together in their living room" },
+    source: "Google Flow ตามบรีฟ ส่งในโฟลเดอร์ Drive “ส่งไฟล์ที่นี่” 2 ต.ค. 2026 (S1-family-streaming.jpg) แปลงเป็น WebP",
+  },
+  "flow-s2-work-from-home": {
+    src: "/media/flow/s2-work-from-home.webp",
+    width: 1200,
+    height: 896,
+    kind: "generated",
+    alt: { th: "ผู้หญิงประชุมออนไลน์ด้วยแล็ปท็อปที่โต๊ะทำงานในบ้าน", en: "A woman on a video call at her desk at home" },
+    source: "Google Flow ตามบรีฟ ส่งในโฟลเดอร์ Drive “ส่งไฟล์ที่นี่” 2 ต.ค. 2026 (S2-work-from-home.jpg) แปลงเป็น WebP",
+  },
+  "flow-s3-gamer": {
+    src: "/media/flow/s3-gamer.webp",
+    width: 1920,
+    height: 1434,
+    kind: "generated",
+    alt: { th: "วัยรุ่นใส่หูฟังเล่นเกมคอมพิวเตอร์", en: "A teenager with headphones playing a computer game" },
+    source: "Google Flow ตามบรีฟ ส่งในโฟลเดอร์ Drive “ส่งไฟล์ที่นี่” 2 ต.ค. 2026 (S3-gamer.jpg) แปลงเป็น WebP",
+  },
+  "flow-s4-mobile-city": {
+    src: "/media/flow/s4-mobile-city.webp",
+    width: 1920,
+    height: 1434,
+    kind: "generated",
+    alt: { th: "ชายหนุ่มยิ้มดูโทรศัพท์ริมถนนยามเย็น", en: "A young man smiling at his phone on a street at dusk" },
+    source: "Google Flow ตามบรีฟ ส่งในโฟลเดอร์ Drive “ส่งไฟล์ที่นี่” 2 ต.ค. 2026 (S4-mobile-city.jpg) แปลงเป็น WebP",
+  },
+  "flow-s5-friends-phone": {
+    src: "/media/flow/s5-friends-phone.webp",
+    width: 1920,
+    height: 1434,
+    kind: "generated",
+    alt: { th: "เพื่อนสามคนดูคลิปในโทรศัพท์ด้วยกันที่ร้านกลางแจ้ง", en: "Three friends watching a clip on a phone at an outdoor café" },
+    source: "Google Flow ตามบรีฟ ส่งในโฟลเดอร์ Drive “ส่งไฟล์ที่นี่” 2 ต.ค. 2026 (S5-prepaid-friends.jpg) แปลงเป็น WebP",
+  },
+  "flow-s6-technician": {
+    src: "/media/flow/s6-technician.webp",
+    width: 1920,
+    height: 1072,
+    kind: "generated",
+    alt: { th: "ช่างติดตั้งอุปกรณ์เน็ตบ้านบนผนัง เจ้าของบ้านยืนดู", en: "A technician fitting home internet equipment to a wall while the owner looks on" },
+    source: "Google Flow ตามบรีฟ ส่งในโฟลเดอร์ Drive “ส่งไฟล์ที่นี่” 2 ต.ค. 2026 (S6-technician.jpg) แปลงเป็น WebP",
+  },
+  "flow-s7-support": {
+    src: "/media/flow/s7-support.webp",
+    width: 1920,
+    height: 1434,
+    kind: "generated",
+    alt: { th: "เจ้าหน้าที่ใส่ชุดหูฟังกำลังให้คำแนะนำลูกค้า", en: "A support agent with a headset helping a customer" },
+    source: "Google Flow ตามบรีฟ ส่งในโฟลเดอร์ Drive “ส่งไฟล์ที่นี่” 2 ต.ค. 2026 (S7-support.jpg) แปลงเป็น WebP",
+  },
+  "flow-s8-fibre": {
+    src: "/media/flow/s8-fibre.webp",
+    width: 1920,
+    height: 1072,
+    kind: "generated",
+    alt: { th: "เส้นใยแก้วนำแสงสีขาวและแดงบนพื้นสีน้ำเงิน", en: "White and red fibre-optic strands on a blue background" },
+    source: "Google Flow ตามบรีฟ ส่งในโฟลเดอร์ Drive “ส่งไฟล์ที่นี่” 2 ต.ค. 2026 (S8-fibre-abstract.jpg) แปลงเป็น WebP",
+  },
+
   // Apply with an agent
   "agent-support": asset(
     "/assets/HomeInternet/home-tol-Applywithagent.webp",

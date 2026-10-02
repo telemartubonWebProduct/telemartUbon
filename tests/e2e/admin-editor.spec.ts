@@ -25,10 +25,9 @@ test.describe.configure({ mode: "serial" });
 let admin: TestUser;
 let member: TestUser;
 const createdUserIds: string[] = [];
-const documents = ["page:home", "page:contact", "site"];
 const publishedHeading = content.pages.home.hero.beats[0].heading;
 
-/** Every draft goes: tests add packages, pictures and the package order (R4) besides the documents above. */
+/** Every draft goes: the tests write pages, settings, packages, pictures and the package order. */
 async function clearDrafts() {
   const { error } = await serviceClient().from("content_drafts").delete().neq("document_id", "");
   if (error) throw error;

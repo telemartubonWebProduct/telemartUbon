@@ -86,3 +86,15 @@ test("elsewhere, such as a preview deployment, the home page reports none", asyn
     expect(await conversions(page), path).toEqual([]);
   }
 });
+
+test("Google Analytics 4 counts the production domain only", async ({ page }) => {
+  const ga4 = content.site.integrations.ga4MeasurementId!;
+  const ga4Config = async () => (await gtagCalls(page)).filter(([command, id]) => command === "config" && id === ga4);
+  await page.goto(`${production}/monthy`);
+  await tagConfigured(page);
+  expect(await ga4Config()).toHaveLength(1);
+
+  await page.goto("/monthy");
+  await tagConfigured(page);
+  expect(await ga4Config()).toEqual([]);
+});

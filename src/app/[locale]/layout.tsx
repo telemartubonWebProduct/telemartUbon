@@ -43,17 +43,17 @@ export const viewport: Viewport = {
 
 export default async function PublicRootLayout({ children, params }: LayoutProps<"/[locale]">) {
   const locale = await pageLocale(params);
-  const { googleAdsId, tawkSrc } = content.site.integrations;
+  const { googleAdsId, ga4MeasurementId, tawkSrc } = content.site.integrations;
 
   return (
     <html lang={locale} className={fontVariables}>
       {/* Theme colours from site settings; the default theme adds nothing. */}
       <body className="tm-site" style={themeVariables(content.site.theme)}>
         {children}
-        {/* Google Ads base tag, as on the old site; the home page reports its conversion (AdsConversion). */}
+        {/* Google Ads base tag (as on the old site) and Google Analytics 4 on the production domain; the home page reports its Ads conversion (AdsConversion). */}
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} strategy="afterInteractive" />
         <Script id="gtag-init" strategy="afterInteractive">
-          {gtagInitScript(googleAdsId)}
+          {gtagInitScript({ googleAdsId, ga4MeasurementId, productionHost: siteUrl().hostname })}
         </Script>
         {/* Tawk live chat, as on the old site; loaded once the page is idle. */}
         <Script src={tawkSrc} strategy="lazyOnload" />

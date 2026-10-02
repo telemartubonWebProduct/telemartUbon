@@ -145,13 +145,18 @@ export function CatalogManager({ content, published, store, onSelect }: CatalogM
                           <button
                             type="button"
                             className={smallButton}
+                            aria-label={`${item.review.status === "hidden" ? "แสดง" : "ซ่อน"}: ${item.name.th}`}
                             onClick={() => store.edit(`package:${item.id}`, ["review", "status"], item.review.status === "hidden" ? "unverified" : "hidden")}
                           >
                             {item.review.status === "hidden" ? "แสดง" : "ซ่อน"}
-                            <span className="sr-only">: {item.name.th}</span>
                           </button>
-                          <button type="button" className={`${smallButton} hover:border-tm-danger hover:text-tm-danger`} onClick={() => remove(item)}>
-                            ลบ<span className="sr-only">: {item.name.th}</span>
+                          <button
+                            type="button"
+                            className={`${smallButton} hover:border-tm-danger hover:text-tm-danger`}
+                            aria-label={`ลบ: ${item.name.th}`}
+                            onClick={() => remove(item)}
+                          >
+                            ลบ
                           </button>
                         </span>
                       </li>
@@ -173,8 +178,8 @@ export function CatalogManager({ content, published, store, onSelect }: CatalogM
             {removed.map((item) => (
               <li key={item.id} className="flex items-center justify-between gap-2 text-tm-small">
                 <span className="truncate">{item.name.th}</span>
-                <button type="button" className={smallButton} onClick={() => void store.discard(`package:${item.id}`)}>
-                  เอาคืน<span className="sr-only">: {item.name.th}</span>
+                <button type="button" className={smallButton} aria-label={`เอาคืน: ${item.name.th}`} onClick={() => void store.discard(`package:${item.id}`)}>
+                  เอาคืน
                 </button>
               </li>
             ))}
@@ -212,9 +217,10 @@ function BenefitsList({ content, published, store, onSelect }: CatalogManagerPro
                 className={`${smallButton} hover:border-tm-danger hover:text-tm-danger`}
                 disabled={used > 0}
                 title={used > 0 ? "เอาออกจากแพ็กเกจที่ใช้ก่อน จึงลบได้" : undefined}
+                aria-label={`ลบ: ${benefit.label.th}`}
                 onClick={() => store.remove(`benefit:${id}` as DocumentId)}
               >
-                ลบ<span className="sr-only">: {benefit.label.th}</span>
+                ลบ
               </button>
             </li>
           );

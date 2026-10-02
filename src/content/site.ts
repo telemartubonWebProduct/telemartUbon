@@ -173,6 +173,8 @@ export const site: SiteSettings = {
   theme: defaultTheme,
   integrations: {
     googleAdsId: "AW-18007307609",
+    // The owner's GA4 property (web stream tag sent 2 Oct 2026).
+    ga4MeasurementId: "G-DQGCC5J4YM",
     googleAdsHomeConversion: "AW-18007307609/51JQCLqnuIYcENnqxopD",
     tawkSrc: "https://embed.tawk.to/67c0738b25eb41190eae9189/1il3s6mmf",
   },
