@@ -9,6 +9,8 @@ import type { NextConfig } from "next";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL) : null;
 const localSupabase = supabaseUrl !== null && ["127.0.0.1", "localhost"].includes(supabaseUrl.hostname);
 
+const NEW_SITE = "https://www.truegetherth.com";
+
 const nextConfig: NextConfig = {
   experimental: {
     // Public pages sit under a dynamic root segment (src/app/[locale]) and the
@@ -40,13 +42,17 @@ const nextConfig: NextConfig = {
     ];
   },
   async redirects() {
+    // This domain has moved to www.truegetherth.com (owner's decision, 2026-11-12).
+    // The two sites share their URLs, so every page goes to the same path there.
     return [
-      // /th/... would duplicate the unprefixed Thai URLs.
-      { source: "/th", destination: "/", permanent: true },
-      { source: "/th/:path*", destination: "/:path*", permanent: true },
-      // Unfinished "not ready" placeholder from the old site; nothing links to it.
-      { source: "/SoonContent", destination: "/", permanent: true },
-      { source: "/en/SoonContent", destination: "/en", permanent: true },
+      { source: "/th", destination: NEW_SITE, permanent: true },
+      { source: "/th/:path*", destination: `${NEW_SITE}/:path*`, permanent: true },
+      { source: "/SoonContent", destination: NEW_SITE, permanent: true },
+      { source: "/en/SoonContent", destination: `${NEW_SITE}/en`, permanent: true },
+      // Everything else keeps its path. Google's ownership file stays here so
+      // Search Console can still verify this domain for the change of address.
+      { source: "/", destination: NEW_SITE, permanent: true },
+      { source: "/:path((?!google[0-9a-z]+\.html$).+)", destination: `${NEW_SITE}/:path`, permanent: true },
     ];
   },
   async rewrites() {
